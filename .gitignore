@@ -7,6 +7,8 @@
 
 # testing
 /coverage
+/playwright-report/
+/test-results/
 
 # production
 /build
@@ -39,3 +41,6 @@ yarn-error.log*
 
 # setup_tasks.md
 setup_tasks.md
+
+# TypeScript auto-generated files
+next-env.d.ts
