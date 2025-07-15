@@ -6,36 +6,36 @@
 
 ## 主要技術
 
--   **フロントエンド:** Next.js 15 (App Router), TypeScript, Tailwind CSS, shadcn/ui
--   **バックエンド:** Next.js Server Actions, Vercel KV (キャッシュおよび短縮URL用)
--   **AI:** OpenAI Vision API, GPT-4o (講評生成用)
--   **デプロイ:** Vercel
--   **テスト:** Vitest, React Testing Library, MSW, Playwright
+- **フロントエンド:** Next.js 15 (App Router), TypeScript, Tailwind CSS, shadcn/ui
+- **バックエンド:** Next.js Server Actions, Vercel KV (キャッシュおよび短縮URL用)
+- **AI:** OpenAI Vision API, GPT-4o (講評生成用)
+- **デプロイ:** Vercel
+- **テスト:** Vitest, React Testing Library, MSW, Playwright
 
 ## プロジェクト構造
 
 アプリケーションは Next.js の App Router をベースに構築されています。
 
--   `app/`: 主要なアプリケーションルート
-    -   `app/page.tsx`: メインのアップロード画面
-    -   `app/report/[id]/page.tsx`: 講評レポート画面
-    -   `app/s/[id]/page.tsx`: 公開用のシェア画面
--   `app/api/`: Server Actions および Vercel Functions が処理するAPIルート
-    -   `critique/route.ts`: (Node.js Function) OpenAI APIを呼び出し、AIによる講評を生成
-    -   `ogp/route.ts`: (Edge Function) シェア用のOGP画像を生成
-    -   `upload/route.ts`: (Edge Function) 画像のリサイズ、EXIF抽出、Vercel KVへのメタデータ保存
--   `components/`: 再利用可能なReactコンポーネント (shadcn/uiベース)
--   `lib/`: ユーティリティ関数 (EXIF抽出、OpenAI APIクライアントなど)
--   `tests/`: 単体テストおよびE2Eテスト
+- `app/`: 主要なアプリケーションルート
+  - `app/page.tsx`: メインのアップロード画面
+  - `app/report/[id]/page.tsx`: 講評レポート画面
+  - `app/s/[id]/page.tsx`: 公開用のシェア画面
+- `app/api/`: Server Actions および Vercel Functions が処理するAPIルート
+  - `critique/route.ts`: (Node.js Function) OpenAI APIを呼び出し、AIによる講評を生成
+  - `ogp/route.ts`: (Edge Function) シェア用のOGP画像を生成
+  - `upload/route.ts`: (Edge Function) 画像のリサイズ、EXIF抽出、Vercel KVへのメタデータ保存
+- `components/`: 再利用可能なReactコンポーネント (shadcn/uiベース)
+- `lib/`: ユーティリティ関数 (EXIF抽出、OpenAI APIクライアントなど)
+- `tests/`: 単体テストおよびE2Eテスト
 
 ## 主要コマンド
 
--   **`npm run dev`**: 開発サーバーを起動します。
--   **`npm run build`**: プロダクション用にアプリケーションをビルドします。
--   **`npm run start`**: プロダクションサーバーを起動します。
--   **`npm run test`**: Vitestで単体テストを実行します。
--   **`npm run test:e2e`**: PlaywrightでE2Eテストを実行します。
--   **`npm run lint`**: ESLintとPrettierでコードの静的解析を実行します。
+- **`npm run dev`**: 開発サーバーを起動します。
+- **`npm run build`**: プロダクション用にアプリケーションをビルドします。
+- **`npm run start`**: プロダクションサーバーを起動します。
+- **`npm run test`**: Vitestで単体テストを実行します。
+- **`npm run test:e2e`**: PlaywrightでE2Eテストを実行します。
+- **`npm run lint`**: ESLintとPrettierでコードの静的解析を実行します。
 
 ## 開発ワークフロー
 
@@ -48,8 +48,8 @@
 
 ## AIへの指示
 
--   **コードスタイル:** 既存のコードスタイル（TypeScript, ESLint, Prettierベース）に従ってください。
--   **コンポーネント:** UIコンポーネントには `shadcn/ui` を使用してください。事前の相談なく他のUIライブラリを導入しないでください。
--   **状態管理:** React Server Components および Client Components のフックを使用してください。当面、複雑なグローバル状態管理ライブラリの導入は避けてください。
--   **API連携:** OpenAI APIとの通信には、`lib/openai.ts` に定義されたクライアントを使用してください。テストではMSWを用いてAPI応答をモックしてください。
--   **コミット:** 変更の「なぜ」を説明する、明確で簡潔なコミットメッセージを記述してください。
+- **コードスタイル:** 既存のコードスタイル（TypeScript, ESLint, Prettierベース）に従ってください。
+- **コンポーネント:** UIコンポーネントには `shadcn/ui` を使用してください。事前の相談なく他のUIライブラリを導入しないでください。
+- **状態管理:** React Server Components および Client Components のフックを使用してください。当面、複雑なグローバル状態管理ライブラリの導入は避けてください。
+- **API連携:** OpenAI APIとの通信には、`lib/openai.ts` に定義されたクライアントを使用してください。テストではMSWを用いてAPI応答をモックしてください。
+- **コミット:** 変更の「なぜ」を説明する、明確で簡潔なコミットメッセージを記述してください。
