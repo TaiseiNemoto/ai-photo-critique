@@ -1,103 +1,283 @@
-import Image from "next/image";
+import { useState, useCallback } from "react"
+import { useDropzone } from "react-dropzone"
+import { Card, CardContent } from "/components/ui/card"
+import { Button } from "/components/ui/button"
+import { Badge } from "/components/ui/badge"
+import { Camera, Upload, ImageIcon, Sparkles, ArrowRight } from "lucide-react"
+import Image from "next/image"
 
-export default function Home() {
+interface ExifData {
+  fNumber?: string
+  exposureTime?: string
+  iso?: string
+  lensModel?: string
+  make?: string
+  model?: string
+}
+
+interface UploadedImage {
+  file: File
+  preview: string
+  exif?: ExifData
+}
+
+export default function UploadPage() {
+  const [uploadedImage, setUploadedImage] = useState<UploadedImage | null>(null)
+  const [isProcessing, setIsProcessing] = useState(false)
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const file = acceptedFiles[0]
+    if (file) {
+      const preview = URL.createObjectURL(file)
+
+      // Mock EXIF data extraction (in real app, this would be done server-side)
+      const mockExif: ExifData = {
+        fNumber: "f/2.8",
+        exposureTime: "1/250s",
+        iso: "ISO 200",
+        lensModel: "Sony FE 24-70mm F2.8 GM",
+        make: "Sony",
+        model: "α7R V",
+      }
+
+      setUploadedImage({
+        file,
+        preview,
+        exif: mockExif,
+      })
+    }
+  }, [])
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "image/*": [".jpeg", ".jpg", ".png", ".heic", ".webp"],
+    },
+    maxFiles: 1,
+    maxSize: 10 * 1024 * 1024, // 10MB
+  })
+
+  const handleCameraCapture = () => {
+    // Mobile camera capture would be implemented here
+    const input = document.createElement("input")
+    input.type = "file"
+    input.accept = "image/*"
+    input.capture = "environment"
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (file) {
+        onDrop([file])
+      }
+    }
+    input.click()
+  }
+
+  const handleGenerateCritique = async () => {
+    if (!uploadedImage) return
+
+    setIsProcessing(true)
+    // In real app, this would call the critique API
+    setTimeout(() => {
+      // Navigate to report page
+      window.location.href = "/report/demo"
+    }, 2000)
+  }
+
+  const resetUpload = () => {
+    if (uploadedImage) {
+      URL.revokeObjectURL(uploadedImage.preview)
+    }
+    setUploadedImage(null)
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Sparkles className="h-8 w-8 text-gray-600" />
+              <h1 className="text-3xl font-bold text-gray-900">Photo-Critique</h1>
+            </div>
+            <p className="text-lg text-gray-700 mb-2">あなたの写真を数秒でAI講評</p>
+            <p className="text-sm text-gray-500">
+              技術・構図・色彩の3つの観点から、プロレベルのフィードバックを瞬時に取得
+            </p>
+          </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          {!uploadedImage ? (
+            /* Upload Zone */
+            <Card className="border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors bg-gray-50/50">
+              <CardContent className="p-8">
+                <div
+                  {...getRootProps()}
+                  className={`text-center cursor-pointer transition-all duration-200 ${isDragActive ? "scale-105" : ""}`}
+                >
+                  <input {...getInputProps()} />
+
+                  {/* Desktop Upload */}
+                  <div className="hidden md:block">
+                    <div className="mx-auto w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 border border-gray-200 shadow-sm">
+                      <Upload className="h-12 w-12 text-gray-500" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      {isDragActive ? "画像をドロップしてください" : "画像をドラッグ&ドロップ"}
+                    </h3>
+                    <p className="text-gray-500 mb-6">または、クリックしてファイルを選択</p>
+                  </div>
+
+                  {/* Mobile Upload */}
+                  <div className="md:hidden">
+                    <div className="mx-auto w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 border border-gray-200 shadow-sm">
+                      <Camera className="h-10 w-10 text-gray-500" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">写真を撮影またはアップロード</h3>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full sm:w-auto bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleCameraCapture()
+                      }}
+                    >
+                      <Camera className="h-4 w-4 mr-2" />
+                      撮影してアップロード
+                    </Button>
+                    <Button
+                      type="button"
+                      className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white border-0"
+                    >
+                      <ImageIcon className="h-4 w-4 mr-2" />
+                      ファイルを選択
+                    </Button>
+                  </div>
+
+                  <p className="text-xs text-gray-400 mt-4">対応形式: JPEG, PNG, HEIC, WebP (最大10MB)</p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            /* Preview & EXIF */
+            <div className="space-y-6">
+              <Card className="bg-white border-gray-200 shadow-sm">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">プレビュー</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={resetUpload}
+                      className="text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                    >
+                      別の画像を選択
+                    </Button>
+                  </div>
+
+                  <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden mb-4 border border-gray-200">
+                    <Image
+                      src={uploadedImage.preview || "/placeholder.svg"}
+                      alt="アップロード画像"
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+
+                  {/* EXIF Summary */}
+                  {uploadedImage.exif && (
+                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                      <h4 className="text-sm font-medium text-gray-700 mb-3">撮影情報</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {uploadedImage.exif.fNumber && (
+                          <Badge variant="secondary" className="bg-white text-gray-700 border-gray-300">
+                            {uploadedImage.exif.fNumber}
+                          </Badge>
+                        )}
+                        {uploadedImage.exif.exposureTime && (
+                          <Badge variant="secondary" className="bg-white text-gray-700 border-gray-300">
+                            {uploadedImage.exif.exposureTime}
+                          </Badge>
+                        )}
+                        {uploadedImage.exif.iso && (
+                          <Badge variant="secondary" className="bg-white text-gray-700 border-gray-300">
+                            {uploadedImage.exif.iso}
+                          </Badge>
+                        )}
+                        {uploadedImage.exif.lensModel && (
+                          <Badge
+                            variant="secondary"
+                            className="hidden sm:inline-flex bg-white text-gray-700 border-gray-300"
+                          >
+                            {uploadedImage.exif.lensModel}
+                          </Badge>
+                        )}
+                      </div>
+                      {uploadedImage.exif.make && uploadedImage.exif.model && (
+                        <p className="text-xs text-gray-500 mt-2">
+                          {uploadedImage.exif.make} {uploadedImage.exif.model}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Generate Button */}
+              <div className="text-center">
+                <Button
+                  size="lg"
+                  onClick={handleGenerateCritique}
+                  disabled={isProcessing}
+                  className="bg-gray-900 text-white hover:bg-gray-800 px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 border-0"
+                >
+                  {isProcessing ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                      AI講評を生成中...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-5 w-5 mr-2" />
+                      講評を生成する
+                      <ArrowRight className="h-5 w-5 ml-2" />
+                    </>
+                  )}
+                </Button>
+                <p className="text-sm text-gray-500 mt-3">通常2-3秒で完了します</p>
+              </div>
+            </div>
+          )}
+
+          {/* Features */}
+          <div className="mt-12 grid md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 border border-gray-200 shadow-sm">
+                <span className="text-gray-700 font-bold">技</span>
+              </div>
+              <h4 className="font-semibold text-gray-900 mb-1">技術面</h4>
+              <p className="text-sm text-gray-600">露出・ピント・ノイズなどの技術的評価</p>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 border border-gray-200 shadow-sm">
+                <span className="text-gray-700 font-bold">構</span>
+              </div>
+              <h4 className="font-semibold text-gray-900 mb-1">構図</h4>
+              <p className="text-sm text-gray-600">三分割法・対称性・視線誘導の分析</p>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 border border-gray-200 shadow-sm">
+                <span className="text-gray-700 font-bold">色</span>
+              </div>
+              <h4 className="font-semibold text-gray-900 mb-1">色彩</h4>
+              <p className="text-sm text-gray-600">色調・彩度・コントラストの評価</p>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
     </div>
-  );
+  )
 }
