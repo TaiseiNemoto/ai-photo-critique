@@ -1,8 +1,10 @@
+"use client"
+
 import { useState, useCallback } from "react"
 import { useDropzone } from "react-dropzone"
-import { Card, CardContent } from "/components/ui/card"
-import { Button } from "/components/ui/button"
-import { Badge } from "/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { Camera, Upload, ImageIcon, Sparkles, ArrowRight } from "lucide-react"
 import Image from "next/image"
 
