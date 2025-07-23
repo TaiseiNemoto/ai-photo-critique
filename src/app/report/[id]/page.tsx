@@ -6,9 +6,34 @@ import { ArrowLeft, Share2, Sparkles } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
-export default function ReportDemoPage() {
+interface ReportPageProps {
+  params: {
+    id: string
+  }
+}
+
+export default function ReportPage({ params }: ReportPageProps) {
+  // In real app, this would fetch data based on params.id from Vercel KV
+  // For now, using mock data
+  const reportData = {
+    image: "/placeholder.svg?height=400&width=600",
+    technical: "• ピントは被写体の目にしっかりと合っており、シャープネスも適切です\n• 露出は全体的にバランスが取れており、ハイライトの飛びやシャドウの潰れもありません\n• ISO感度の設定も適切で、ノイズは最小限に抑えられています",
+    composition: "• 三分割法の交点に被写体を配置し、安定感のある構図になっています\n• 前景・中景・背景の奥行き感が効果的に表現されています\n• 視線の流れが自然で、被写体への注目を促す構成です",
+    color: "• 補色関係が効果的に活用され、被写体が際立っています\n• 全体的な色調は統一感があり、温かみのある印象を与えます\n• 彩度とコントラストのバランスが良く、自然な仕上がりです",
+    exif: {
+      fNumber: "f/2.8",
+      exposureTime: "1/250s",
+      iso: "200",
+      focalLength: "35mm",
+      lens: "Sony FE 24-70mm F2.8 GM",
+      camera: "Sony α7R V",
+    },
+  }
+
   const handleShare = () => {
-    navigator.clipboard.writeText(window.location.origin + "/s/demo")
+    // Generate share URL using the report ID
+    const shareUrl = `${window.location.origin}/s/${params.id}`
+    navigator.clipboard.writeText(shareUrl)
     // In real app, show toast notification
     alert("シェア用リンクをコピーしました！")
   }
@@ -34,7 +59,7 @@ export default function ReportDemoPage() {
             <CardContent className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">分析対象画像</h3>
               <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                <Image src="/placeholder.svg?height=400&width=600" alt="分析対象の写真" fill className="object-cover" />
+                <Image src={reportData.image} alt="分析対象の写真" fill className="object-cover" />
               </div>
             </CardContent>
           </Card>
@@ -51,10 +76,8 @@ export default function ReportDemoPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700 leading-relaxed">
-                  • ピントは被写体の目にしっかりと合っており、シャープネスも適切です
-                  <br />• 露出は全体的にバランスが取れており、ハイライトの飛びやシャドウの潰れもありません
-                  <br />• ISO感度の設定も適切で、ノイズは最小限に抑えられています
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {reportData.technical}
                 </p>
               </CardContent>
             </Card>
@@ -69,10 +92,8 @@ export default function ReportDemoPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700 leading-relaxed">
-                  • 三分割法の交点に被写体を配置し、安定感のある構図になっています
-                  <br />• 前景・中景・背景の奥行き感が効果的に表現されています
-                  <br />• 視線の流れが自然で、被写体への注目を促す構成です
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {reportData.composition}
                 </p>
               </CardContent>
             </Card>
@@ -87,10 +108,8 @@ export default function ReportDemoPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700 leading-relaxed">
-                  • 補色関係が効果的に活用され、被写体が際立っています
-                  <br />• 全体的な色調は統一感があり、温かみのある印象を与えます
-                  <br />• 彩度とコントラストのバランスが良く、自然な仕上がりです
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {reportData.color}
                 </p>
               </CardContent>
             </Card>
@@ -105,26 +124,26 @@ export default function ReportDemoPage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
                   <span className="text-gray-500">絞り値</span>
-                  <p className="font-medium text-gray-900">f/2.8</p>
+                  <p className="font-medium text-gray-900">{reportData.exif.fNumber}</p>
                 </div>
                 <div>
                   <span className="text-gray-500">シャッター速度</span>
-                  <p className="font-medium text-gray-900">1/250s</p>
+                  <p className="font-medium text-gray-900">{reportData.exif.exposureTime}</p>
                 </div>
                 <div>
                   <span className="text-gray-500">ISO感度</span>
-                  <p className="font-medium text-gray-900">200</p>
+                  <p className="font-medium text-gray-900">{reportData.exif.iso}</p>
                 </div>
                 <div>
                   <span className="text-gray-500">焦点距離</span>
-                  <p className="font-medium text-gray-900">35mm</p>
+                  <p className="font-medium text-gray-900">{reportData.exif.focalLength}</p>
                 </div>
               </div>
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <p className="text-sm text-gray-600">
-                  <strong>レンズ:</strong> Sony FE 24-70mm F2.8 GM
+                  <strong>レンズ:</strong> {reportData.exif.lens}
                   <br />
-                  <strong>カメラ:</strong> Sony α7R V
+                  <strong>カメラ:</strong> {reportData.exif.camera}
                 </p>
               </div>
             </CardContent>
