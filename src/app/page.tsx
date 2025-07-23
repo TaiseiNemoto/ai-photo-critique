@@ -24,8 +24,10 @@ export default function UploadPage() {
     setIsProcessing(true)
     // In real app, this would call the critique API
     setTimeout(() => {
-      // Navigate to report page using Next.js router
-      router.push("/report/demo")
+      // Generate random ID for the report (in real app, this would come from API)
+      const reportId = Math.random().toString(36).substring(2, 10)
+      // Navigate to report page using dynamic route
+      router.push(`/report/${reportId}`)
     }, 2000)
   }
 
