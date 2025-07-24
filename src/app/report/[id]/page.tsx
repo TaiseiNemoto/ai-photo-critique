@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft, Share2, Sparkles } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { toast } from "sonner"
 
 interface ReportPageProps {
   params: {
@@ -30,12 +31,22 @@ export default function ReportPage({ params }: ReportPageProps) {
     },
   }
 
-  const handleShare = () => {
-    // Generate share URL using the report ID
-    const shareUrl = `${window.location.origin}/s/${params.id}`
-    navigator.clipboard.writeText(shareUrl)
-    // In real app, show toast notification
-    alert("シェア用リンクをコピーしました！")
+  const handleShare = async () => {
+    try {
+      // Generate share URL using the report ID
+      const shareUrl = `${window.location.origin}/s/${params.id}`
+      await navigator.clipboard.writeText(shareUrl)
+      toast.success("シェア用リンクをコピーしました", {
+        description: "SNSやメッセージアプリで共有できます",
+        duration: 3000,
+      })
+    } catch (error) {
+      // Fallback for browsers that don't support clipboard API
+      toast.error("コピーに失敗しました", {
+        description: "手動でURLをコピーしてください",
+        duration: 5000,
+      })
+    }
   }
 
   return (
