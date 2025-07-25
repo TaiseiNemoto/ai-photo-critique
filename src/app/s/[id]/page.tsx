@@ -1,14 +1,15 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Sparkles, Camera } from "lucide-react"
-import Link from "next/link"
-import Image from "next/image"
-import type { Metadata } from "next"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Sparkles, Camera } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import type { Metadata } from "next";
 
 // OGP metadata for social sharing
 export const metadata: Metadata = {
   title: "AI写真講評結果 - Photo-Critique",
-  description: "技術・構図・色彩の3つの観点からAIが分析した写真講評結果をご覧ください。",
+  description:
+    "技術・構図・色彩の3つの観点からAIが分析した写真講評結果をご覧ください。",
   openGraph: {
     title: "AI写真講評結果 - Photo-Critique",
     description: "技術・構図・色彩の3つの観点からAIが分析した写真講評結果",
@@ -27,12 +28,12 @@ export const metadata: Metadata = {
     description: "技術・構図・色彩の3つの観点からAIが分析した写真講評結果",
     images: ["/api/ogp?id=demo"],
   },
-}
+};
 
 interface SharePageProps {
   params: {
-    id: string
-  }
+    id: string;
+  };
 }
 
 export default function SharePage({ params }: SharePageProps) {
@@ -53,7 +54,7 @@ export default function SharePage({ params }: SharePageProps) {
       lens: "Sony FE 24-70mm F2.8 GM",
       camera: "Sony α7R V",
     },
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -63,10 +64,14 @@ export default function SharePage({ params }: SharePageProps) {
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Sparkles className="h-8 w-8 text-gray-600" />
-              <h1 className="text-3xl font-bold text-gray-900">Photo-Critique</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Photo-Critique
+              </h1>
             </div>
             <p className="text-lg text-gray-700 mb-2">AI写真講評結果</p>
-            <p className="text-sm text-gray-500">技術・構図・色彩の3つの観点から分析されました</p>
+            <p className="text-sm text-gray-500">
+              技術・構図・色彩の3つの観点から分析されました
+            </p>
           </div>
 
           {/* Shared Badge */}
@@ -80,7 +85,9 @@ export default function SharePage({ params }: SharePageProps) {
           {/* Image Preview */}
           <Card className="mb-8 bg-white border-gray-200 shadow-sm">
             <CardContent className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">分析対象画像</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                分析対象画像
+              </h3>
               <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
                 <Image
                   src={critiqueData.image || "/placeholder.svg"}
@@ -104,7 +111,9 @@ export default function SharePage({ params }: SharePageProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700 leading-relaxed whitespace-pre-line">{critiqueData.technical}</p>
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {critiqueData.technical}
+                </p>
               </CardContent>
             </Card>
 
@@ -118,7 +127,9 @@ export default function SharePage({ params }: SharePageProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700 leading-relaxed whitespace-pre-line">{critiqueData.composition}</p>
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {critiqueData.composition}
+                </p>
               </CardContent>
             </Card>
 
@@ -132,7 +143,9 @@ export default function SharePage({ params }: SharePageProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700 leading-relaxed whitespace-pre-line">{critiqueData.color}</p>
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {critiqueData.color}
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -146,19 +159,27 @@ export default function SharePage({ params }: SharePageProps) {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
                   <span className="text-gray-500">絞り値</span>
-                  <p className="font-medium text-gray-900">{critiqueData.exif.fNumber}</p>
+                  <p className="font-medium text-gray-900">
+                    {critiqueData.exif.fNumber}
+                  </p>
                 </div>
                 <div>
                   <span className="text-gray-500">シャッター速度</span>
-                  <p className="font-medium text-gray-900">{critiqueData.exif.exposureTime}</p>
+                  <p className="font-medium text-gray-900">
+                    {critiqueData.exif.exposureTime}
+                  </p>
                 </div>
                 <div>
                   <span className="text-gray-500">ISO感度</span>
-                  <p className="font-medium text-gray-900">{critiqueData.exif.iso}</p>
+                  <p className="font-medium text-gray-900">
+                    {critiqueData.exif.iso}
+                  </p>
                 </div>
                 <div>
                   <span className="text-gray-500">焦点距離</span>
-                  <p className="font-medium text-gray-900">{critiqueData.exif.focalLength}</p>
+                  <p className="font-medium text-gray-900">
+                    {critiqueData.exif.focalLength}
+                  </p>
                 </div>
               </div>
               <div className="mt-4 pt-4 border-t border-gray-200">
@@ -179,8 +200,12 @@ export default function SharePage({ params }: SharePageProps) {
                   <Camera className="h-8 w-8 text-gray-600" />
                 </div>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">あなたの写真も講評してみませんか？</h3>
-              <p className="text-gray-600 mb-6">数秒でプロレベルのフィードバックを受け取れます</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                あなたの写真も講評してみませんか？
+              </h3>
+              <p className="text-gray-600 mb-6">
+                数秒でプロレベルのフィードバックを受け取れます
+              </p>
               <Button
                 asChild
                 size="lg"
@@ -198,7 +223,10 @@ export default function SharePage({ params }: SharePageProps) {
           <div className="mt-8 pt-6 border-t border-gray-200 text-center">
             <p className="text-sm text-gray-500">
               Powered by{" "}
-              <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium">
+              <Link
+                href="/"
+                className="text-gray-700 hover:text-gray-900 font-medium"
+              >
                 Photo-Critique
               </Link>
             </p>
@@ -206,5 +234,5 @@ export default function SharePage({ params }: SharePageProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

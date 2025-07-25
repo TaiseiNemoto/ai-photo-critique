@@ -57,6 +57,7 @@ This project actively uses **v0.dev** for UI development:
 ## Environment Variables
 
 Copy `.env.example` to `.env.local` and configure:
+
 - `OPENAI_API_KEY` - OpenAI API key for Vision/GPT-4o
 - `KV_*` - Vercel KV credentials for caching and short URLs
 

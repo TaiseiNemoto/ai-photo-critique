@@ -3,11 +3,11 @@
 - **パス:** `/s/[id]`
 - **目的:** 第三者閲覧用ライトビュー
 - **主なUI要素:**
-    - Card ×3（読み取り専用）
-    - EXIF テーブル
-    - 「自分も試す」ボタン
+  - Card ×3（読み取り専用）
+  - EXIF テーブル
+  - 「自分も試す」ボタン
 - **主要アクション & 状態遷移:**
-    - OGP 用 `<meta property="og:image" content="/api/ogp?id=…">` を埋め込み、SNS クローラーとブラウザ双方に対応
+  - OGP 用 `<meta property="og:image" content="/api/ogp?id=…">` を埋め込み、SNS クローラーとブラウザ双方に対応
 
 ### ワイヤーフレーム（テキスト）
 

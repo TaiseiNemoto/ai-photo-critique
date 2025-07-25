@@ -3,19 +3,19 @@ export default function FeatureCards() {
     {
       icon: "技",
       title: "技術面",
-      description: "露出・ピント・ノイズなどの技術的評価"
+      description: "露出・ピント・ノイズなどの技術的評価",
     },
     {
-      icon: "構", 
+      icon: "構",
       title: "構図",
-      description: "三分割法・対称性・視線誘導の分析"
+      description: "三分割法・対称性・視線誘導の分析",
     },
     {
       icon: "色",
-      title: "色彩", 
-      description: "色調・彩度・コントラストの評価"
-    }
-  ]
+      title: "色彩",
+      description: "色調・彩度・コントラストの評価",
+    },
+  ];
 
   return (
     <div className="mt-12 grid md:grid-cols-3 gap-6">
@@ -29,5 +29,5 @@ export default function FeatureCards() {
         </div>
       ))}
     </div>
-  )
+  );
 }

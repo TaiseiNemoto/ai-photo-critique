@@ -1,37 +1,39 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import { useDropzone } from "react-dropzone"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Camera, Upload, ImageIcon, Sparkles, ArrowRight } from 'lucide-react'
-import Image from "next/image"
-import { toast } from "sonner"
+import { useState, useCallback } from "react";
+import { useDropzone } from "react-dropzone";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Camera, Upload, ImageIcon, Sparkles, ArrowRight } from "lucide-react";
+import Image from "next/image";
+import { toast } from "sonner";
 
 interface ExifData {
-  fNumber?: string
-  exposureTime?: string
-  iso?: string
-  lensModel?: string
-  make?: string
-  model?: string
+  fNumber?: string;
+  exposureTime?: string;
+  iso?: string;
+  lensModel?: string;
+  make?: string;
+  model?: string;
 }
 
 interface UploadedImage {
-  file: File
-  preview: string
-  exif?: ExifData
+  file: File;
+  preview: string;
+  exif?: ExifData;
 }
 
 export default function UploadPage() {
-  const [uploadedImage, setUploadedImage] = useState<UploadedImage | null>(null)
-  const [isProcessing, setIsProcessing] = useState(false)
+  const [uploadedImage, setUploadedImage] = useState<UploadedImage | null>(
+    null,
+  );
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    const file = acceptedFiles[0]
+    const file = acceptedFiles[0];
     if (file) {
-      const preview = URL.createObjectURL(file)
+      const preview = URL.createObjectURL(file);
 
       // Mock EXIF data extraction (in real app, this would be done server-side)
       const mockExif: ExifData = {
@@ -41,20 +43,20 @@ export default function UploadPage() {
         lensModel: "Sony FE 24-70mm F2.8 GM",
         make: "Sony",
         model: "α7R V",
-      }
+      };
 
       setUploadedImage({
         file,
         preview,
         exif: mockExif,
-      })
+      });
 
       toast.success("画像をアップロードしました", {
         description: "EXIF情報を解析中...",
         duration: 2000,
-      })
+      });
     }
-  }, [])
+  }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -64,73 +66,73 @@ export default function UploadPage() {
     maxFiles: 1,
     maxSize: 10 * 1024 * 1024, // 10MB
     onDropRejected: (fileRejections) => {
-      const rejection = fileRejections[0]
+      const rejection = fileRejections[0];
       if (rejection) {
-        const error = rejection.errors[0]
+        const error = rejection.errors[0];
         if (error?.code === "file-too-large") {
           toast.error("ファイルサイズが大きすぎます", {
             description: "10MB以下の画像を選択してください",
             duration: 4000,
-          })
+          });
         } else if (error?.code === "file-invalid-type") {
           toast.error("対応していないファイル形式です", {
             description: "JPEG、PNG、HEIC、WebP形式の画像を選択してください",
             duration: 4000,
-          })
+          });
         }
       }
     },
-  })
+  });
 
   const handleCameraCapture = () => {
     // Mobile camera capture would be implemented here
-    const input = document.createElement("input")
-    input.type = "file"
-    input.accept = "image/*"
-    input.capture = "environment"
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.capture = "environment";
     input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0]
+      const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
-        onDrop([file])
+        onDrop([file]);
       }
-    }
-    input.click()
-  }
+    };
+    input.click();
+  };
 
   const handleGenerateCritique = async () => {
-    if (!uploadedImage) return
+    if (!uploadedImage) return;
 
-    setIsProcessing(true)
+    setIsProcessing(true);
 
     toast.loading("AI講評を生成中...", {
       description: "技術・構図・色彩を分析しています",
       duration: 2000,
-    })
+    });
 
     // In real app, this would call the critique API
     setTimeout(() => {
       toast.success("講評が完了しました", {
         description: "結果ページに移動します",
         duration: 1500,
-      })
+      });
 
       setTimeout(() => {
-        window.location.href = "/report/demo"
-      }, 1500)
-    }, 2000)
-  }
+        window.location.href = "/report/demo";
+      }, 1500);
+    }, 2000);
+  };
 
   const resetUpload = () => {
     if (uploadedImage) {
-      URL.revokeObjectURL(uploadedImage.preview)
+      URL.revokeObjectURL(uploadedImage.preview);
     }
-    setUploadedImage(null)
+    setUploadedImage(null);
 
     toast("画像をリセットしました", {
       description: "新しい画像を選択してください",
       duration: 2000,
-    })
-  }
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -140,9 +142,13 @@ export default function UploadPage() {
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Sparkles className="h-8 w-8 text-gray-600" />
-              <h1 className="text-3xl font-bold text-gray-900">Photo-Critique</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Photo-Critique
+              </h1>
             </div>
-            <p className="text-lg text-gray-700 mb-2">あなたの写真を数秒でAI講評</p>
+            <p className="text-lg text-gray-700 mb-2">
+              あなたの写真を数秒でAI講評
+            </p>
             <p className="text-sm text-gray-500">
               技術・構図・色彩の3つの観点から、プロレベルのフィードバックを瞬時に取得
             </p>
@@ -164,9 +170,13 @@ export default function UploadPage() {
                       <Upload className="h-12 w-12 text-gray-500" />
                     </div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                      {isDragActive ? "画像をドロップしてください" : "画像をドラッグ&ドロップ"}
+                      {isDragActive
+                        ? "画像をドロップしてください"
+                        : "画像をドラッグ&ドロップ"}
                     </h3>
-                    <p className="text-gray-500 mb-6">または、クリックしてファイルを選択</p>
+                    <p className="text-gray-500 mb-6">
+                      または、クリックしてファイルを選択
+                    </p>
                   </div>
 
                   {/* Mobile Upload */}
@@ -174,7 +184,9 @@ export default function UploadPage() {
                     <div className="mx-auto w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 border border-gray-200 shadow-sm">
                       <Camera className="h-10 w-10 text-gray-500" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">写真を撮影またはアップロード</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      写真を撮影またはアップロード
+                    </h3>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
@@ -183,8 +195,8 @@ export default function UploadPage() {
                       variant="outline"
                       className="w-full sm:w-auto bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                       onClick={(e) => {
-                        e.stopPropagation()
-                        handleCameraCapture()
+                        e.stopPropagation();
+                        handleCameraCapture();
                       }}
                     >
                       <Camera className="h-4 w-4 mr-2" />
@@ -199,7 +211,9 @@ export default function UploadPage() {
                     </Button>
                   </div>
 
-                  <p className="text-xs text-gray-400 mt-4">対応形式: JPEG, PNG, HEIC, WebP (最大10MB)</p>
+                  <p className="text-xs text-gray-400 mt-4">
+                    対応形式: JPEG, PNG, HEIC, WebP (最大10MB)
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -209,7 +223,9 @@ export default function UploadPage() {
               <Card className="bg-white border-gray-200 shadow-sm">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">プレビュー</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      プレビュー
+                    </h3>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -232,20 +248,31 @@ export default function UploadPage() {
                   {/* EXIF Summary */}
                   {uploadedImage.exif && (
                     <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                      <h4 className="text-sm font-medium text-gray-700 mb-3">撮影情報</h4>
+                      <h4 className="text-sm font-medium text-gray-700 mb-3">
+                        撮影情報
+                      </h4>
                       <div className="flex flex-wrap gap-2">
                         {uploadedImage.exif.fNumber && (
-                          <Badge variant="secondary" className="bg-white text-gray-700 border-gray-300">
+                          <Badge
+                            variant="secondary"
+                            className="bg-white text-gray-700 border-gray-300"
+                          >
                             {uploadedImage.exif.fNumber}
                           </Badge>
                         )}
                         {uploadedImage.exif.exposureTime && (
-                          <Badge variant="secondary" className="bg-white text-gray-700 border-gray-300">
+                          <Badge
+                            variant="secondary"
+                            className="bg-white text-gray-700 border-gray-300"
+                          >
                             {uploadedImage.exif.exposureTime}
                           </Badge>
                         )}
                         {uploadedImage.exif.iso && (
-                          <Badge variant="secondary" className="bg-white text-gray-700 border-gray-300">
+                          <Badge
+                            variant="secondary"
+                            className="bg-white text-gray-700 border-gray-300"
+                          >
                             {uploadedImage.exif.iso}
                           </Badge>
                         )}
@@ -289,7 +316,9 @@ export default function UploadPage() {
                     </>
                   )}
                 </Button>
-                <p className="text-sm text-gray-500 mt-3">通常2-3秒で完了します</p>
+                <p className="text-sm text-gray-500 mt-3">
+                  通常2-3秒で完了します
+                </p>
               </div>
             </div>
           )}
@@ -301,25 +330,31 @@ export default function UploadPage() {
                 <span className="text-gray-700 font-bold">技</span>
               </div>
               <h4 className="font-semibold text-gray-900 mb-1">技術面</h4>
-              <p className="text-sm text-gray-600">露出・ピント・ノイズなどの技術的評価</p>
+              <p className="text-sm text-gray-600">
+                露出・ピント・ノイズなどの技術的評価
+              </p>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 border border-gray-200 shadow-sm">
                 <span className="text-gray-700 font-bold">構</span>
               </div>
               <h4 className="font-semibold text-gray-900 mb-1">構図</h4>
-              <p className="text-sm text-gray-600">三分割法・対称性・視線誘導の分析</p>
+              <p className="text-sm text-gray-600">
+                三分割法・対称性・視線誘導の分析
+              </p>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 border border-gray-200 shadow-sm">
                 <span className="text-gray-700 font-bold">色</span>
               </div>
               <h4 className="font-semibold text-gray-900 mb-1">色彩</h4>
-              <p className="text-sm text-gray-600">色調・彩度・コントラストの評価</p>
+              <p className="text-sm text-gray-600">
+                色調・彩度・コントラストの評価
+              </p>
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

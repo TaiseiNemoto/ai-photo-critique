@@ -1,15 +1,18 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import Image from "next/image"
-import type { UploadedImage } from "@/types/upload"
-import ExifDisplay from "./ExifDisplay"
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import type { UploadedImage } from "@/types/upload";
+import ExifDisplay from "./ExifDisplay";
 
 interface ImagePreviewProps {
-  uploadedImage: UploadedImage
-  onReset: () => void
+  uploadedImage: UploadedImage;
+  onReset: () => void;
 }
 
-export default function ImagePreview({ uploadedImage, onReset }: ImagePreviewProps) {
+export default function ImagePreview({
+  uploadedImage,
+  onReset,
+}: ImagePreviewProps) {
   return (
     <Card className="bg-white border-gray-200 shadow-sm">
       <CardContent className="p-6">
@@ -35,10 +38,8 @@ export default function ImagePreview({ uploadedImage, onReset }: ImagePreviewPro
         </div>
 
         {/* EXIF Summary */}
-        {uploadedImage.exif && (
-          <ExifDisplay exif={uploadedImage.exif} />
-        )}
+        {uploadedImage.exif && <ExifDisplay exif={uploadedImage.exif} />}
       </CardContent>
     </Card>
-  )
+  );
 }

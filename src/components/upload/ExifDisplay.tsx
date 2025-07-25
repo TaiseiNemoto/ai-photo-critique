@@ -1,8 +1,8 @@
-import { Badge } from "@/components/ui/badge"
-import type { ExifData } from "@/types/upload"
+import { Badge } from "@/components/ui/badge";
+import type { ExifData } from "@/types/upload";
 
 interface ExifDisplayProps {
-  exif: ExifData
+  exif: ExifData;
 }
 
 export default function ExifDisplay({ exif }: ExifDisplayProps) {
@@ -11,17 +11,26 @@ export default function ExifDisplay({ exif }: ExifDisplayProps) {
       <h4 className="text-sm font-medium text-gray-700 mb-3">撮影情報</h4>
       <div className="flex flex-wrap gap-2">
         {exif.fNumber && (
-          <Badge variant="secondary" className="bg-white text-gray-700 border-gray-300">
+          <Badge
+            variant="secondary"
+            className="bg-white text-gray-700 border-gray-300"
+          >
             {exif.fNumber}
           </Badge>
         )}
         {exif.exposureTime && (
-          <Badge variant="secondary" className="bg-white text-gray-700 border-gray-300">
+          <Badge
+            variant="secondary"
+            className="bg-white text-gray-700 border-gray-300"
+          >
             {exif.exposureTime}
           </Badge>
         )}
         {exif.iso && (
-          <Badge variant="secondary" className="bg-white text-gray-700 border-gray-300">
+          <Badge
+            variant="secondary"
+            className="bg-white text-gray-700 border-gray-300"
+          >
             {exif.iso}
           </Badge>
         )}
@@ -40,5 +49,5 @@ export default function ExifDisplay({ exif }: ExifDisplayProps) {
         </p>
       )}
     </div>
-  )
+  );
 }
