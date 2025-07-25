@@ -36,6 +36,7 @@ interface SharePageProps {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function SharePage({ params }: SharePageProps) {
   // In real app, this would fetch data based on params.id
   const critiqueData = {
