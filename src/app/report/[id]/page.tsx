@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft, Share2, Sparkles } from "lucide-react"
-import Link from "next/link"
-import Image from "next/image"
-import { toast } from "sonner"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Share2, Sparkles } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { toast } from "sonner";
 
 interface ReportPageProps {
   params: {
-    id: string
-  }
+    id: string;
+  };
 }
 
 export default function ReportPage({ params }: ReportPageProps) {
@@ -18,9 +18,12 @@ export default function ReportPage({ params }: ReportPageProps) {
   // For now, using mock data
   const reportData = {
     image: "/placeholder.svg?height=400&width=600",
-    technical: "• ピントは被写体の目にしっかりと合っており、シャープネスも適切です\n• 露出は全体的にバランスが取れており、ハイライトの飛びやシャドウの潰れもありません\n• ISO感度の設定も適切で、ノイズは最小限に抑えられています",
-    composition: "• 三分割法の交点に被写体を配置し、安定感のある構図になっています\n• 前景・中景・背景の奥行き感が効果的に表現されています\n• 視線の流れが自然で、被写体への注目を促す構成です",
-    color: "• 補色関係が効果的に活用され、被写体が際立っています\n• 全体的な色調は統一感があり、温かみのある印象を与えます\n• 彩度とコントラストのバランスが良く、自然な仕上がりです",
+    technical:
+      "• ピントは被写体の目にしっかりと合っており、シャープネスも適切です\n• 露出は全体的にバランスが取れており、ハイライトの飛びやシャドウの潰れもありません\n• ISO感度の設定も適切で、ノイズは最小限に抑えられています",
+    composition:
+      "• 三分割法の交点に被写体を配置し、安定感のある構図になっています\n• 前景・中景・背景の奥行き感が効果的に表現されています\n• 視線の流れが自然で、被写体への注目を促す構成です",
+    color:
+      "• 補色関係が効果的に活用され、被写体が際立っています\n• 全体的な色調は統一感があり、温かみのある印象を与えます\n• 彩度とコントラストのバランスが良く、自然な仕上がりです",
     exif: {
       fNumber: "f/2.8",
       exposureTime: "1/250s",
@@ -29,25 +32,25 @@ export default function ReportPage({ params }: ReportPageProps) {
       lens: "Sony FE 24-70mm F2.8 GM",
       camera: "Sony α7R V",
     },
-  }
+  };
 
   const handleShare = async () => {
     try {
       // Generate share URL using the report ID
-      const shareUrl = `${window.location.origin}/s/${params.id}`
-      await navigator.clipboard.writeText(shareUrl)
+      const shareUrl = `${window.location.origin}/s/${params.id}`;
+      await navigator.clipboard.writeText(shareUrl);
       toast.success("シェア用リンクをコピーしました", {
         description: "SNSやメッセージアプリで共有できます",
         duration: 3000,
-      })
+      });
     } catch (error) {
       // Fallback for browsers that don't support clipboard API
       toast.error("コピーに失敗しました", {
         description: "手動でURLをコピーしてください",
         duration: 5000,
-      })
+      });
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -55,7 +58,10 @@ export default function ReportPage({ params }: ReportPageProps) {
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
-            <Link href="/" className="flex items-center text-gray-500 hover:text-gray-900 transition-colors">
+            <Link
+              href="/"
+              className="flex items-center text-gray-500 hover:text-gray-900 transition-colors"
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
               戻る
             </Link>
@@ -68,9 +74,16 @@ export default function ReportPage({ params }: ReportPageProps) {
           {/* Image Preview */}
           <Card className="mb-8 bg-white border-gray-200 shadow-sm">
             <CardContent className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">分析対象画像</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                分析対象画像
+              </h3>
               <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                <Image src={reportData.image} alt="分析対象の写真" fill className="object-cover" />
+                <Image
+                  src={reportData.image}
+                  alt="分析対象の写真"
+                  fill
+                  className="object-cover"
+                />
               </div>
             </CardContent>
           </Card>
@@ -135,19 +148,27 @@ export default function ReportPage({ params }: ReportPageProps) {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
                   <span className="text-gray-500">絞り値</span>
-                  <p className="font-medium text-gray-900">{reportData.exif.fNumber}</p>
+                  <p className="font-medium text-gray-900">
+                    {reportData.exif.fNumber}
+                  </p>
                 </div>
                 <div>
                   <span className="text-gray-500">シャッター速度</span>
-                  <p className="font-medium text-gray-900">{reportData.exif.exposureTime}</p>
+                  <p className="font-medium text-gray-900">
+                    {reportData.exif.exposureTime}
+                  </p>
                 </div>
                 <div>
                   <span className="text-gray-500">ISO感度</span>
-                  <p className="font-medium text-gray-900">{reportData.exif.iso}</p>
+                  <p className="font-medium text-gray-900">
+                    {reportData.exif.iso}
+                  </p>
                 </div>
                 <div>
                   <span className="text-gray-500">焦点距離</span>
-                  <p className="font-medium text-gray-900">{reportData.exif.focalLength}</p>
+                  <p className="font-medium text-gray-900">
+                    {reportData.exif.focalLength}
+                  </p>
                 </div>
               </div>
               <div className="mt-4 pt-4 border-t border-gray-200">
@@ -162,7 +183,10 @@ export default function ReportPage({ params }: ReportPageProps) {
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button onClick={handleShare} className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white">
+            <Button
+              onClick={handleShare}
+              className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white"
+            >
               <Share2 className="h-4 w-4" />
               シェア用リンクをコピー
             </Button>
@@ -177,5 +201,5 @@ export default function ReportPage({ params }: ReportPageProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

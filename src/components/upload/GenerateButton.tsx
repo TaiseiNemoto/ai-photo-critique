@@ -1,15 +1,19 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Sparkles, ArrowRight } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Sparkles, ArrowRight } from "lucide-react";
 
 interface GenerateButtonProps {
-  isProcessing: boolean
-  onGenerate: () => void
-  disabled?: boolean
+  isProcessing: boolean;
+  onGenerate: () => void;
+  disabled?: boolean;
 }
 
-export default function GenerateButton({ isProcessing, onGenerate, disabled }: GenerateButtonProps) {
+export default function GenerateButton({
+  isProcessing,
+  onGenerate,
+  disabled,
+}: GenerateButtonProps) {
   return (
     <div className="text-center">
       <Button
@@ -33,5 +37,5 @@ export default function GenerateButton({ isProcessing, onGenerate, disabled }: G
       </Button>
       <p className="text-sm text-gray-500 mt-3">通常2-3秒で完了します</p>
     </div>
-  )
+  );
 }

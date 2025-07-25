@@ -3,14 +3,14 @@
 - **パス:** `/`
 - **目的:** 画像投稿の入口
 - **主なUI要素:**
-    - サービス説明（1〜2 行）
-    - DropZone（PC） / 撮影ボタン（SP）
-    - 画像プレビュー＋EXIF サマリ
-    - 「講評を生成」ボタン
+  - サービス説明（1〜2 行）
+  - DropZone（PC） / 撮影ボタン（SP）
+  - 画像プレビュー＋EXIF サマリ
+  - 「講評を生成」ボタン
 - **主要アクション & 状態遷移:**
-    1. 画像選択 → local preview
-    2. `upload()` Edge Function 呼び出し
-    3. 正常終了で `critique()` Node Function を実行
+  1. 画像選択 → local preview
+  2. `upload()` Edge Function 呼び出し
+  3. 正常終了で `critique()` Node Function を実行
 
 ### ワイヤーフレーム（テキスト）
 

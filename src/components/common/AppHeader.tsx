@@ -1,4 +1,4 @@
-import { Sparkles } from "lucide-react"
+import { Sparkles } from "lucide-react";
 
 export default function AppHeader() {
   return (
@@ -12,5 +12,5 @@ export default function AppHeader() {
         技術・構図・色彩の3つの観点から、プロレベルのフィードバックを瞬時に取得
       </p>
     </div>
-  )
+  );
 }
