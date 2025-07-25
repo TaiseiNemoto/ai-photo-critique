@@ -5,6 +5,7 @@ import { useDropzone } from "react-dropzone";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Camera, Upload, ImageIcon } from "lucide-react";
+import { toast } from "sonner";
 import type { UploadedImage, ExifData } from "@/types/upload";
 
 interface UploadZoneProps {
@@ -45,6 +46,23 @@ export default function UploadZone({ onImageUploaded }: UploadZoneProps) {
     },
     maxFiles: 1,
     maxSize: 10 * 1024 * 1024, // 10MB
+    onDropRejected: (fileRejections) => {
+      const rejection = fileRejections[0];
+      if (rejection) {
+        const error = rejection.errors[0];
+        if (error?.code === "file-too-large") {
+          toast.error("ファイルサイズが大きすぎます", {
+            description: "10MB以下の画像を選択してください",
+            duration: 4000,
+          });
+        } else if (error?.code === "file-invalid-type") {
+          toast.error("対応していないファイル形式です", {
+            description: "JPEG、PNG、HEIC、WebP形式の画像を選択してください",
+            duration: 4000,
+          });
+        }
+      }
+    },
   });
 
   const handleCameraCapture = () => {
