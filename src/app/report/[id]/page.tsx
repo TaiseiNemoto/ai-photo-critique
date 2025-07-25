@@ -45,6 +45,7 @@ export default function ReportPage({ params }: ReportPageProps) {
       });
     } catch (error) {
       // Fallback for browsers that don't support clipboard API
+      console.error("Clipboard API failed:", error);
       toast.error("コピーに失敗しました", {
         description: "手動でURLをコピーしてください",
         duration: 5000,
