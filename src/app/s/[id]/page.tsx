@@ -31,13 +31,14 @@ export const metadata: Metadata = {
 };
 
 interface SharePageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function SharePage({ params }: SharePageProps) {
+export default async function SharePage({ params }: SharePageProps) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { id } = await params;
   // In real app, this would fetch data based on params.id
   const critiqueData = {
     image: "/placeholder.svg?height=400&width=600",
