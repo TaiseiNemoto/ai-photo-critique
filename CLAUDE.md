@@ -75,3 +75,13 @@ Copy `.env.example` to `.env.local` and configure:
 - Leverage shadcn/ui components via v0.dev generation
 - Write clear commit messages focusing on "why" not "what"
 - OpenAI API communication through `lib/openai.ts` client
+
+### **IMPORTANT: End-of-Work Routine**
+
+**コーディング作業終了時には必ず以下を実行すること:**
+
+1. `npm run lint` - ESLintでコードチェック
+2. `npm run format` - Prettierでコードフォーマット
+3. エラーがあれば修正してから完了とする
+
+これにより、コードの品質と一貫性を保つ。
