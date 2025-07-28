@@ -17,7 +17,7 @@ export default function UploadPage() {
 
   const handleImageUploaded = (image: UploadedImage) => {
     setUploadedImage(image);
-    
+
     toast.success("画像をアップロードしました", {
       description: "EXIF情報を解析中...",
       duration: 2000,

@@ -23,27 +23,19 @@ export function ExifDetails({ exif }: ExifDetailsProps) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
             <span className="text-gray-500">絞り値</span>
-            <p className="font-medium text-gray-900">
-              {exif.fNumber}
-            </p>
+            <p className="font-medium text-gray-900">{exif.fNumber}</p>
           </div>
           <div>
             <span className="text-gray-500">シャッター速度</span>
-            <p className="font-medium text-gray-900">
-              {exif.exposureTime}
-            </p>
+            <p className="font-medium text-gray-900">{exif.exposureTime}</p>
           </div>
           <div>
             <span className="text-gray-500">ISO感度</span>
-            <p className="font-medium text-gray-900">
-              {exif.iso}
-            </p>
+            <p className="font-medium text-gray-900">{exif.iso}</p>
           </div>
           <div>
             <span className="text-gray-500">焦点距離</span>
-            <p className="font-medium text-gray-900">
-              {exif.focalLength}
-            </p>
+            <p className="font-medium text-gray-900">{exif.focalLength}</p>
           </div>
         </div>
         <div className="mt-4 pt-4 border-t border-gray-200">

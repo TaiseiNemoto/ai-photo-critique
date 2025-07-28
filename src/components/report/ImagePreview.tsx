@@ -6,7 +6,10 @@ interface ImagePreviewProps {
   alt?: string;
 }
 
-export function ImagePreview({ src, alt = "分析対象の写真" }: ImagePreviewProps) {
+export function ImagePreview({
+  src,
+  alt = "分析対象の写真",
+}: ImagePreviewProps) {
   return (
     <Card className="mb-8 bg-white border-gray-200 shadow-sm">
       <CardContent className="p-6">
@@ -14,12 +17,7 @@ export function ImagePreview({ src, alt = "分析対象の写真" }: ImagePrevie
           分析対象画像
         </h3>
         <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-          <Image
-            src={src}
-            alt={alt}
-            fill
-            className="object-cover"
-          />
+          <Image src={src} alt={alt} fill className="object-cover" />
         </div>
       </CardContent>
     </Card>

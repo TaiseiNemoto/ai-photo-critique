@@ -1,4 +1,3 @@
-
 import { ReportHeader } from "@/components/report/ReportHeader";
 import { ImagePreview } from "@/components/report/ImagePreview";
 import { CritiqueCard } from "@/components/report/CritiqueCard";
@@ -33,15 +32,14 @@ export default async function ReportPage({ params }: ReportPageProps) {
     },
   };
 
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl">
           <ReportHeader />
-          
+
           <ImagePreview src={reportData.image} />
-          
+
           <div className="space-y-6 mb-8">
             <CritiqueCard
               title="技術面"
@@ -53,15 +51,11 @@ export default async function ReportPage({ params }: ReportPageProps) {
               icon="構"
               content={reportData.composition}
             />
-            <CritiqueCard
-              title="色彩"
-              icon="色"
-              content={reportData.color}
-            />
+            <CritiqueCard title="色彩" icon="色" content={reportData.color} />
           </div>
-          
+
           <ExifDetails exif={reportData.exif} />
-          
+
           <ReportActions reportId={id} />
         </div>
       </div>
