@@ -39,9 +39,6 @@ yarn-error.log*
 # next.js build output
 .next/
 
-# setup_tasks.md
-setup_tasks.md
-
 # TypeScript auto-generated files
 next-env.d.ts
 .claude/

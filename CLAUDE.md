@@ -76,6 +76,25 @@ Copy `.env.example` to `.env.local` and configure:
 - Write clear commit messages focusing on "why" not "what"
 - OpenAI API communication through `lib/openai.ts` client
 
+### **MANDATORY: t-wada Development Methodology**
+
+**すべてのロジック実装時には、必ず以下のルールを守ること:**
+
+1. **テストファースト**: 実装前に必ずテストを書く
+2. **Red-Green-Refactorサイクル**: 失敗→成功→改善の順序を厳守
+3. **小さなステップ**: 大きな機能を小さな単位に分割して実装
+4. **境界値・異常系テスト**: 正常系だけでなく境界値や異常系も必ずテスト
+5. **適切なモック使用**: 外部依存をモック化してテストの独立性を保つ
+
+**詳細は必ず `docs/development/coding_guidelines.md` を参照すること。**
+
+**実装前チェックリスト:**
+- [ ] テストケースを設計したか？
+- [ ] 失敗するテストを先に書いたか？
+- [ ] 最小限の実装でテストを通したか？
+- [ ] リファクタリングを行ったか？
+- [ ] 境界値・異常系のテストを追加したか？
+
 ### **IMPORTANT: End-of-Work Routine**
 
 **コーディング作業終了時には必ず以下を実行すること:**
