@@ -17,20 +17,24 @@ export function extractExifData(file: File) {
 }
 
 // ✅ 良い例: テストを先に書く
-describe('extractExifData', () => {
-  it('should extract EXIF data from JPEG file', async () => {
-    const mockFile = new File([mockJpegData], 'test.jpg', { type: 'image/jpeg' });
+describe("extractExifData", () => {
+  it("should extract EXIF data from JPEG file", async () => {
+    const mockFile = new File([mockJpegData], "test.jpg", {
+      type: "image/jpeg",
+    });
     const result = await extractExifData(mockFile);
-    
-    expect(result.make).toBe('Canon');
-    expect(result.model).toBe('EOS R5');
-    expect(result.fNumber).toBe('f/2.8');
+
+    expect(result.make).toBe("Canon");
+    expect(result.model).toBe("EOS R5");
+    expect(result.fNumber).toBe("f/2.8");
   });
-  
-  it('should handle files without EXIF data gracefully', async () => {
-    const mockFile = new File([mockImageWithoutExif], 'noexif.jpg', { type: 'image/jpeg' });
+
+  it("should handle files without EXIF data gracefully", async () => {
+    const mockFile = new File([mockImageWithoutExif], "noexif.jpg", {
+      type: "image/jpeg",
+    });
     const result = await extractExifData(mockFile);
-    
+
     expect(result).toEqual({});
   });
 });
@@ -46,21 +50,21 @@ describe('extractExifData', () => {
 
 ```typescript
 // Step 1: Red - 失敗するテストを書く
-it('should extract ISO value from EXIF', async () => {
+it("should extract ISO value from EXIF", async () => {
   const result = await extractExifData(mockFile);
-  expect(result.iso).toBe('200');
+  expect(result.iso).toBe("200");
 }); // この時点ではテストは失敗する
 
 // Step 2: Green - 最小限の実装
 export function extractExifData(file: File) {
-  return { iso: '200' }; // とりあえず固定値で通す
+  return { iso: "200" }; // とりあえず固定値で通す
 }
 
 // Step 3: Refactor - 実際の実装に改善
 export async function extractExifData(file: File) {
   const exif = await exifr.parse(file);
   return {
-    iso: exif?.ISO?.toString() || '',
+    iso: exif?.ISO?.toString() || "",
     // 他のフィールドも追加
   };
 }
@@ -89,7 +93,10 @@ export async function resizeImage(file: File, maxSize: number): Promise<File> {
   // リサイズのみに集中
 }
 
-export async function compressImage(file: File, quality: number): Promise<File> {
+export async function compressImage(
+  file: File,
+  quality: number,
+): Promise<File> {
   // 圧縮のみに集中
 }
 ```
@@ -101,18 +108,30 @@ export async function compressImage(file: File, quality: number): Promise<File> 
 **ルール**: 正常系だけでなく、境界値や異常系のテストを必ず書く
 
 ```typescript
-describe('画像処理', () => {
+describe("画像処理", () => {
   // 正常系
-  it('should process valid JPEG file', async () => { /* ... */ });
-  
+  it("should process valid JPEG file", async () => {
+    /* ... */
+  });
+
   // 境界値テスト
-  it('should handle maximum file size (10MB)', async () => { /* ... */ });
-  it('should handle minimum file size (1KB)', async () => { /* ... */ });
-  
+  it("should handle maximum file size (10MB)", async () => {
+    /* ... */
+  });
+  it("should handle minimum file size (1KB)", async () => {
+    /* ... */
+  });
+
   // 異常系
-  it('should throw error for unsupported file format', async () => { /* ... */ });
-  it('should throw error for corrupted file', async () => { /* ... */ });
-  it('should handle file with no EXIF data', async () => { /* ... */ });
+  it("should throw error for unsupported file format", async () => {
+    /* ... */
+  });
+  it("should throw error for corrupted file", async () => {
+    /* ... */
+  });
+  it("should handle file with no EXIF data", async () => {
+    /* ... */
+  });
 });
 ```
 
@@ -122,23 +141,23 @@ describe('画像処理', () => {
 
 ```typescript
 // ✅ 外部ライブラリをモック化
-jest.mock('exifr', () => ({
-  parse: jest.fn()
+jest.mock("exifr", () => ({
+  parse: jest.fn(),
 }));
 
-describe('extractExifData', () => {
+describe("extractExifData", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should call exifr.parse with correct parameters', async () => {
-    const mockFile = new File([], 'test.jpg');
-    const mockExifData = { Make: 'Canon', Model: 'EOS R5' };
-    
+  it("should call exifr.parse with correct parameters", async () => {
+    const mockFile = new File([], "test.jpg");
+    const mockExifData = { Make: "Canon", Model: "EOS R5" };
+
     (exifr.parse as jest.Mock).mockResolvedValue(mockExifData);
-    
+
     await extractExifData(mockFile);
-    
+
     expect(exifr.parse).toHaveBeenCalledWith(mockFile);
   });
 });
@@ -149,22 +168,22 @@ describe('extractExifData', () => {
 **ルール**: エラーケースも必ずテストする
 
 ```typescript
-describe('エラーハンドリング', () => {
-  it('should handle EXIF parsing error gracefully', async () => {
-    const mockFile = new File([], 'corrupt.jpg');
-    (exifr.parse as jest.Mock).mockRejectedValue(new Error('Parse failed'));
-    
+describe("エラーハンドリング", () => {
+  it("should handle EXIF parsing error gracefully", async () => {
+    const mockFile = new File([], "corrupt.jpg");
+    (exifr.parse as jest.Mock).mockRejectedValue(new Error("Parse failed"));
+
     const result = await extractExifData(mockFile);
-    
+
     expect(result).toEqual({}); // エラー時は空オブジェクトを返す
   });
-  
-  it('should throw meaningful error for invalid file type', async () => {
-    const mockFile = new File([], 'test.txt', { type: 'text/plain' });
-    
-    await expect(extractExifData(mockFile))
-      .rejects
-      .toThrow('Unsupported file type: text/plain');
+
+  it("should throw meaningful error for invalid file type", async () => {
+    const mockFile = new File([], "test.txt", { type: "text/plain" });
+
+    await expect(extractExifData(mockFile)).rejects.toThrow(
+      "Unsupported file type: text/plain",
+    );
   });
 });
 ```
@@ -192,11 +211,13 @@ git commit -m "refactor: EXIF抽出機能のエラーハンドリング改善"
 ## 品質基準
 
 ### テストカバレッジ
+
 - **最低基準**: 80%以上
 - **目標**: 90%以上
 - **対象**: 新規実装のロジック部分
 
 ### テスト実行
+
 ```bash
 # 実装前に必ず実行
 npm run test
@@ -211,6 +232,7 @@ npm run test src/lib/exif.test.ts
 ## 禁止事項
 
 ❌ **やってはいけないこと**:
+
 - テストを書かずに実装を始める
 - 一度に大きな機能を実装する
 - エラーハンドリングを後回しにする
@@ -218,6 +240,7 @@ npm run test src/lib/exif.test.ts
 - テストが失敗した状態でコミットする
 
 ✅ **必ずやること**:
+
 - Red-Green-Refactorサイクルの遵守
 - 境界値・異常系のテスト
 - 適切なモック・スタブの使用
@@ -227,6 +250,7 @@ npm run test src/lib/exif.test.ts
 ---
 
 **参考資料**:
+
 - [t-wadaの「テスト駆動開発」](https://www.amazon.co.jp/dp/4274217884)
 - [テスティングフレームワークVitestの使い方](https://vitest.dev/)
 - [Jest Mockingのベストプラクティス](https://jestjs.io/docs/mock-functions)

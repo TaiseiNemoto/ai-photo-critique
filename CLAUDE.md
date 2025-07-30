@@ -89,6 +89,7 @@ Copy `.env.example` to `.env.local` and configure:
 **詳細は必ず `docs/development/coding_guidelines.md` を参照すること。**
 
 **実装前チェックリスト:**
+
 - [ ] テストケースを設計したか？
 - [ ] 失敗するテストを先に書いたか？
 - [ ] 最小限の実装でテストを通したか？
