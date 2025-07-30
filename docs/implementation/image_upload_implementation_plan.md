@@ -15,10 +15,10 @@
 
 ### 採用予定ライブラリ
 
-| ライブラリ | 用途 | サイズ | 理由 |
-|-----------|------|--------|------|
-| `exifr` | EXIF抽出 | 7KB | 軽量、高速、TypeScript対応 |
-| `browser-image-compression` | 画像圧縮 | 45KB | ブラウザサイド処理、シンプルAPI |
+| ライブラリ                  | 用途     | サイズ | 理由                            |
+| --------------------------- | -------- | ------ | ------------------------------- |
+| `exifr`                     | EXIF抽出 | 7KB    | 軽量、高速、TypeScript対応      |
+| `browser-image-compression` | 画像圧縮 | 45KB   | ブラウザサイド処理、シンプルAPI |
 
 ### 処理フロー
 
@@ -39,15 +39,18 @@ graph TD
 ### Phase 1: 準備・調査（10分）
 
 #### Step 1: EXIF抽出ライブラリの調査と選定
+
 - **対象ライブラリ**: `exif-js`, `piexifjs`, `exifr`
 - **評価基準**: TypeScript対応、パフォーマンス、メンテナンス状況
 - **推奨**: `exifr`（最も軽量で高速、TS完全対応）
 
 #### Step 2: 画像処理ライブラリの調査と選定
+
 - **候補**: `browser-image-compression`, Canvas API直接使用
 - **推奨**: `browser-image-compression`（シンプルなAPI、実装コスト低）
 
 #### Step 3: 必要なパッケージのインストール
+
 ```bash
 npm install exifr browser-image-compression
 npm install -D @types/exifr
@@ -56,6 +59,7 @@ npm install -D @types/exifr
 ### Phase 2: ライブラリ関数実装（20分）
 
 #### Step 4: EXIF抽出関数の実装
+
 - **ファイル**: `src/lib/exif.ts`
 - **関数**: `extractExifData(file: File): Promise<ExifData>`
 - **取得情報**: カメラ名、レンズ名、F値、シャッター速度、ISO感度、焦点距離
@@ -63,17 +67,18 @@ npm install -D @types/exifr
 ```typescript
 // 実装予定の型定義
 interface ExifData {
-  make?: string;        // カメラメーカー
-  model?: string;       // カメラ機種
-  lensModel?: string;   // レンズ名
-  fNumber?: string;     // F値
+  make?: string; // カメラメーカー
+  model?: string; // カメラ機種
+  lensModel?: string; // レンズ名
+  fNumber?: string; // F値
   exposureTime?: string; // シャッター速度
-  iso?: string;         // ISO感度
+  iso?: string; // ISO感度
   focalLength?: string; // 焦点距離
 }
 ```
 
 #### Step 5: 画像リサイズ・圧縮機能の実装
+
 - **ファイル**: `src/lib/image.ts`
 - **関数**: `processImage(file: File): Promise<ProcessedImage>`
 - **仕様**: 最大1024px、品質80%、JPEG形式で出力
@@ -81,8 +86,9 @@ interface ExifData {
 ### Phase 3: Server Action実装（15分）
 
 #### Step 6: 画像アップロード処理のServer Action実装
+
 - **ファイル**: `src/app/actions.ts`
-- **機能**: 
+- **機能**:
   - FormDataから画像ファイルを受け取り
   - EXIF抽出とリサイズを並列実行
   - 一時的にbase64形式で返却（後でVercel KV対応）
@@ -93,12 +99,12 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
   // 並列処理でパフォーマンス向上
   const [exifData, processedImage] = await Promise.all([
     extractExifData(file),
-    processImage(file)
+    processImage(file),
   ]);
-  
+
   return {
     success: true,
-    data: { exifData, processedImage }
+    data: { exifData, processedImage },
   };
 }
 ```
@@ -106,6 +112,7 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
 ### Phase 4: フロントエンド統合（20分）
 
 #### Step 7: UploadZoneコンポーネントの修正
+
 - **ファイル**: `src/components/upload/UploadZone.tsx`
 - **変更点**:
   - react-dropzoneの処理を実際のServer Action呼び出しに変更
@@ -113,6 +120,7 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
   - エラー処理の追加
 
 #### Step 8: ExifDisplayコンポーネントの修正
+
 - **ファイル**: `src/components/upload/ExifDisplay.tsx`
 - **変更点**:
   - 実際のEXIFデータを表示
@@ -120,6 +128,7 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
   - データが取得できない場合の代替表示
 
 #### Step 9: メインページの修正
+
 - **ファイル**: `src/app/page.tsx`
 - **変更点**:
   - `setTimeout`を使ったモック処理を削除
@@ -129,12 +138,14 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
 ### Phase 5: エラー処理・テスト（10分）
 
 #### Step 10: エラーハンドリングの実装
+
 - **バリデーション**:
   - 対応ファイル形式: JPEG, PNG, TIFF, RAW
   - ファイルサイズ制限: 10MB
   - EXIF抽出失敗時の代替処理
 
 #### Step 11: テスト実行と動作確認
+
 - **テストケース**:
   - 各種カメラ・スマートフォンで撮影した画像
   - EXIF情報あり・なしの両パターン
@@ -144,11 +155,13 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
 ## 実装後の成果物
 
 ### 新規作成ファイル
+
 - `src/lib/exif.ts` - EXIF抽出ライブラリ
 - `src/lib/image.ts` - 画像処理ライブラリ
 - `src/app/actions.ts` - Server Actions
 
 ### 修正ファイル
+
 - `src/components/upload/UploadZone.tsx`
 - `src/components/upload/ExifDisplay.tsx`
 - `src/app/page.tsx`
