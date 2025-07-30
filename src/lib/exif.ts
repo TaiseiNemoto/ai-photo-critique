@@ -1,21 +1,21 @@
-import { parse } from 'exifr';
-import type { ExifData } from '@/types/upload';
+import { parse } from "exifr";
+import type { ExifData } from "@/types/upload";
 
 export async function extractExifData(file: File): Promise<ExifData> {
   // サポートされているファイル形式をチェック
-  const supportedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/tiff'];
+  const supportedTypes = ["image/jpeg", "image/jpg", "image/png", "image/tiff"];
   if (!supportedTypes.includes(file.type)) {
     throw new Error(`Unsupported file type: ${file.type}`);
   }
 
   // ファイル名の検証
   if (!file.name) {
-    throw new Error('Invalid file: file name is empty');
+    throw new Error("Invalid file: file name is empty");
   }
 
   try {
     const exifData = await parse(file);
-    
+
     if (!exifData) {
       return {};
     }
@@ -36,7 +36,7 @@ export async function extractExifData(file: File): Promise<ExifData> {
     if (exifData.FocalLength) result.focalLength = `${exifData.FocalLength}mm`;
 
     return result;
-  } catch (error) {
+  } catch {
     // EXIF解析エラーは空オブジェクトを返す
     return {};
   }
@@ -47,7 +47,7 @@ function convertToFraction(decimal: number): string {
   if (decimal >= 1) {
     return decimal.toString();
   }
-  
+
   // 1未満の場合は分数形式に変換
   const denominator = Math.round(1 / decimal);
   return `1/${denominator}`;
