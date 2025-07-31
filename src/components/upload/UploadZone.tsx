@@ -95,7 +95,7 @@ export default function UploadZone({ onImageUploaded }: UploadZoneProps) {
       "image/*": [".jpeg", ".jpg", ".png", ".heic", ".webp"],
     },
     maxFiles: 1,
-    maxSize: 10 * 1024 * 1024, // 10MB
+    maxSize: 20 * 1024 * 1024, // 20MB
     onDropRejected: (fileRejections) => {
       const rejection = fileRejections[0];
       if (!rejection) return;
@@ -104,7 +104,7 @@ export default function UploadZone({ onImageUploaded }: UploadZoneProps) {
       if (error?.code === "file-too-large") {
         showErrorToast(
           ERROR_MESSAGES.FILE_TOO_LARGE,
-          ERROR_MESSAGES.FILE_TOO_LARGE_DESC,
+          "20MB以下の画像を選択してください",
         );
       } else if (error?.code === "file-invalid-type") {
         showErrorToast(
@@ -215,7 +215,7 @@ export default function UploadZone({ onImageUploaded }: UploadZoneProps) {
           </div>
 
           <p className="text-xs text-gray-400 mt-4">
-            対応形式: JPEG, PNG, HEIC, WebP (最大10MB)
+            対応形式: JPEG, PNG, HEIC, WebP (最大20MB)
           </p>
         </div>
       </CardContent>
