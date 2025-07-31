@@ -1,10 +1,28 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { processImage } from "./image";
 
-// browser-image-compressionライブラリをモック化
-vi.mock("browser-image-compression", () => ({
-  default: vi.fn(),
-}));
+// sharpライブラリをモック化
+vi.mock("sharp", () => {
+  const mockSharp = {
+    resize: vi.fn().mockReturnThis(),
+    jpeg: vi.fn().mockReturnThis(),
+    toBuffer: vi.fn(),
+  };
+  return {
+    default: vi.fn(() => mockSharp),
+  };
+});
+
+// arrayBufferメソッドを持つFileモックを作成するヘルパー
+function createMockFile(
+  name: string,
+  type: string,
+  content: string = "",
+): File {
+  const file = new File([content], name, { type });
+  file.arrayBuffer = vi.fn().mockResolvedValue(new ArrayBuffer(content.length));
+  return file;
+}
 
 describe("processImage", () => {
   beforeEach(() => {
@@ -13,33 +31,36 @@ describe("processImage", () => {
 
   describe("正常系", () => {
     it("画像を正常にリサイズ・圧縮できる", async () => {
-      const mockOriginalFile = new File(["original"], "test.jpg", {
-        type: "image/jpeg",
-        lastModified: Date.now(),
-      });
+      const mockOriginalFile = createMockFile(
+        "test.jpg",
+        "image/jpeg",
+        "original",
+      );
+      const mockProcessedBuffer = Buffer.from("compressed");
 
-      const mockCompressedFile = new File(["compressed"], "test.jpg", {
-        type: "image/jpeg",
-        lastModified: Date.now(),
-      });
-
-      const compress = (await import("browser-image-compression")).default;
-      vi.mocked(compress).mockResolvedValue(mockCompressedFile);
+      const sharp = (await import("sharp")).default;
+      const mockSharpInstance = {
+        resize: vi.fn().mockReturnThis(),
+        jpeg: vi.fn().mockReturnThis(),
+        toBuffer: vi.fn().mockResolvedValue(mockProcessedBuffer),
+      };
+      vi.mocked(sharp).mockReturnValue(mockSharpInstance as ReturnType<typeof sharp>);
 
       const result = await processImage(mockOriginalFile);
 
-      expect(result).toEqual({
-        originalFile: mockOriginalFile,
-        processedFile: mockCompressedFile,
-        originalSize: mockOriginalFile.size,
-        processedSize: mockCompressedFile.size,
-      });
+      expect(result.originalFile).toBe(mockOriginalFile);
+      expect(result.processedFile.type).toBe("image/jpeg");
+      expect(result.processedFile.name).toBe("test.jpg");
+      expect(result.originalSize).toBe(mockOriginalFile.size);
+      expect(result.processedSize).toBe(mockProcessedBuffer.length);
 
-      expect(compress).toHaveBeenCalledWith(mockOriginalFile, {
-        maxSizeMB: 2,
-        maxWidthOrHeight: 1024,
-        useWebWorker: true,
-        quality: 0.8,
+      expect(mockSharpInstance.resize).toHaveBeenCalledWith(1024, 1024, {
+        fit: "inside",
+        withoutEnlargement: true,
+      });
+      expect(mockSharpInstance.jpeg).toHaveBeenCalledWith({
+        quality: 80,
+        progressive: true,
       });
     });
 

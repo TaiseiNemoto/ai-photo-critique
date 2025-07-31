@@ -1,4 +1,4 @@
-import imageCompression from "browser-image-compression";
+import sharp from "sharp";
 
 export interface ProcessedImageResult {
   originalFile: File;
@@ -9,7 +9,14 @@ export interface ProcessedImageResult {
 
 export async function processImage(file: File): Promise<ProcessedImageResult> {
   // サポートされているファイル形式をチェック
-  const supportedTypes = ["image/jpeg", "image/jpg", "image/png", "image/tiff"];
+  const supportedTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/tiff",
+    "image/webp",
+    "image/heic",
+  ];
   if (!supportedTypes.includes(file.type)) {
     throw new Error(`サポートされていないファイル形式です: ${file.type}`);
   }
@@ -19,28 +26,39 @@ export async function processImage(file: File): Promise<ProcessedImageResult> {
     throw new Error("無効なファイルです: ファイル名が空です");
   }
 
-  // ファイルサイズ制限（10MB）
-  const maxSizeBytes = 10 * 1024 * 1024; // 10MB
+  // ファイルサイズ制限（20MB）
+  const maxSizeBytes = 20 * 1024 * 1024; // 20MB
   if (file.size > maxSizeBytes) {
-    throw new Error("ファイルサイズが制限を超えています（最大10MB）");
+    throw new Error("ファイルサイズが制限を超えています（最大20MB）");
   }
 
   try {
-    // 圧縮オプション
-    const options = {
-      maxSizeMB: 2, // 最大2MB
-      maxWidthOrHeight: 1024, // 最大1024px
-      useWebWorker: true, // WebWorkerを使用（非ブロッキング）
-      quality: 0.8, // 品質80%
-    };
+    // ファイルをArrayBufferに変換
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-    const processedFile = await imageCompression(file, options);
+    // Sharpで画像を処理（リサイズ・圧縮）
+    const processedBuffer = await sharp(buffer)
+      .resize(1024, 1024, {
+        fit: "inside",
+        withoutEnlargement: true,
+      })
+      .jpeg({
+        quality: 80,
+        progressive: true,
+      })
+      .toBuffer();
+
+    // 処理済みファイルを作成
+    const processedFile = new File([processedBuffer], file.name, {
+      type: "image/jpeg",
+    });
 
     return {
       originalFile: file,
       processedFile,
       originalSize: file.size,
-      processedSize: processedFile.size,
+      processedSize: processedBuffer.length,
     };
   } catch (error) {
     throw new Error(

@@ -68,6 +68,9 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
       processImage(file),
     ]);
 
+    // デバッグ用：EXIF抽出結果をログ出力
+    console.log("EXIF抽出結果:", exifData);
+
     // 処理済み画像をbase64データURLに変換
     const dataUrl = await convertToDataUrl(
       processedImageResult.processedFile,
