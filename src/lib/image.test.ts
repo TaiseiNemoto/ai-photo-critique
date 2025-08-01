@@ -44,7 +44,9 @@ describe("processImage", () => {
         jpeg: vi.fn().mockReturnThis(),
         toBuffer: vi.fn().mockResolvedValue(mockProcessedBuffer),
       };
-      vi.mocked(sharp).mockReturnValue(mockSharpInstance as ReturnType<typeof sharp>);
+      vi.mocked(sharp).mockReturnValue(
+        mockSharpInstance as ReturnType<typeof sharp>,
+      );
 
       const result = await processImage(mockOriginalFile);
 
