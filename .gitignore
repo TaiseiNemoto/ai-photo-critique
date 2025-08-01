@@ -42,3 +42,6 @@ yarn-error.log*
 # TypeScript auto-generated files
 next-env.d.ts
 .claude/
+
+# Serena MCP server cache
+.serena/cache/
