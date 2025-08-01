@@ -1,6 +1,7 @@
 # 開発コマンド
 
 ## 基本コマンド
+
 ```bash
 # 開発サーバー起動
 npm run dev
@@ -13,6 +14,7 @@ npm run start
 ```
 
 ## コード品質
+
 ```bash
 # ESLintチェック
 npm run lint
@@ -25,6 +27,7 @@ npm run format
 ```
 
 ## テスト
+
 ```bash
 # 単体テスト (Vitest)
 npm run test
@@ -40,6 +43,7 @@ npm run test src/lib/exif.test.ts
 ```
 
 ## WindowsシステムでのGitコマンド
+
 ```bash
 # ファイル削除 (rmはインタラクティブモードが有効なため)
 rm -f <filename>
@@ -53,6 +57,7 @@ find    # ファイル検索
 ```
 
 ## 環境設定
+
 ```bash
 # 環境変数設定
 cp .env.example .env.local
