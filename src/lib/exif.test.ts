@@ -186,9 +186,17 @@ describe("extractExifData", () => {
       const { parse } = await import("exifr");
       vi.mocked(parse).mockRejectedValue(new Error("Parse failed"));
 
+      // ログ出力をモックして抑制
+      const loggerErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+
       const result = await extractExifData(mockFile);
 
       expect(result).toEqual({});
+      expect(loggerErrorSpy).toHaveBeenCalled();
+
+      loggerErrorSpy.mockRestore();
     });
 
     it("サポートされていないファイル形式でエラーを投げる", async () => {
