@@ -4,7 +4,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import type { UploadedImage } from "@/types/upload";
 import AppHeader from "@/components/common/AppHeader";
-import FeatureCards from "@/components/common/FeatureCards";
 import UploadZone from "@/components/upload/UploadZone";
 import ImagePreview from "@/components/upload/ImagePreview";
 import GenerateButton from "@/components/upload/GenerateButton";
@@ -80,8 +79,6 @@ export default function UploadPage() {
               />
             </div>
           )}
-
-          <FeatureCards />
         </div>
       </div>
     </div>
