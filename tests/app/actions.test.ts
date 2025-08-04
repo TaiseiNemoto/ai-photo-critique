@@ -175,16 +175,29 @@ describe("uploadImage Server Action", () => {
         new Error("Unsupported file type: text/plain"),
       );
 
-      const mockFile = createMockImageFile("test.txt", "text/plain");
+      const unsupportedFile = new File(["content"], "test.txt", {
+        type: "text/plain",
+        lastModified: Date.now(),
+      });
+
       const formData = new FormData();
-      formData.append("image", mockFile);
+      formData.append("image", unsupportedFile);
+
+      // ログ出力をモックして抑制
+      const loggerErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
       // Act
       const result = await uploadImage(formData);
 
       // Assert
       expect(result.success).toBe(false);
-      expect(result.error).toContain("Unsupported file type");
+      if (!result.success) {
+        expect(result.error).toBe("Unsupported file type: text/plain");
+      }
+
+      loggerErrorSpy.mockRestore();
     });
   });
 

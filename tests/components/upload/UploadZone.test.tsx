@@ -49,7 +49,7 @@ describe("UploadZone コンポーネント統合テスト", () => {
       renderUploadZone();
 
       expect(
-        screen.getByText("対応形式: JPEG, PNG, HEIC, WebP (最大10MB)"),
+        screen.getByText("対応形式: JPEG, PNG, HEIC, WebP (最大20MB)"),
       ).toBeInTheDocument();
     });
   });
