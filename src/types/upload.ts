@@ -9,10 +9,10 @@ export interface ExifData {
 }
 
 export interface CritiqueData {
-  technique: string;    // 技術面の講評（50-100文字）
-  composition: string;  // 構図面の講評（50-100文字）
-  color: string;       // 色彩面の講評（50-100文字）
-  overall?: string;    // 総合評価（オプション）
+  technique: string; // 技術面の講評（50-100文字）
+  composition: string; // 構図面の講評（50-100文字）
+  color: string; // 色彩面の講評（50-100文字）
+  overall?: string; // 総合評価（オプション）
 }
 
 export interface CritiqueResult {
