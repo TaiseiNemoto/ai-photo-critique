@@ -26,21 +26,21 @@ AI Photo Critique is a web application that provides instant AI-powered feedback
 The application is built on Next.js 15 with App Router and uses Server Actions for backend logic. The system processes images through multiple stages:
 
 1. **Upload Flow**: Edge Function resizes images to 1024px, extracts EXIF data, stores metadata in Vercel KV
-2. **AI Analysis**: Node Function calls OpenAI Vision API → GPT-4o for critique generation
+2. **AI Analysis**: Node Function calls Google Gemini Vision API for critique generation
 3. **Report Display**: Three-card UI shows technique/composition/color feedback + EXIF table
 4. **Share System**: Short URLs via Vercel KV with OGP image generation
 
 ### Key Components
 
 - **Frontend**: Next.js 15 (App Router), TypeScript, Tailwind CSS, shadcn/ui
-- **AI Integration**: OpenAI Vision API + GPT-4o with function calling
+- **AI Integration**: Google Gemini Vision API + Gemini 1.5 Pro
 - **Storage**: Vercel KV (24h TTL for privacy)
 - **Deployment**: Vercel with Edge Functions and Node Functions
 
 ### File Structure
 
 - `src/app/` - Next.js App Router pages and layouts
-- `src/lib/` - Utility functions (EXIF extraction, OpenAI client)
+- `src/lib/` - Utility functions (EXIF extraction, Gemini client)
 - `components/` - Reusable React components (shadcn/ui based)
 - `tests/` - Unit tests (Vitest) and E2E tests (Playwright)
 
@@ -58,13 +58,13 @@ This project actively uses **v0.dev** for UI development:
 
 Copy `.env.example` to `.env.local` and configure:
 
-- `OPENAI_API_KEY` - OpenAI API key for Vision/GPT-4o
+- `GOOGLE_AI_API_KEY` - Google AI Studio API key for Gemini Vision
 - `KV_*` - Vercel KV credentials for caching and short URLs
 
 ## Testing Strategy
 
 - **Unit Tests**: Vitest + React Testing Library for upload/EXIF/state management
-- **API Mocking**: MSW for Vision/GPT response simulation
+- **API Mocking**: MSW for Gemini Vision response simulation
 - **E2E Tests**: Playwright for full upload → critique → share flow
 - **Target**: 80% test coverage, <3s processing time per image
 
@@ -74,7 +74,7 @@ Copy `.env.example` to `.env.local` and configure:
 - Use React Server Components and Client Components appropriately
 - Leverage shadcn/ui components via v0.dev generation
 - Write clear commit messages focusing on "why" not "what"
-- OpenAI API communication through `lib/openai.ts` client
+- Gemini API communication through `lib/gemini.ts` client
 
 ### **MANDATORY: t-wada Development Methodology**
 
