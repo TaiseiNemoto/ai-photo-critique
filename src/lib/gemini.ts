@@ -17,9 +17,34 @@ const defaultConfig: GeminiConfig = {
 
 export class GeminiClient {
   private config: GeminiConfig;
+  private requestCount: number = 0;
+  private lastRequestTime: number = 0;
 
   constructor(config?: Partial<GeminiConfig>) {
     this.config = { ...defaultConfig, ...config };
+  }
+
+  /**
+   * レート制限チェック（Google AI Studio: 15 RPM）
+   */
+  private async checkRateLimit(): Promise<void> {
+    const now = Date.now();
+    const timeSinceLastRequest = now - this.lastRequestTime;
+
+    // 1分間に15リクエストの制限をチェック
+    if (timeSinceLastRequest < 60000 && this.requestCount >= 15) {
+      const waitTime = 60000 - timeSinceLastRequest;
+      console.warn(`Rate limit reached, waiting ${waitTime}ms`);
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
+    }
+
+    // カウンターのリセット（1分経過した場合）
+    if (timeSinceLastRequest >= 60000) {
+      this.requestCount = 0;
+    }
+
+    this.requestCount++;
+    this.lastRequestTime = now;
   }
 
   async analyzeCritique(
@@ -32,6 +57,9 @@ export class GeminiClient {
       if (!process.env.GOOGLE_AI_API_KEY) {
         throw new Error("GOOGLE_AI_API_KEY environment variable is not set");
       }
+
+      // レート制限チェック
+      await this.checkRateLimit();
 
       const model = genAI.getGenerativeModel({
         model: this.config.model,
@@ -62,10 +90,36 @@ export class GeminiClient {
         processingTime: Date.now() - startTime,
       };
     } catch (error) {
+      console.error("Gemini API error:", error);
+
+      let errorMessage = "Unknown error occurred";
+
+      if (error instanceof Error) {
+        // Gemini API特有のエラーハンドリング
+        if (error.message.includes("429") || error.message.includes("quota")) {
+          errorMessage =
+            "リクエスト制限に達しました。しばらく待ってから再試行してください。";
+        } else if (
+          error.message.includes("401") ||
+          error.message.includes("API key")
+        ) {
+          errorMessage = "APIキーが無効です。設定を確認してください。";
+        } else if (error.message.includes("403")) {
+          errorMessage = "アクセスが拒否されました。権限を確認してください。";
+        } else if (error.message.includes("timeout")) {
+          errorMessage =
+            "リクエストがタイムアウトしました。再試行してください。";
+        } else if (error.message.includes("network")) {
+          errorMessage =
+            "ネットワークエラーが発生しました。接続を確認してください。";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : "Unknown error occurred",
+        error: errorMessage,
         processingTime: Date.now() - startTime,
       };
     }
