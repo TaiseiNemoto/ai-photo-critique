@@ -2,7 +2,8 @@
 
 import { extractExifData } from "@/lib/exif";
 import { processImage } from "@/lib/image";
-import type { ExifData } from "@/types/upload";
+import { generatePhotoCritiqueWithRetry } from "@/lib/critique";
+import type { ExifData, CritiqueResult } from "@/types/upload";
 
 /**
  * 画像アップロードの結果を表す型
@@ -101,6 +102,152 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
     return {
       success: false,
       error: errorMessage,
+    };
+  }
+}
+
+/**
+ * 画像に対するAI講評を生成するServer Action
+ *
+ * @param formData - 講評対象の画像を含むFormData
+ * @returns AI講評結果（成功時は3軸評価データ、失敗時はエラーメッセージ）
+ */
+export async function generateCritique(
+  formData: FormData,
+): Promise<CritiqueResult> {
+  try {
+    // ファイルの抽出と基本検証
+    const file = extractAndValidateFile(formData);
+    if (!file) {
+      return {
+        success: false,
+        error: "ファイルが選択されていません",
+      };
+    }
+
+    // ファイルの種類確認
+    if (!file.type.startsWith("image/")) {
+      return {
+        success: false,
+        error: "画像ファイルを選択してください",
+      };
+    }
+
+    // 画像をBufferに変換
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // AI講評生成（再試行機能付き）
+    const result = await generatePhotoCritiqueWithRetry(buffer, file.type, 1);
+
+    return result;
+  } catch (error) {
+    console.error("Critique generation error:", error);
+
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "AI講評の生成中にエラーが発生しました";
+
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}
+
+/**
+ * 画像アップロードとAI講評生成を統合したServer Action（最適化版）
+ *
+ * @param formData - アップロードされた画像を含むFormData
+ * @returns アップロード結果とAI講評結果の両方
+ */
+export async function uploadImageWithCritique(formData: FormData): Promise<{
+  upload: UploadResult;
+  critique: CritiqueResult;
+}> {
+  const startTime = Date.now();
+
+  try {
+    // ファイル検証を一回だけ実行
+    const file = extractAndValidateFile(formData);
+    if (!file) {
+      const errorResult = {
+        success: false as const,
+        error: "ファイルが選択されていません",
+      };
+      return {
+        upload: errorResult,
+        critique: errorResult,
+      };
+    }
+
+    if (!file.type.startsWith("image/")) {
+      const errorResult = {
+        success: false as const,
+        error: "画像ファイルを選択してください",
+      };
+      return {
+        upload: errorResult,
+        critique: errorResult,
+      };
+    }
+
+    // ファイル読み込みを一回だけ実行
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // EXIF抽出、画像処理、AI講評生成を並列実行
+    const [exifData, processedImageResult, critiqueResult] = await Promise.all([
+      extractExifData(file),
+      processImage(file),
+      generatePhotoCritiqueWithRetry(buffer, file.type, 1),
+    ]);
+
+    // 処理済み画像をbase64データURLに変換
+    const dataUrl = await convertToDataUrl(
+      processedImageResult.processedFile,
+      processedImageResult.processedFile.type,
+    );
+
+    const uploadResult: UploadResult = {
+      success: true,
+      data: {
+        exifData,
+        processedImage: {
+          dataUrl,
+          originalSize: processedImageResult.originalSize,
+          processedSize: processedImageResult.processedSize,
+        },
+      },
+    };
+
+    console.log(
+      `Integrated processing completed in ${Date.now() - startTime}ms`,
+    );
+
+    return {
+      upload: uploadResult,
+      critique: critiqueResult,
+    };
+  } catch (error) {
+    console.error("Integrated processing error:", error);
+
+    const errorMessage =
+      error instanceof Error ? error.message : "処理中にエラーが発生しました";
+
+    const processingTime = Date.now() - startTime;
+
+    return {
+      upload: {
+        success: false,
+        error: errorMessage,
+      },
+      critique: {
+        success: false,
+        error: errorMessage,
+        processingTime,
+      },
     };
   }
 }
