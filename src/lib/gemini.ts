@@ -1,0 +1,137 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import type { CritiqueData, CritiqueResult } from "@/types/upload";
+
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || "");
+
+export interface GeminiConfig {
+  model: string;
+  maxOutputTokens: number;
+  temperature: number;
+}
+
+const defaultConfig: GeminiConfig = {
+  model: "gemini-1.5-pro",
+  maxOutputTokens: 2048,
+  temperature: 0.7,
+};
+
+export class GeminiClient {
+  private config: GeminiConfig;
+
+  constructor(config?: Partial<GeminiConfig>) {
+    this.config = { ...defaultConfig, ...config };
+  }
+
+  async analyzeCritique(
+    imageBuffer: Buffer,
+    mimeType: string,
+  ): Promise<CritiqueResult> {
+    const startTime = Date.now();
+
+    try {
+      if (!process.env.GOOGLE_AI_API_KEY) {
+        throw new Error("GOOGLE_AI_API_KEY environment variable is not set");
+      }
+
+      const model = genAI.getGenerativeModel({
+        model: this.config.model,
+        generationConfig: {
+          maxOutputTokens: this.config.maxOutputTokens,
+          temperature: this.config.temperature,
+        },
+      });
+
+      const prompt = this.buildCritiquePrompt();
+
+      const imagePart = {
+        inlineData: {
+          data: imageBuffer.toString("base64"),
+          mimeType: mimeType,
+        },
+      };
+
+      const result = await model.generateContent([prompt, imagePart]);
+      const response = await result.response;
+      const text = response.text();
+
+      const critiqueData = this.parseCritiqueResponse(text);
+
+      return {
+        success: true,
+        data: critiqueData,
+        processingTime: Date.now() - startTime,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
+        processingTime: Date.now() - startTime,
+      };
+    }
+  }
+
+  private buildCritiquePrompt(): string {
+    return `写真を3つの観点から分析し、日本語で建設的な講評を提供してください。
+
+以下のJSON形式で回答してください：
+
+{
+  "technique": "技術面の講評（50-100文字、F値・シャッター速度・ISO・ピントなどについて）",
+  "composition": "構図面の講評（50-100文字、被写体の配置・バランス・視線誘導などについて）",
+  "color": "色彩面の講評（50-100文字、色の調和・明暗・雰囲気などについて）"
+}
+
+講評のガイドライン：
+- 建設的で具体的なアドバイス
+- 初心者から中級者向け
+- 日本語で自然な表現
+- 各項目50-100文字程度
+- JSONフォーマット厳守`;
+  }
+
+  private parseCritiqueResponse(response: string): CritiqueData {
+    try {
+      // JSON部分を抽出
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error("JSON response not found");
+      }
+
+      const parsed = JSON.parse(jsonMatch[0]);
+
+      // 必須フィールドの検証
+      if (!parsed.technique || !parsed.composition || !parsed.color) {
+        throw new Error("Required critique fields missing");
+      }
+
+      return {
+        technique: String(parsed.technique),
+        composition: String(parsed.composition),
+        color: String(parsed.color),
+        overall: parsed.overall ? String(parsed.overall) : undefined,
+      };
+    } catch (error) {
+      throw new Error(
+        `Failed to parse critique response: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+    }
+  }
+
+  async testConnection(): Promise<boolean> {
+    try {
+      if (!process.env.GOOGLE_AI_API_KEY) {
+        return false;
+      }
+
+      const model = genAI.getGenerativeModel({ model: this.config.model });
+      const result = await model.generateContent("Hello");
+      const response = await result.response;
+      return Boolean(response.text());
+    } catch {
+      return false;
+    }
+  }
+}
+
+export const geminiClient = new GeminiClient();
