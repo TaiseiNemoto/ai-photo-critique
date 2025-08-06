@@ -1,7 +1,9 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import type { CritiqueData, CritiqueResult } from "@/types/upload";
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || "");
+const genAI = new GoogleGenAI({
+  apiKey: process.env.GOOGLE_AI_API_KEY || "",
+});
 
 export interface GeminiConfig {
   model: string;
@@ -10,7 +12,7 @@ export interface GeminiConfig {
 }
 
 const defaultConfig: GeminiConfig = {
-  model: "gemini-1.5-pro",
+  model: "gemini-2.0-flash-001",
   maxOutputTokens: 2048,
   temperature: 0.7,
 };
@@ -61,26 +63,35 @@ export class GeminiClient {
       // レート制限チェック
       await this.checkRateLimit();
 
-      const model = genAI.getGenerativeModel({
-        model: this.config.model,
-        generationConfig: {
-          maxOutputTokens: this.config.maxOutputTokens,
-          temperature: this.config.temperature,
-        },
-      });
-
       const prompt = this.buildCritiquePrompt();
 
-      const imagePart = {
+      // 新しいAPIに合わせた画像データの準備
+      const imageContent = {
         inlineData: {
           data: imageBuffer.toString("base64"),
           mimeType: mimeType,
         },
       };
 
-      const result = await model.generateContent([prompt, imagePart]);
-      const response = await result.response;
-      const text = response.text();
+      // 新SDK形式でのAPI呼び出し
+      const result = await genAI.models.generateContent({
+        model: this.config.model,
+        contents: [
+          {
+            parts: [{ text: prompt }, imageContent],
+          },
+        ],
+        config: {
+          temperature: this.config.temperature,
+          maxOutputTokens: this.config.maxOutputTokens,
+        },
+      });
+
+      const text = result.text;
+      
+      if (!text) {
+        throw new Error("No response text received from Gemini API");
+      }
 
       const critiqueData = this.parseCritiqueResponse(text);
 
@@ -178,10 +189,12 @@ export class GeminiClient {
         return false;
       }
 
-      const model = genAI.getGenerativeModel({ model: this.config.model });
-      const result = await model.generateContent("Hello");
-      const response = await result.response;
-      return Boolean(response.text());
+      const result = await genAI.models.generateContent({
+        model: this.config.model,
+        contents: "Hello, this is a connection test.",
+      });
+
+      return Boolean(result.text);
     } catch {
       return false;
     }
