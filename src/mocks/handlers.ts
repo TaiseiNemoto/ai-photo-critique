@@ -53,7 +53,27 @@ const mockCritiqueVariations = {
 
 // MSWハンドラー定義
 export const handlers = [
-  // Gemini API モック（成功レスポンス）
+  // Gemini API モック（成功レスポンス）- 新SDK用
+  http.post(
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent",
+    () => {
+      return HttpResponse.json({
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify(mockCritiqueData),
+                },
+              ],
+            },
+          },
+        ],
+      });
+    },
+  ),
+
+  // 旧モデル用の互換性サポート
   http.post(
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
     () => {
@@ -75,7 +95,7 @@ export const handlers = [
 
   // Gemini API モック（エラーレスポンス）
   http.post(
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent",
     () => {
       return new HttpResponse(null, {
         status: 429,
@@ -110,7 +130,7 @@ export const createMockCritiqueHandler = (response: CritiqueResult) =>
 
 export const createMockGeminiHandler = (critiqueData: CritiqueData) =>
   http.post(
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent",
     () => {
       return HttpResponse.json({
         candidates: [
@@ -131,14 +151,14 @@ export const createMockGeminiHandler = (critiqueData: CritiqueData) =>
 // エラーケース用のハンドラー
 export const errorHandlers = {
   networkError: http.post(
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent",
     () => {
       return HttpResponse.error();
     },
   ),
 
   timeout: http.post(
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent",
     async () => {
       await new Promise((resolve) => setTimeout(resolve, 30000)); // 30秒タイムアウト
       return HttpResponse.json({ error: "Request timeout" });
@@ -146,7 +166,7 @@ export const errorHandlers = {
   ),
 
   rateLimited: http.post(
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent",
     () => {
       return new HttpResponse(
         JSON.stringify({
@@ -167,7 +187,7 @@ export const errorHandlers = {
   ),
 
   invalidApiKey: http.post(
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent",
     () => {
       return new HttpResponse(
         JSON.stringify({
