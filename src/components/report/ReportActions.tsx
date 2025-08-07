@@ -11,6 +11,15 @@ interface ReportActionsProps {
 
 export function ReportActions({ reportId }: ReportActionsProps) {
   const handleShare = async () => {
+    // Context API版では一時的なデータのため、シェア機能は制限
+    if (reportId === "current") {
+      toast.error("シェア機能は準備中です", {
+        description: "現在の講評結果は一時的なもののため、シェアできません",
+        duration: 3000,
+      });
+      return;
+    }
+
     try {
       const shareUrl = `${window.location.origin}/s/${reportId}`;
       await navigator.clipboard.writeText(shareUrl);
@@ -32,6 +41,7 @@ export function ReportActions({ reportId }: ReportActionsProps) {
       <Button
         onClick={handleShare}
         className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white"
+        disabled={reportId === "current"}
       >
         <Share2 className="h-4 w-4" />
         シェア用リンクをコピー

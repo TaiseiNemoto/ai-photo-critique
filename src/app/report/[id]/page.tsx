@@ -77,9 +77,9 @@ export default function ReportPage({ params }: ReportPageProps) {
               <CritiqueCard title="色彩" icon="色" content={critique.color} />
             </div>
 
-            {image.exif && <ExifDetails exifData={image.exif} />}
+            {image.exif && <ExifDetails exif={image.exif} />}
 
-            <ReportActions />
+            <ReportActions reportId="current" />
           </div>
         </div>
       </div>
