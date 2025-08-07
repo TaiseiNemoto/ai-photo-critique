@@ -88,7 +88,7 @@ export class GeminiClient {
       });
 
       const text = result.text;
-      
+
       if (!text) {
         throw new Error("No response text received from Gemini API");
       }
