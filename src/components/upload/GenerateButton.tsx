@@ -7,13 +7,19 @@ interface GenerateButtonProps {
   isProcessing: boolean;
   onGenerate: () => void;
   disabled?: boolean;
+  critiqueStatus?: "idle" | "loading" | "success" | "error";
+  critiqueError?: string;
 }
 
 export default function GenerateButton({
   isProcessing,
   onGenerate,
   disabled,
+  critiqueStatus = "idle",
+  critiqueError,
 }: GenerateButtonProps) {
+  const showError = critiqueStatus === "error" && critiqueError;
+
   return (
     <div className="text-center">
       <Button
@@ -35,7 +41,12 @@ export default function GenerateButton({
           </>
         )}
       </Button>
-      <p className="text-sm text-gray-500 mt-3">通常2-3秒で完了します</p>
+
+      {showError ? (
+        <p className="text-sm text-red-500 mt-3">エラー: {critiqueError}</p>
+      ) : (
+        <p className="text-sm text-gray-500 mt-3">通常2-3秒で完了します</p>
+      )}
     </div>
   );
 }
