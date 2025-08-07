@@ -1,15 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { UploadedImage, CritiqueData } from "@/types/upload";
 import { generateCritique } from "@/app/actions";
+import { useCritique } from "@/contexts/CritiqueContext";
 import AppHeader from "@/components/common/AppHeader";
 import UploadZone from "@/components/upload/UploadZone";
 import ImagePreview from "@/components/upload/ImagePreview";
 import GenerateButton from "@/components/upload/GenerateButton";
 
 export default function UploadPage() {
+  const router = useRouter();
+  const { setCritiqueData } = useCritique();
+
   const [uploadedImage, setUploadedImage] = useState<UploadedImage | null>(
     null,
   );
@@ -70,21 +75,18 @@ export default function UploadPage() {
           duration: 1500,
         });
 
-        // 少し遅延してから結果ページに移動
+        // Context APIにデータを保存してSPA的に画面遷移
         setTimeout(() => {
-          // 実際のプロダクションでは、講評データをVercel KVに保存してIDで管理
-          // 現在はデモ用にローカルストレージを使用
           if (uploadedImage && result.data) {
-            localStorage.setItem(
-              "currentCritique",
-              JSON.stringify({
-                image: uploadedImage,
-                critique: result.data,
-                timestamp: Date.now(),
-              }),
-            );
+            // Context APIに講評データを保存
+            setCritiqueData({
+              image: uploadedImage,
+              critique: result.data,
+            });
+
+            // Next.js routerでSPA的に画面遷移
+            router.push("/report/current");
           }
-          window.location.href = "/report/demo";
         }, 1500);
       } else {
         setCritiqueState({

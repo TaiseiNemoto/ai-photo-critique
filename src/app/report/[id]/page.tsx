@@ -1,3 +1,8 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCritique } from "@/contexts/CritiqueContext";
 import { ReportHeader } from "@/components/report/ReportHeader";
 import { ImagePreview } from "@/components/report/ImagePreview";
 import { CritiqueCard } from "@/components/report/CritiqueCard";
@@ -10,10 +15,78 @@ interface ReportPageProps {
   }>;
 }
 
-export default async function ReportPage({ params }: ReportPageProps) {
-  const { id } = await params;
-  // In real app, this would fetch data based on params.id from Vercel KV
-  // For now, using mock data
+export default function ReportPage({ params }: ReportPageProps) {
+  const router = useRouter();
+  const { currentCritique, hasCritiqueData } = useCritique();
+  const [id, setId] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function getParams() {
+      const resolvedParams = await params;
+      setId(resolvedParams.id);
+
+      // idが"current"の場合はContext APIからデータを取得
+      if (resolvedParams.id === "current") {
+        if (!hasCritiqueData) {
+          // Context APIにデータがない場合はメインページにリダイレクト
+          router.push("/");
+          return;
+        }
+      }
+      setIsLoading(false);
+    }
+
+    getParams();
+  }, [params, hasCritiqueData, router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">講評データを読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // idが"current"の場合はContext APIからデータを使用
+  if (id === "current" && currentCritique) {
+    const { image, critique } = currentCritique;
+
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl">
+            <ReportHeader />
+
+            <ImagePreview src={image.preview} />
+
+            <div className="space-y-6 mb-8">
+              <CritiqueCard
+                title="技術面"
+                icon="技"
+                content={critique.technique}
+              />
+              <CritiqueCard
+                title="構図"
+                icon="構"
+                content={critique.composition}
+              />
+              <CritiqueCard title="色彩" icon="色" content={critique.color} />
+            </div>
+
+            {image.exif && <ExifDetails exifData={image.exif} />}
+
+            <ReportActions />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // その他のidの場合は従来のモックデータを使用（将来的にはVercel KVから取得）
   const reportData = {
     image: "/placeholder.svg?height=400&width=600",
     technical:
