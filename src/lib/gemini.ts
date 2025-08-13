@@ -65,7 +65,7 @@ export class GeminiClient {
 
       const prompt = this.buildCritiquePrompt();
 
-      // 新しいAPIに合わせた画像データの準備
+      // 画像データの準備
       const imageContent = {
         inlineData: {
           data: imageBuffer.toString("base64"),
@@ -73,7 +73,7 @@ export class GeminiClient {
         },
       };
 
-      // 新SDK形式でのAPI呼び出し
+      // @google/genaiの正しいAPI使用方法
       const result = await genAI.models.generateContent({
         model: this.config.model,
         contents: [
