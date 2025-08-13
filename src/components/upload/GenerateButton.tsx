@@ -19,34 +19,89 @@ export default function GenerateButton({
   critiqueError,
 }: GenerateButtonProps) {
   const showError = critiqueStatus === "error" && critiqueError;
+  const showSuccess = critiqueStatus === "success";
+
+  const getButtonText = () => {
+    if (isProcessing) return "AI講評を生成中...";
+    if (showSuccess) return "講評完了！";
+    return "講評を生成する";
+  };
+
+  const getButtonIcon = () => {
+    if (isProcessing) {
+      return (
+        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+      );
+    }
+    if (showSuccess) {
+      return <ArrowRight className="h-5 w-5 mr-2" />;
+    }
+    return <Sparkles className="h-5 w-5 mr-2" />;
+  };
+
+  const getStatusMessage = () => {
+    if (showError) {
+      return (
+        <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-600 font-medium">
+            エラーが発生しました
+          </p>
+          <p className="text-sm text-red-500 mt-1">{critiqueError}</p>
+        </div>
+      );
+    }
+    if (showSuccess) {
+      return (
+        <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+          <p className="text-sm text-green-600 font-medium">
+            講評が正常に生成されました
+          </p>
+          <p className="text-sm text-green-500 mt-1">
+            結果ページに移動します...
+          </p>
+        </div>
+      );
+    }
+    if (isProcessing) {
+      return (
+        <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-600 font-medium">
+            AI講評を生成しています
+          </p>
+          <p className="text-sm text-blue-500 mt-1">
+            技術・構図・色彩を分析中...
+          </p>
+        </div>
+      );
+    }
+    return <p className="text-sm text-gray-500 mt-3">通常2-3秒で完了します</p>;
+  };
 
   return (
     <div className="text-center">
       <Button
         size="lg"
         onClick={onGenerate}
-        disabled={isProcessing || disabled}
-        className="bg-gray-900 text-white hover:bg-gray-800 px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 border-0"
+        disabled={isProcessing || disabled || showSuccess}
+        className={`
+          px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 border-0
+          ${
+            showSuccess
+              ? "bg-green-600 text-white hover:bg-green-700"
+              : showError
+                ? "bg-red-600 text-white hover:bg-red-700"
+                : "bg-gray-900 text-white hover:bg-gray-800"
+          }
+        `}
       >
-        {isProcessing ? (
-          <>
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-            AI講評を生成中...
-          </>
-        ) : (
-          <>
-            <Sparkles className="h-5 w-5 mr-2" />
-            講評を生成する
-            <ArrowRight className="h-5 w-5 ml-2" />
-          </>
+        {getButtonIcon()}
+        {getButtonText()}
+        {!isProcessing && !showSuccess && (
+          <ArrowRight className="h-5 w-5 ml-2" />
         )}
       </Button>
 
-      {showError ? (
-        <p className="text-sm text-red-500 mt-3">エラー: {critiqueError}</p>
-      ) : (
-        <p className="text-sm text-gray-500 mt-3">通常2-3秒で完了します</p>
-      )}
+      {getStatusMessage()}
     </div>
   );
 }
