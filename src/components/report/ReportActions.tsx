@@ -43,7 +43,7 @@ export function ReportActions({ reportId }: ReportActionsProps) {
         className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white"
         disabled={reportId === "current"}
       >
-        <Share2 className="h-4 w-4" />
+        <Share2 className="h-4 w-4" data-testid="share-icon" />
         シェア用リンクをコピー
       </Button>
       <Button

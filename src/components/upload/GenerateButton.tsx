@@ -30,13 +30,18 @@ export default function GenerateButton({
   const getButtonIcon = () => {
     if (isProcessing) {
       return (
-        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+        <div
+          className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"
+          data-testid="loading-spinner"
+        ></div>
       );
     }
     if (showSuccess) {
-      return <ArrowRight className="h-5 w-5 mr-2" />;
+      return (
+        <ArrowRight className="h-5 w-5 mr-2" data-testid="arrow-right-icon" />
+      );
     }
-    return <Sparkles className="h-5 w-5 mr-2" />;
+    return <Sparkles className="h-5 w-5 mr-2" data-testid="sparkles-icon" />;
   };
 
   const getStatusMessage = () => {
