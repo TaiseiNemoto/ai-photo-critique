@@ -1,36 +1,134 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Photo Critique
 
-## Getting Started
+AI-powered photo analysis web application that provides instant feedback on photography technique, composition, and color. Built with Next.js 15 and Google Gemini Vision API.
 
-First, run the development server:
+## ✨ Features
+
+- **Instant AI Analysis**: Get comprehensive critique in <3 seconds
+- **Three-Dimensional Feedback**: Technique, Composition, Color analysis
+- **EXIF Data Extraction**: Detailed camera settings and metadata
+- **Share System**: Generate shareable URLs with OGP images
+- **Privacy First**: All data auto-deleted after 24 hours
+- **Japanese Interface**: Tailored for Japanese photographers
+
+## 🛠 Tech Stack
+
+- **Frontend**: Next.js 15, TypeScript, Tailwind CSS, shadcn/ui
+- **AI**: Google Gemini Vision API (Gemini 1.5 Pro)
+- **Storage**: Upstash Redis (24h TTL)
+- **Testing**: Vitest + Playwright
+- **Deployment**: Vercel
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- Google AI Studio API key
+- Upstash Redis database
+
+### Environment Setup
+
+1. Copy environment template:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Configure environment variables:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Google AI Studio API key
+GOOGLE_AI_API_KEY=your_api_key_here
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Upstash Redis (get from Vercel Marketplace)
+UPSTASH_REDIS_REST_URL=your_redis_url
+UPSTASH_REDIS_REST_TOKEN=your_redis_token
+```
 
-## Learn More
+### Installation
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Install dependencies
+npm install
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Start development server
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Open [http://localhost:3000](http://localhost:3000) to see the application.
 
-## Deploy on Vercel
+## 📋 Available Commands
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npm run lint:fix     # Fix ESLint issues
+npm run format       # Format with Prettier
+npm run test         # Run unit tests
+npm run test:e2e     # Run E2E tests
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🏗 Project Structure
+
+```
+src/
+├── app/                 # Next.js App Router
+│   ├── page.tsx        # Upload page
+│   ├── report/[id]/    # Critique results
+│   └── s/[id]/         # Shared results
+├── components/         # React components
+│   ├── upload/         # Upload flow components
+│   ├── report/         # Report display components
+│   └── share/          # Share system components
+├── lib/                # Utility functions
+│   ├── gemini.ts       # AI client
+│   ├── kv.ts           # Redis client
+│   ├── exif.ts         # EXIF extraction
+│   └── image.ts        # Image processing
+└── tests/              # Test files
+```
+
+## 🔧 Development Workflow
+
+1. **UI Development**: Use v0.dev for component generation
+2. **Backend Logic**: Implement via Server Actions
+3. **Testing**: Write unit tests with Vitest, E2E with Playwright
+4. **Code Quality**: ESLint + Prettier on every commit
+
+## 📊 Data Flow
+
+1. **Upload**: Image → Resize → EXIF extraction → Upstash Redis
+2. **Analysis**: Gemini Vision API → Japanese critique generation
+3. **Display**: Three-card UI (Technique/Composition/Color) + EXIF
+4. **Share**: Generate short URL → OGP image → 24h TTL
+
+## 🧪 Testing
+
+- **Unit Tests**: 80%+ coverage target
+- **E2E Tests**: Full user journey coverage
+- **Performance**: <3s processing time per image
+
+## 🚀 Deployment
+
+Deploy to Vercel with automatic CI/CD:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/ai-photo-critique)
+
+## 📄 License
+
+[MIT License](LICENSE)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
+
+## 📞 Support
+
+For questions or issues, please [open an issue](https://github.com/your-username/ai-photo-critique/issues).
