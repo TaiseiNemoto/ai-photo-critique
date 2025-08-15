@@ -45,3 +45,4 @@ next-env.d.ts
 
 # Serena MCP server cache
 .serena/cache/
+tsconfig.tsbuildinfo
