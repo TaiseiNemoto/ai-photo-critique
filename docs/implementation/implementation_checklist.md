@@ -19,6 +19,7 @@
 - [x] **EXIF抽出** (`src/lib/exif.ts`) - exifrライブラリ使用
 - [x] **画像処理** (`src/lib/image.ts`) - Sharpによるリサイズ
 - [x] **Gemini統合** (`src/lib/gemini.ts`) - Vision API呼び出し
+- [x] **Upstash Redis統合** (`src/lib/kv.ts`) - データ永続化
 - [x] **型定義** (`src/types/upload.ts`) - TypeScript型安全性
 
 #### テスト基盤
@@ -51,10 +52,11 @@
 
 #### データ永続化
 
-- [ ] **Vercel KV設定** - 環境変数、接続設定
-- [ ] **データスキーマ** - アップロード・講評データ構造
-- [ ] **TTL管理** - 24時間自動削除
-- [ ] **クリーンアップ機能** - 期限切れデータ削除
+- [x] **KVクライアント実装** - インメモリ/Upstash対応完了
+- [x] **データスキーマ** - CritiqueData, ShareData型定義済み
+- [x] **TTL管理** - 24時間自動削除実装
+- [ ] **Upstash Redis接続** - 次回セッションで実施予定
+- [ ] **本番環境テスト** - 実際のRedis環境での動作確認
 
 #### 運用機能
 
@@ -95,7 +97,7 @@
    ↓
 3. generateCritique() Server Action (Gemini API直接呼び出し)
    ↓
-4. メモリ内保存（永続化なし）
+4. Upstash Redis保存（開発時はインメモリ）
    ↓
 5. レポート表示
 ```
@@ -107,11 +109,11 @@
    ↓
 2. uploadImage() → /api/upload (Edge Function)
    ↓
-3. 画像処理 + EXIF抽出 + KV保存
+3. 画像処理 + EXIF抽出 + Upstash Redis保存
    ↓
 4. generateCritique() → /api/critique (Node Function)
    ↓
-5. Gemini API呼び出し + KV更新
+5. Gemini API呼び出し + Upstash Redis更新
    ↓
 6. 短縮URL生成 + OGP画像生成
    ↓
@@ -127,6 +129,7 @@
 - [x] **EXIF抽出テスト** (`src/lib/exif.test.ts`)
 - [x] **画像処理テスト** (`src/lib/image.test.ts`)
 - [x] **講評機能テスト** (`src/lib/critique.test.ts`)
+- [x] **KVクライアントテスト** (`src/lib/kv.test.ts`) - 9つのテストケース
 
 #### APIモック
 
@@ -191,7 +194,8 @@
 
 #### Vercel設定
 
-- [ ] **環境変数** - `GOOGLE_AI_API_KEY`, `KV_*`
+- [ ] **環境変数** - `GOOGLE_AI_API_KEY`, `UPSTASH_REDIS_*`
+- [ ] **Upstash Redis統合** - Marketplace経由設定
 - [ ] **Edge/Node Function設定** - ランタイム指定
 - [ ] **ドメイン設定** - 本番URL
 - [ ] **分析設定** - Vercel Analytics
@@ -205,12 +209,13 @@
 
 ## 次のアクション項目
 
-### 即座に着手（1週間以内）
+### 即座に着手（次回セッション）
 
-1. **Vercel KV設定**
-   - [ ] 環境変数設定
-   - [ ] 接続テスト実装
-   - [ ] データスキーマ定義
+1. **Upstash Redis接続設定** 🔄
+   - [x] KVクライアント実装
+   - [x] 開発時フォールバック実装
+   - [ ] 実際のUpstashインスタンス作成
+   - [ ] 環境変数設定と動作確認
 
 2. **API Route実装**
    - [ ] `/api/upload` Edge Function
@@ -219,7 +224,7 @@
 
 3. **Server Actions修正**
    - [ ] API Route呼び出しに変更
-   - [ ] KV統合
+   - [ ] Upstash Redis統合
    - [ ] レスポンス形式統一
 
 ### 第2フェーズ（2-3週間以内）
@@ -241,6 +246,7 @@
 
 ---
 
-**最終更新**: 2025-08-14  
+**最終更新**: 2025-08-15  
+**重要変更**: Vercel KV廃止に伴いUpstash Redisに移行完了  
 **チェック基準**: MVP完成要件（要件ドキュメント準拠）  
 **次回更新**: API Route実装完了時
