@@ -5,6 +5,7 @@
 ### Step 1: Upstash Redisインスタンス作成 (15分)
 
 #### 1.1 Vercel Marketplace経由での設定
+
 ```bash
 # Vercel Dashboard での操作
 1. https://vercel.com/dashboard → Projects
@@ -15,6 +16,7 @@
 ```
 
 #### 1.2 代替案：直接Upstash設定
+
 ```bash
 # https://upstash.com/ での操作
 1. アカウント作成/ログイン
@@ -26,6 +28,7 @@
 ### Step 2: 環境変数設定とテスト (10分)
 
 #### 2.1 環境変数の設定
+
 ```bash
 # .env.local に追加
 UPSTASH_REDIS_REST_URL="https://..."
@@ -33,6 +36,7 @@ UPSTASH_REDIS_REST_TOKEN="..."
 ```
 
 #### 2.2 接続テスト実行
+
 ```bash
 cd /path/to/ai-photo-critique
 npm run test src/lib/kv.test.ts
@@ -41,6 +45,7 @@ npm run test src/lib/kv.test.ts
 ### Step 3: パッケージ変更 (5分)
 
 #### 3.1 依存関係の変更
+
 ```bash
 # @vercel/kv を @upstash/redis に変更
 npm uninstall @vercel/kv
@@ -48,15 +53,17 @@ npm install @upstash/redis
 ```
 
 #### 3.2 コード修正
+
 ```typescript
 // src/lib/kv.ts の修正
 // import { kv } from '@vercel/kv';
-import { Redis } from '@upstash/redis';
+import { Redis } from "@upstash/redis";
 ```
 
 ### Step 4: 動作確認 (10分)
 
 #### 4.1 実際のデータ操作テスト
+
 ```bash
 # 開発サーバー起動
 npm run dev
@@ -80,21 +87,24 @@ npm run dev
 ## 🔄 その後の作業（Step2準備）
 
 ### API Routes実装準備
+
 ```bash
 # 次の優先タスク
 1. /api/upload Edge Function実装
-2. /api/critique Node Function実装  
+2. /api/critique Node Function実装
 3. Server Actions修正（API Route呼び出し）
 ```
 
 ## 📁 関連ファイル
 
 ### 修正が必要なファイル
+
 - `src/lib/kv.ts` - パッケージ変更
 - `package.json` - 依存関係更新
 - `.env.local` - 環境変数追加
 
 ### 確認が必要なファイル
+
 - `src/lib/kv.test.ts` - テスト動作確認
 - `docs/implementation/implementation_checklist.md` - 進捗更新
 
@@ -108,8 +118,9 @@ npm run dev
 ## 📞 トラブルシューティング
 
 ### よくある問題
+
 1. **接続エラー**: 環境変数のコピペミス確認
-2. **認証エラー**: Upstashトークンの権限確認  
+2. **認証エラー**: Upstashトークンの権限確認
 3. **ネットワークエラー**: プロキシ/ファイアウォール設定確認
 
 ---
