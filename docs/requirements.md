@@ -12,7 +12,7 @@
 | -------------- | --------------------------------------------------------------------- |
 | **MVP**        | Minimum Viable Product。今回の初期リリース範囲                        |
 | **講評 API**   | OpenAI Vision → GPT‑4o を呼び出して講評 JSON を返すサーバーアクション |
-| **シェア URL** | Vercel KV に保存されたレポートのキーを短縮 URL 化したもの             |
+| **シェア URL** | Upstash Redis に保存されたレポートのキーを短縮 URL 化したもの         |
 | **EXIF**       | 画像に埋め込まれた撮影設定メタデータ                                  |
 
 ## 4. スコープ
@@ -58,7 +58,7 @@
 │ kv.set()
 ▼
 ┌────────────────────────┐
-│ ④ Vercel KV │ 24h 期限付きメタデータ
+│ ④ Upstash Redis │ 24h 期限付きメタデータ
 └────────┬───────────────┘
 │ kv.get()/set()
 ▼
@@ -71,20 +71,20 @@
 │ ⑥ OpenAI API │ 画像＋講評生成
 └────────────────────────┘
 
-【運用】Vercel Cron (1 日 1 回) → KV 内の 24h 超データを削除
+【運用】TTL機能により24h後に自動削除（Cronジョブ不要）
 
 ### コンポーネント一覧と役割
 
-| ID  | コンポーネント                    | 主な責務                                    | 実装／デプロイ                            |
-| --- | --------------------------------- | ------------------------------------------- | ----------------------------------------- |
-| ①   | **ブラウザ UI**                   | 画像アップロード、講評カード表示、シェア    | Next.js 15 (App Router／RSC)              |
-| ②   | **Next.js サーバー層**            | Server Actions 経由でバックエンド呼び出し   | Vercel Edge Runtime                       |
-| ③   | **Edge Function `/api/upload`**   | 画像を 1024 px に縮小、EXIF 抽出、KV へ保存 | Vercel Edge Function                      |
-| ④   | **Vercel KV**                     | 短縮 URL と講評 JSON を 24 h 保存           | 無料枠 3 GB                               |
-| ⑤   | **Node Function `/api/critique`** | Vision → GPT-4o 呼び出し、講評 JSON 整形    | Vercel Node Function (`runtime='nodejs'`) |
-| ⑥   | **OpenAI API**                    | 画像解析＋LLM で講評生成                    | 従量課金                                  |
-| —   | **Edge Function `/api/ogp`**      | Satori＋Resvg で OGP 画像生成               | Vercel Edge Function                      |
-| —   | **Vercel Cron**                   | 24 h 経過データの自動削除                   | 1 回/日 無料                              |
+| ID  | コンポーネント                    | 主な責務                                       | 実装／デプロイ                            |
+| --- | --------------------------------- | ---------------------------------------------- | ----------------------------------------- |
+| ①   | **ブラウザ UI**                   | 画像アップロード、講評カード表示、シェア       | Next.js 15 (App Router／RSC)              |
+| ②   | **Next.js サーバー層**            | Server Actions 経由でバックエンド呼び出し      | Vercel Edge Runtime                       |
+| ③   | **Edge Function `/api/upload`**   | 画像を 1024 px に縮小、EXIF 抽出、Redis へ保存 | Vercel Edge Function                      |
+| ④   | **Upstash Redis**                 | 短縮 URL と講評 JSON を 24 h 保存              | 無料枠 10,000 リクエスト/日               |
+| ⑤   | **Node Function `/api/critique`** | Vision → GPT-4o 呼び出し、講評 JSON 整形       | Vercel Node Function (`runtime='nodejs'`) |
+| ⑥   | **OpenAI API**                    | 画像解析＋LLM で講評生成                       | 従量課金                                  |
+| —   | **Edge Function `/api/ogp`**      | Satori＋Resvg で OGP 画像生成                  | Vercel Edge Function                      |
+| —   | **Vercel Cron**                   | 24 h 経過データの自動削除                      | 1 回/日 無料                              |
 
 ### リクエストフロー
 
