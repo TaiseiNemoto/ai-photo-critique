@@ -8,7 +8,7 @@ gantt
     dateFormat  YYYY-MM-DD
     section Phase 1: MVP完成
     API Route実装          :active, p1-1, 2025-08-14, 4d
-    Vercel KV統合         :p1-2, after p1-1, 3d
+    Upstash Redis統合     :p1-2, after p1-1, 3d
     統合テスト           :p1-3, after p1-2, 3d
     section Phase 2: 品質向上
     UX/アクセシビリティ   :p2-1, after p1-3, 5d
@@ -28,19 +28,20 @@ gantt
 
 ### Step 1: APIインフラ構築 (4日)
 
-#### 1.1 Vercel KV設定
+#### 1.1 Upstash Redis設定 🔄
 
-- [ ] 環境変数設定 (`.env.local`)
-- [ ] KV接続テスト実装
-- [ ] TTL設定 (24時間)
-- [ ] クリーンアップ機能実装
+- [x] KVクライアント実装 (`src/lib/kv.ts`)
+- [x] 開発時フォールバック実装 (インメモリストレージ)
+- [x] TTL設定 (24時間自動削除)
+- [x] データスキーマ定義 (CritiqueData, ShareData)
+- [ ] **次回実施**: 実際のUpstashインスタンス作成・接続
 
 #### 1.2 `/api/upload` Edge Function実装
 
 - [ ] ファイル処理ロジック移行
 - [ ] Sharp による画像リサイズ (1024px)
 - [ ] EXIF データ抽出
-- [ ] KV への一時保存
+- [ ] Upstash Redis への一時保存
 - [ ] エラーハンドリング
 
 #### 1.3 `/api/critique` Node Function実装
