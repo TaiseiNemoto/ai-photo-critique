@@ -52,13 +52,13 @@ class KvClient {
   private isProduction: boolean;
 
   constructor() {
-    // 本番環境ではVercel KVを使用、開発時はインメモリストレージを使用
+    // 本番環境ではUpstash Redisを使用、開発時はインメモリストレージを使用
     this.isProduction = !!(
       process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN
     );
 
     if (this.isProduction) {
-      // 動的インポートでVercel KVを使用（本番環境のみ）
+      // 動的インポートでUpstash Redisを使用（本番環境のみ）
       this.client = null as unknown as KvInterface; // 後で初期化
     } else {
       // 開発時用のインメモリストレージ
@@ -68,8 +68,11 @@ class KvClient {
 
   private async getClient() {
     if (this.isProduction && !this.client) {
-      const { kv } = await import("@vercel/kv");
-      this.client = kv;
+      const { Redis } = await import("@upstash/redis");
+      this.client = new Redis({
+        url: process.env.KV_REST_API_URL!,
+        token: process.env.KV_REST_API_TOKEN!,
+      });
     }
     return this.client;
   }
@@ -86,7 +89,17 @@ class KvClient {
     const client = await this.getClient();
     const key = `critique:${id}`;
     const data = await client.get(key);
-    return data ? JSON.parse(data as string) : null;
+    
+    if (!data) return null;
+    
+    // Upstash Redis の場合、データが既にパースされて返される場合がある
+    if (typeof data === 'string') {
+      return JSON.parse(data);
+    } else if (typeof data === 'object') {
+      return data as CritiqueData;
+    }
+    
+    return null;
   }
 
   // 共有URLデータの保存（24時間TTL）
@@ -101,7 +114,17 @@ class KvClient {
     const client = await this.getClient();
     const key = `share:${id}`;
     const data = await client.get(key);
-    return data ? JSON.parse(data as string) : null;
+    
+    if (!data) return null;
+    
+    // Upstash Redis の場合、データが既にパースされて返される場合がある
+    if (typeof data === 'string') {
+      return JSON.parse(data);
+    } else if (typeof data === 'object') {
+      return data as ShareData;
+    }
+    
+    return null;
   }
 
   // 画像データの保存（Base64エンコード済み、24時間TTL）
