@@ -36,13 +36,14 @@ gantt
 - [x] データスキーマ定義 (CritiqueData, ShareData)
 - [x] **完了 (2025-08-18)**: 実際のUpstashインスタンス作成・接続
 
-#### 1.2 `/api/upload` Edge Function実装
+#### 1.2 `/api/upload` Node Function実装 ✅
 
-- [ ] ファイル処理ロジック移行
-- [ ] Sharp による画像リサイズ (1024px)
-- [ ] EXIF データ抽出
-- [ ] Upstash Redis への一時保存
-- [ ] エラーハンドリング
+- [x] ファイル処理ロジック移行
+- [x] Sharp による画像リサイズ (1024px)
+- [x] EXIF データ抽出
+- [x] Upstash Redis への一時保存
+- [x] エラーハンドリング
+- [x] **完了 (2025-08-19)**: Node Runtime対応（Sharp制約のため）
 
 #### 1.3 `/api/critique` Node Function実装
 

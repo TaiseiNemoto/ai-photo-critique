@@ -1,7 +1,5 @@
 "use server";
 
-import { extractExifData } from "@/lib/exif";
-import { processImage } from "@/lib/image";
 import { generatePhotoCritiqueWithRetry } from "@/lib/critique";
 import type { ExifData, CritiqueResult } from "@/types/upload";
 
@@ -35,18 +33,6 @@ function extractAndValidateFile(formData: FormData): File | null {
 }
 
 /**
- * 処理済み画像をbase64データURLに変換する
- */
-async function convertToDataUrl(
-  processedFile: File,
-  fileType: string,
-): Promise<string> {
-  const arrayBuffer = await processedFile.arrayBuffer();
-  const base64 = Buffer.from(arrayBuffer).toString("base64");
-  return `data:${fileType};base64,${base64}`;
-}
-
-/**
  * 画像アップロード処理のServer Action
  *
  * @param formData - アップロードされた画像を含むFormData
@@ -54,46 +40,40 @@ async function convertToDataUrl(
  */
 export async function uploadImage(formData: FormData): Promise<UploadResult> {
   try {
-    // ファイルの抽出と基本検証
-    const file = extractAndValidateFile(formData);
-    if (!file) {
+    // APIエンドポイントに画像をアップロード
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
       return {
         success: false,
-        error: "ファイルが選択されていません",
+        error: errorData.error || "アップロードに失敗しました",
       };
     }
 
-    // EXIF抽出と画像処理を並列実行（パフォーマンス向上）
-    const [exifData, processedImageResult] = await Promise.all([
-      extractExifData(file),
-      processImage(file),
-    ]);
+    const apiResponse = await response.json();
 
-    // デバッグ用：EXIF抽出結果をログ出力
-    console.log("EXIF抽出結果:", exifData);
+    if (!apiResponse.success) {
+      return {
+        success: false,
+        error: apiResponse.error || "アップロードに失敗しました",
+      };
+    }
 
-    // 処理済み画像をbase64データURLに変換
-    const dataUrl = await convertToDataUrl(
-      processedImageResult.processedFile,
-      processedImageResult.processedFile.type,
-    );
-
+    // API Responseを既存の形式に変換
     return {
       success: true,
       data: {
-        exifData,
-        processedImage: {
-          dataUrl,
-          originalSize: processedImageResult.originalSize,
-          processedSize: processedImageResult.processedSize,
-        },
+        exifData: apiResponse.data.exifData,
+        processedImage: apiResponse.data.processedImage,
       },
     };
   } catch (error) {
-    // エラーログ出力（デバッグ用）
-    console.error("Upload error:", error);
+    console.error("Upload action error:", error);
 
-    // ユーザーフレンドリーなエラーメッセージを返却
     const errorMessage =
       error instanceof Error
         ? error.message
@@ -169,58 +149,22 @@ export async function uploadImageWithCritique(formData: FormData): Promise<{
   const startTime = Date.now();
 
   try {
-    // ファイル検証を一回だけ実行
-    const file = extractAndValidateFile(formData);
-    if (!file) {
+    // アップロード処理をAPI経由で実行
+    const uploadResult = await uploadImage(formData);
+
+    if (!uploadResult.success) {
       const errorResult = {
         success: false as const,
-        error: "ファイルが選択されていません",
+        error: uploadResult.error || "アップロードに失敗しました",
       };
       return {
-        upload: errorResult,
+        upload: uploadResult,
         critique: errorResult,
       };
     }
 
-    if (!file.type.startsWith("image/")) {
-      const errorResult = {
-        success: false as const,
-        error: "画像ファイルを選択してください",
-      };
-      return {
-        upload: errorResult,
-        critique: errorResult,
-      };
-    }
-
-    // ファイル読み込みを一回だけ実行
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // EXIF抽出、画像処理、AI講評生成を並列実行
-    const [exifData, processedImageResult, critiqueResult] = await Promise.all([
-      extractExifData(file),
-      processImage(file),
-      generatePhotoCritiqueWithRetry(buffer, file.type, 1),
-    ]);
-
-    // 処理済み画像をbase64データURLに変換
-    const dataUrl = await convertToDataUrl(
-      processedImageResult.processedFile,
-      processedImageResult.processedFile.type,
-    );
-
-    const uploadResult: UploadResult = {
-      success: true,
-      data: {
-        exifData,
-        processedImage: {
-          dataUrl,
-          originalSize: processedImageResult.originalSize,
-          processedSize: processedImageResult.processedSize,
-        },
-      },
-    };
+    // 講評生成処理は既存のgenerateCritique関数を使用
+    const critiqueResult = await generateCritique(formData);
 
     console.log(
       `Integrated processing completed in ${Date.now() - startTime}ms`,

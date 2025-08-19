@@ -89,16 +89,16 @@ class KvClient {
     const client = await this.getClient();
     const key = `critique:${id}`;
     const data = await client.get(key);
-    
+
     if (!data) return null;
-    
+
     // Upstash Redis の場合、データが既にパースされて返される場合がある
-    if (typeof data === 'string') {
+    if (typeof data === "string") {
       return JSON.parse(data);
-    } else if (typeof data === 'object') {
+    } else if (typeof data === "object") {
       return data as CritiqueData;
     }
-    
+
     return null;
   }
 
@@ -114,16 +114,16 @@ class KvClient {
     const client = await this.getClient();
     const key = `share:${id}`;
     const data = await client.get(key);
-    
+
     if (!data) return null;
-    
+
     // Upstash Redis の場合、データが既にパースされて返される場合がある
-    if (typeof data === 'string') {
+    if (typeof data === "string") {
       return JSON.parse(data);
-    } else if (typeof data === 'object') {
+    } else if (typeof data === "object") {
       return data as ShareData;
     }
-    
+
     return null;
   }
 
@@ -132,6 +132,34 @@ class KvClient {
     const client = await this.getClient();
     const key = `image:${id}`;
     await client.setex(key, 24 * 60 * 60, imageData);
+  }
+
+  // アップロードデータの保存（24時間TTL）
+  async saveUpload(
+    id: string,
+    uploadData: Record<string, unknown>,
+  ): Promise<void> {
+    const client = await this.getClient();
+    const key = `upload:${id}`;
+    await client.setex(key, 24 * 60 * 60, JSON.stringify(uploadData));
+  }
+
+  // アップロードデータの取得
+  async getUpload(id: string): Promise<Record<string, unknown> | null> {
+    const client = await this.getClient();
+    const key = `upload:${id}`;
+    const data = await client.get(key);
+
+    if (!data) return null;
+
+    // Upstash Redis の場合、データが既にパースされて返される場合がある
+    if (typeof data === "string") {
+      return JSON.parse(data);
+    } else if (typeof data === "object") {
+      return data as Record<string, unknown>;
+    }
+
+    return null;
   }
 
   // 画像データの取得
