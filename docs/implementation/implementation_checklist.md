@@ -97,9 +97,11 @@
    ↓
 3. 画像処理 + EXIF抽出 + Upstash Redis保存（一意ID生成）
    ↓
-4. generateCritique() Server Action (Gemini API直接呼び出し)
+4. generateCritique() Server Action → /api/critique Node Function ✅
    ↓
-5. レポート表示
+5. Gemini API呼び出し + レスポンス統一 ✅
+   ↓
+6. レポート表示
 ```
 
 ### 目標処理フロー
@@ -141,7 +143,7 @@
 #### API Routeテスト
 
 - [ ] **Edge Functionテスト** - `/api/upload`
-- [ ] **Node Functionテスト** - `/api/critique`
+- [x] **Node Functionテスト** - `/api/critique` (`src/app/api/critique/route.test.ts`) - 5つのテストケース ✅
 - [ ] **OGP生成テスト** - `/api/ogp`
 
 #### 統合テスト
