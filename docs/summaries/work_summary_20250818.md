@@ -25,20 +25,22 @@ npm install @upstash/redis
 ##### 主な変更点
 
 1. **環境変数の対応**
+
    ```typescript
    // 変更前
-   process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-   
+   process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN;
+
    // 変更後（既存環境変数を活用）
-   process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN
+   process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN;
    ```
 
 2. **Redisクライアントの初期化**
+
    ```typescript
    // 変更前
    const { kv } = await import("@vercel/kv");
    this.client = kv;
-   
+
    // 変更後
    const { Redis } = await import("@upstash/redis");
    this.client = new Redis({
@@ -50,9 +52,9 @@ npm install @upstash/redis
 3. **APIレスポンス形式への対応**
    ```typescript
    // Upstash RedisのAPIレスポンス形式に対応
-   if (typeof data === 'string') {
+   if (typeof data === "string") {
      return JSON.parse(data);
-   } else if (typeof data === 'object') {
+   } else if (typeof data === "object") {
      return data as CritiqueData;
    }
    ```
@@ -60,10 +62,12 @@ npm install @upstash/redis
 #### 3. 環境変数の活用
 
 **既存の環境変数を再利用**:
+
 - `KV_REST_API_URL`: Upstash RedisのREST API URL
 - `KV_REST_API_TOKEN`: Upstash RedisのAPIトークン
 
-**利点**: 
+**利点**:
+
 - 既存のVercel統合設定をそのまま活用
 - 新たな環境変数設定が不要
 - シームレスな移行
@@ -73,6 +77,7 @@ npm install @upstash/redis
 ##### テスト実行結果
 
 1. **単体テスト**
+
    ```bash
    npm run test src/lib/kv.test.ts
    # ✅ 9つのテストケースすべて成功
@@ -114,7 +119,7 @@ npm install @upstash/redis
 {
   "success": true,
   "message": "Upstash Redis接続とデータ操作が正常に動作しています",
-  "envStatus": {"url": true, "token": true},
+  "envStatus": { "url": true, "token": true },
   "testResult": {
     "connection": true,
     "dataOperations": true,
@@ -124,7 +129,7 @@ npm install @upstash/redis
       "technique": "露出が適切で、シャープな画質です。",
       "composition": "三分割法を活用した構図が効果的です。",
       "color": "色彩バランスが良く、暖色系で統一感があります。",
-      "exifData": {"camera": "Test Camera"},
+      "exifData": { "camera": "Test Camera" },
       "uploadedAt": "2025-08-18T00:24:52.336Z"
     }
   }
