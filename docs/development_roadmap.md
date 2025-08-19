@@ -28,13 +28,13 @@ gantt
 
 ### Step 1: APIインフラ構築 (4日)
 
-#### 1.1 Upstash Redis設定 🔄
+#### 1.1 Upstash Redis設定 ✅
 
 - [x] KVクライアント実装 (`src/lib/kv.ts`)
 - [x] 開発時フォールバック実装 (インメモリストレージ)
 - [x] TTL設定 (24時間自動削除)
 - [x] データスキーマ定義 (CritiqueData, ShareData)
-- [ ] **次回実施**: 実際のUpstashインスタンス作成・接続
+- [x] **完了 (2025-08-18)**: 実際のUpstashインスタンス作成・接続
 
 #### 1.2 `/api/upload` Edge Function実装
 
