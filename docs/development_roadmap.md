@@ -45,12 +45,13 @@ gantt
 - [x] エラーハンドリング
 - [x] **完了 (2025-08-19)**: Node Runtime対応（Sharp制約のため）
 
-#### 1.3 `/api/critique` Node Function実装
+#### 1.3 `/api/critique` Node Function実装 ✅
 
-- [ ] Server Action から API Route に移行
-- [ ] Gemini Vision API 呼び出し
-- [ ] レスポンス形式統一
-- [ ] リトライ機能実装
+- [x] Server Action から API Route に移行
+- [x] Gemini Vision API 呼び出し
+- [x] レスポンス形式統一
+- [x] リトライ機能実装
+- [x] **完了 (2025-08-19)**: t-wada手法によるテストファースト開発
 
 ### Step 2: データフロー統合 (3日)
 
@@ -256,5 +257,5 @@ gantt
 ---
 
 **作成日**: 2025-08-14  
-**最終更新**: 2025-08-14  
+**最終更新**: 2025-08-19  
 **次回レビュー予定**: 2025-08-21 (Phase 1完了時)
