@@ -22,9 +22,17 @@ export interface CritiqueResult {
   processingTime?: number; // デバッグ用
 }
 
+// フロントエンド用のアップロード画像型（既存のコンポーネント用）
 export interface UploadedImage {
   file: File;
   preview: string;
   exif?: ExifData;
-  critique?: CritiqueData; // 新規追加
+  critique?: CritiqueData;
+}
+
+// API用の処理済み画像型
+export interface ProcessedImageData {
+  dataUrl: string;
+  originalSize: number;
+  processedSize: number;
 }

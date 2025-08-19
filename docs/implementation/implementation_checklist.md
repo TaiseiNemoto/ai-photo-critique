@@ -30,11 +30,11 @@
 
 ### 🔧 部分実装
 
-#### Server Actions（要API Route統合）
+#### Server Actions（API Route統合済み）
 
-- [x] **uploadImage** - ローカル処理のみ、KV保存未実装
+- [x] **uploadImage** - `/api/upload` 呼び出しに変更済み ✅
 - [x] **generateCritique** - Gemini呼び出し実装済み
-- [ ] **API Route統合** - `/api/*` エンドポイント未実装
+- [x] **API Route統合** - `/api/upload` 完了、`/api/critique` 待ち
 
 #### 共有機能
 
@@ -46,7 +46,7 @@
 
 #### API Routes
 
-- [ ] **`/api/upload`** - Edge Function (画像処理 + KV保存)
+- [x] **`/api/upload`** - Node Function (画像処理 + KV保存) ✅ 2025-08-19完了
 - [ ] **`/api/critique`** - Node Function (Gemini API)
 - [ ] **`/api/ogp`** - Edge Function (Satori + OGP画像生成)
 
@@ -93,11 +93,11 @@
 ```
 1. ユーザー画像選択
    ↓
-2. uploadImage() Server Action (ローカル処理)
+2. uploadImage() Server Action → /api/upload Node Function
    ↓
-3. generateCritique() Server Action (Gemini API直接呼び出し)
+3. 画像処理 + EXIF抽出 + Upstash Redis保存（一意ID生成）
    ↓
-4. Upstash Redis保存（開発時はインメモリ）
+4. generateCritique() Server Action (Gemini API直接呼び出し)
    ↓
 5. レポート表示
 ```
@@ -217,15 +217,15 @@
    - [x] 実際のUpstashインスタンス作成
    - [x] 環境変数設定と動作確認
 
-2. **API Route実装**
-   - [ ] `/api/upload` Edge Function
+2. **API Route実装** 🔄
+   - [x] `/api/upload` Node Function ✅ 2025-08-19完了
    - [ ] `/api/critique` Node Function
    - [ ] Error handling統一
 
-3. **Server Actions修正**
-   - [ ] API Route呼び出しに変更
-   - [ ] Upstash Redis統合
-   - [ ] レスポンス形式統一
+3. **Server Actions修正** ✅
+   - [x] uploadImage API Route呼び出しに変更 ✅
+   - [x] Upstash Redis統合 ✅
+   - [x] レスポンス形式統一 ✅
 
 ### 第2フェーズ（2-3週間以内）
 
@@ -246,7 +246,7 @@
 
 ---
 
-**最終更新**: 2025-08-18  
-**重要変更**: Upstash Redis接続設定・動作確認完了、@upstash/redisパッケージ導入  
+**最終更新**: 2025-08-19  
+**重要変更**: `/api/upload` Node Function実装完了、Server Action→API Route移行済み  
 **チェック基準**: MVP完成要件（要件ドキュメント準拠）  
-**次回更新**: API Route実装完了時
+**次回更新**: `/api/critique` Node Function実装完了時
