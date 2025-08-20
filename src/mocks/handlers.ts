@@ -53,6 +53,39 @@ const mockCritiqueVariations = {
 
 // MSWハンドラー定義
 export const handlers = [
+  // /api/upload エンドポイントのモック（成功レスポンス）
+  http.post("/api/upload", () => {
+    return HttpResponse.json({
+      success: true,
+      data: {
+        exifData: {
+          make: "Sony",
+          model: "α7R V",
+          lensModel: "Sony FE 24-70mm F2.8 GM",
+          fNumber: "f/2.8",
+          exposureTime: "1/250s",
+          iso: "200",
+        },
+        processedImage: {
+          dataUrl: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ...",
+          originalSize: 1024,
+          processedSize: 512,
+        },
+      },
+    });
+  }),
+
+  // /api/upload エンドポイントのモック（エラーレスポンス）
+  http.post("/api/upload-error", () => {
+    return HttpResponse.json(
+      {
+        success: false,
+        error: "ファイルが選択されていません",
+      },
+      { status: 400 }
+    );
+  }),
+
   // Gemini API モック（成功レスポンス）- 新SDK用
   http.post(
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent",
