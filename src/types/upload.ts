@@ -17,7 +17,9 @@ export interface CritiqueData {
 
 export interface CritiqueResult {
   success: boolean;
-  data?: CritiqueData;
+  data?: CritiqueData & {
+    shareId?: string; // 共有用のID
+  };
   error?: string;
   processingTime?: number; // デバッグ用
 }

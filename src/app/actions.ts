@@ -18,7 +18,6 @@ export interface UploadResult {
   error?: string;
 }
 
-
 /**
  * 画像アップロード処理のServer Action
  *
