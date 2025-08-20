@@ -49,8 +49,8 @@ export async function processImage(file: File): Promise<ProcessedImageResult> {
       })
       .toBuffer();
 
-    // 処理済みファイルを作成
-    const processedFile = new File([processedBuffer], file.name, {
+    // 処理済みファイルを作成（BufferをUint8Arrayに変換）
+    const processedFile = new File([new Uint8Array(processedBuffer)], file.name, {
       type: "image/jpeg",
     });
 
