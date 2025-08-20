@@ -30,6 +30,7 @@ gantt
 ### ✅ Step 1: APIインフラ構築 **完了** (2025-08-14〜08-19)
 
 #### 1.1 Upstash Redis設定 ✅ 完了 (2025-08-18)
+
 - [x] KVクライアント実装 (`src/lib/kv.ts`)
 - [x] 開発時フォールバック実装 (インメモリストレージ)
 - [x] TTL設定 (24時間自動削除)
@@ -37,6 +38,7 @@ gantt
 - [x] 実際のUpstashインスタンス作成・接続
 
 #### 1.2 `/api/upload` Node Function実装 ✅ 完了 (2025-08-19)
+
 - [x] ファイル処理ロジック移行
 - [x] Sharp による画像リサイズ (1024px)
 - [x] EXIF データ抽出
@@ -45,6 +47,7 @@ gantt
 - [x] Node Runtime対応（Sharp制約のため）
 
 #### 1.3 `/api/critique` Node Function実装 ✅ 完了 (2025-08-19)
+
 - [x] Server Action から API Route に移行
 - [x] Gemini Vision API 呼び出し
 - [x] レスポンス形式統一
@@ -53,13 +56,18 @@ gantt
 
 ### 🔄 Step 2: データフロー統合 **進行中** (3日)
 
-#### 2.1 Server Actions修正 **次のタスク**
-- [ ] `uploadImage()` を API Route 呼び出しに変更
-- [ ] `generateCritique()` を API Route 呼び出しに変更
-- [ ] エラーハンドリングの統一
-- [ ] レスポンス形式の調整
+#### 2.1 Server Actions修正 ✅ 完了 (2025-08-20)
 
-#### 2.2 永続化層統合
+- [x] `uploadImage()` を API Route 呼び出しに変更
+- [x] `generateCritique()` を API Route 呼び出しに変更
+- [x] エラーハンドリングの統一
+- [x] レスポンス形式の調整
+- [x] MSWモックの更新（`/api/upload` エンドポイント追加）
+- [x] テストケースの更新（12テスト全て通過）
+- [x] t-wada手法による既存テストの更新・拡充
+
+#### 2.2 永続化層統合 **次のタスク**
+
 - [ ] アップロード結果のKV保存
 - [ ] 講評結果のKV更新
 - [ ] 短縮URL生成機能
@@ -68,18 +76,21 @@ gantt
 ### ⏳ Step 3: 共有機能完成 (3日)
 
 #### 3.1 `/api/ogp` Edge Function実装
+
 - [ ] Satori + Resvg セットアップ
 - [ ] 動的OGP画像生成
 - [ ] 講評内容の画像化
 - [ ] フォント・レイアウト調整
 
 #### 3.2 共有ページ改善
+
 - [ ] `/s/[id]` ページの完全実装
 - [ ] メタデータ動的生成
 - [ ] OGP画像表示確認
 - [ ] ソーシャル共有テスト
 
 ### ⏳ Step 4: MVP検証 (1日)
+
 - [ ] 全機能の統合テスト
 - [ ] パフォーマンス測定
 - [ ] エラーケース確認
@@ -92,6 +103,7 @@ gantt
 ### ✅ 完了済み機能
 
 #### フロントエンド UI
+
 - [x] **UploadZone** - ドラッグ&ドロップ、ファイル選択
 - [x] **ImagePreview** - アップロード画像のプレビュー表示
 - [x] **ExifDisplay** - EXIF情報のテーブル表示
@@ -101,6 +113,7 @@ gantt
 - [x] **SharePage** - 共有ページレイアウト
 
 #### ユーティリティ・ライブラリ
+
 - [x] **EXIF抽出** (`src/lib/exif.ts`) - exifrライブラリ使用
 - [x] **画像処理** (`src/lib/image.ts`) - Sharpによるリサイズ
 - [x] **Gemini統合** (`src/lib/gemini.ts`) - Vision API呼び出し
@@ -108,10 +121,12 @@ gantt
 - [x] **型定義** (`src/types/upload.ts`) - TypeScript型安全性
 
 #### API Routes
+
 - [x] **`/api/upload`** - Node Function (画像処理 + KV保存) ✅
 - [x] **`/api/critique`** - Node Function (Gemini API + リトライ) ✅
 
 #### Page Components
+
 | ページ      | 状態 | ファイルパス                   | 備考                   |
 | ----------- | ---- | ------------------------------ | ---------------------- |
 | Upload Page | ✅   | `src/app/page.tsx`             | メインアップロード画面 |
@@ -121,14 +136,17 @@ gantt
 ### 🧪 テスト状況
 
 #### ✅ 実装済みテスト
+
 - [x] **EXIF抽出テスト** (`src/lib/exif.test.ts`)
 - [x] **画像処理テスト** (`src/lib/image.test.ts`)
 - [x] **講評機能テスト** (`src/lib/critique.test.ts`)
 - [x] **KVクライアントテスト** (`src/lib/kv.test.ts`) - 9つのテストケース
 - [x] **API Routeテスト** (`src/app/api/critique/route.test.ts`) - 5つのテストケース
-- [x] **MSW設定** (`src/mocks/handlers.ts`) - Gemini APIモック
+- [x] **Server Actionsテスト** (`tests/app/actions.test.ts`) - 12つのテストケース ✅ 2025-08-20更新
+- [x] **MSW設定** (`src/mocks/handlers.ts`) - API Routes + Gemini APIモック
 
 #### ❌ 未実装テスト
+
 - [ ] **Edge Functionテスト** - `/api/upload`
 - [ ] **OGP生成テスト** - `/api/ogp`
 - [ ] **E2Eフローテスト** - アップロード→講評→共有
@@ -150,6 +168,8 @@ gantt
    ↓
 6. レポート表示 ✅
 ```
+
+**✅ 2025-08-20更新**: Server ActionsのAPI Route統合完了。12テストケース全て通過確認済み。
 
 ### 🎯 目標データフロー (MVP完成時)
 
@@ -174,6 +194,7 @@ gantt
 ## 🎯 Phase 2: 品質向上 (2025-08-25 ～ 2025-09-08)
 
 ### Step 5: UX/アクセシビリティ (5日)
+
 - [ ] WCAG AA準拠チェック
 - [ ] キーボードナビゲーション
 - [ ] スクリーンリーダー対応
@@ -181,12 +202,14 @@ gantt
 - [ ] ダークモード実装
 
 ### Step 6: パフォーマンス最適化 (4日)
+
 - [ ] Next.js Image コンポーネント活用
 - [ ] バンドルサイズ分析
 - [ ] API レスポンス時間測定
 - [ ] Core Web Vitals改善
 
 ### Step 7: テスト強化 (5日)
+
 - [ ] E2Eテスト拡充
 - [ ] クロスブラウザテスト
 - [ ] CI/CD パイプライン設定
@@ -197,16 +220,19 @@ gantt
 ## 🚀 Phase 3: 運用準備 (2025-09-09 ～ 2025-09-14)
 
 ### Step 8: 監視・ログ設定 (2日)
+
 - [ ] Sentry 統合
 - [ ] Vercel Analytics 設定
 - [ ] API 使用量監視
 
 ### Step 9: セキュリティ対応 (2日)
+
 - [ ] CSP (Content Security Policy) 設定
 - [ ] レート制限実装
 - [ ] セキュリティ監査
 
 ### Step 10: ドキュメント整備 (1日)
+
 - [ ] API 仕様書作成
 - [ ] 運用マニュアル作成
 - [ ] ユーザーガイド作成
@@ -216,17 +242,20 @@ gantt
 ## 📏 成功メトリクス
 
 ### MVP リリース (2025-08-24)
+
 - 完全な画像アップロード→講評→共有フロー
 - P95 < 3秒のレスポンス時間
 - 基本的なエラーハンドリング
 
 ### 技術メトリクス
+
 - **パフォーマンス**: P95 < 3秒
 - **可用性**: 99.5%以上
 - **テストカバレッジ**: 80%以上
 - **Core Web Vitals**: 全て合格
 
 ### ビジネスメトリクス
+
 - **月間運用コスト**: $50以下
 - **エラー率**: 1%以下
 - **ユーザビリティスコア**: 80%以上
@@ -234,5 +263,5 @@ gantt
 ---
 
 **作成日**: 2025-08-14  
-**最終更新**: 2025-08-19  
+**最終更新**: 2025-08-20 (2.1 Server Actions修正完了)  
 **次回レビュー予定**: 2025-08-21 (Phase 1完了時)

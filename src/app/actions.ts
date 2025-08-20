@@ -1,6 +1,5 @@
 "use server";
 
-import { generatePhotoCritiqueWithRetry } from "@/lib/critique";
 import type { ExifData, CritiqueResult } from "@/types/upload";
 
 /**
@@ -19,18 +18,6 @@ export interface UploadResult {
   error?: string;
 }
 
-/**
- * フォームから画像ファイルを抽出し、バリデーションを行う
- */
-function extractAndValidateFile(formData: FormData): File | null {
-  const file = formData.get("image") as File;
-
-  if (!file || file.size === 0) {
-    return null;
-  }
-
-  return file;
-}
 
 /**
  * 画像アップロード処理のServer Action
@@ -96,31 +83,31 @@ export async function generateCritique(
   formData: FormData,
 ): Promise<CritiqueResult> {
   try {
-    // ファイルの抽出と基本検証
-    const file = extractAndValidateFile(formData);
-    if (!file) {
+    // APIエンドポイントに画像を送信して講評生成
+    const response = await fetch("/api/critique", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
       return {
         success: false,
-        error: "ファイルが選択されていません",
+        error: errorData.error || "講評生成に失敗しました",
       };
     }
 
-    // ファイルの種類確認
-    if (!file.type.startsWith("image/")) {
+    const apiResponse = await response.json();
+
+    if (!apiResponse.success) {
       return {
         success: false,
-        error: "画像ファイルを選択してください",
+        error: apiResponse.error || "講評生成に失敗しました",
       };
     }
 
-    // 画像をBufferに変換
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // AI講評生成（再試行機能付き）
-    const result = await generatePhotoCritiqueWithRetry(buffer, file.type, 1);
-
-    return result;
+    // API Responseをそのまま返却（形式は既に統一済み）
+    return apiResponse;
   } catch (error) {
     console.error("Critique generation error:", error);
 
