@@ -2,7 +2,7 @@
 
 ## 📊 全体進捗状況
 
-**現在位置**: Phase 1 Step 1 完了（API インフラ構築） → Step 2 進行中
+**現在位置**: Phase 1 Step 2 完了（データフロー統合） → Step 3 次のタスク
 
 ```mermaid
 gantt
@@ -10,8 +10,8 @@ gantt
     dateFormat  YYYY-MM-DD
     section Phase 1: MVP完成
     API Route実装          :done, p1-1, 2025-08-14, 2025-08-19
-    データフロー統合       :active, p1-2, 2025-08-19, 3d
-    共有機能完成           :p1-3, after p1-2, 3d
+    データフロー統合       :done, p1-2, 2025-08-19, 2025-08-20
+    共有機能完成           :active, p1-3, 2025-08-20, 3d
     MVP検証               :p1-4, after p1-3, 1d
     section Phase 2: 品質向上
     UX/アクセシビリティ    :p2-1, after p1-4, 5d
@@ -54,7 +54,7 @@ gantt
 - [x] リトライ機能実装
 - [x] t-wada手法によるテストファースト開発（5テストケース）
 
-### 🔄 Step 2: データフロー統合 **進行中** (3日)
+### ✅ Step 2: データフロー統合 **完了** (3日)
 
 #### 2.1 Server Actions修正 ✅ 完了 (2025-08-20)
 
@@ -66,12 +66,16 @@ gantt
 - [x] テストケースの更新（12テスト全て通過）
 - [x] t-wada手法による既存テストの更新・拡充
 
-#### 2.2 永続化層統合 **次のタスク**
+#### 2.2 永続化層統合 ✅ 完了 (2025-08-20)
 
-- [ ] アップロード結果のKV保存
-- [ ] 講評結果のKV更新
-- [ ] 短縮URL生成機能
-- [ ] データ取得API実装
+- [x] アップロード結果のKV保存（既存KV実装活用）
+- [x] 講評結果のKV更新（`/api/critique`にKV保存機能追加）
+- [x] 短縮URL生成機能（`/api/share`エンドポイント新規実装）
+- [x] データ取得API実装（`/api/data/[id]`エンドポイント新規実装）
+- [x] t-wada手法による全APIのテストファースト開発
+- [x] 型定義統一（CritiqueResultにshareId追加）
+- [x] 期限切れチェック機能実装
+- [x] 全108テスト成功確認
 
 ### ⏳ Step 3: 共有機能完成 (3日)
 
@@ -123,7 +127,9 @@ gantt
 #### API Routes
 
 - [x] **`/api/upload`** - Node Function (画像処理 + KV保存) ✅
-- [x] **`/api/critique`** - Node Function (Gemini API + リトライ) ✅
+- [x] **`/api/critique`** - Node Function (Gemini API + KV保存 + shareId生成) ✅
+- [x] **`/api/share`** - Node Function (短縮URL生成) ✅
+- [x] **`/api/data/[id]`** - Node Function (共有データ取得 + 期限切れチェック) ✅
 
 #### Page Components
 
@@ -141,9 +147,10 @@ gantt
 - [x] **画像処理テスト** (`src/lib/image.test.ts`)
 - [x] **講評機能テスト** (`src/lib/critique.test.ts`)
 - [x] **KVクライアントテスト** (`src/lib/kv.test.ts`) - 9つのテストケース
-- [x] **API Routeテスト** (`src/app/api/critique/route.test.ts`) - 5つのテストケース
+- [x] **API Routeテスト** - `/api/critique` (7テストケース), `/api/share` (4テストケース), `/api/data/[id]` (5テストケース)
 - [x] **Server Actionsテスト** (`tests/app/actions.test.ts`) - 12つのテストケース ✅ 2025-08-20更新
 - [x] **MSW設定** (`src/mocks/handlers.ts`) - API Routes + Gemini APIモック
+- [x] **永続化層統合テスト** - KV保存・取得・期限切れチェック完全対応
 
 #### ❌ 未実装テスト
 
@@ -164,12 +171,16 @@ gantt
    ↓
 4. generateCritique() Server Action → /api/critique Node Function ✅
    ↓
-5. Gemini API呼び出し + レスポンス統一 ✅
+5. Gemini API呼び出し + KV保存 + shareId生成 ✅
    ↓
-6. レポート表示 ✅
+6. レポート表示 + 共有機能 ✅
+   ↓
+7. /api/share → 短縮URL生成 ✅
+   ↓
+8. /api/data/[id] → 共有データ取得 ✅
 ```
 
-**✅ 2025-08-20更新**: Server ActionsのAPI Route統合完了。12テストケース全て通過確認済み。
+**✅ 2025-08-20更新**: 永続化層統合完了。全108テストケース通過確認済み。
 
 ### 🎯 目標データフロー (MVP完成時)
 
@@ -263,5 +274,5 @@ gantt
 ---
 
 **作成日**: 2025-08-14  
-**最終更新**: 2025-08-20 (2.1 Server Actions修正完了)  
-**次回レビュー予定**: 2025-08-21 (Phase 1完了時)
+**最終更新**: 2025-08-20 (2.2 永続化層統合完了)  
+**次回レビュー予定**: 2025-08-23 (Step 3 共有機能完成時)

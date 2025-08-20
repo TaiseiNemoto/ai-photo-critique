@@ -8,7 +8,19 @@ vi.mock("@/lib/critique", () => ({
   generatePhotoCritiqueWithRetry: vi.fn(),
 }));
 
+vi.mock("@/lib/kv", () => ({
+  kvClient: {
+    generateId: vi.fn(() => "test-id-12345"),
+    saveCritique: vi.fn(),
+    saveShare: vi.fn(),
+    getUpload: vi.fn(() =>
+      Promise.resolve({ exifData: { make: "Canon", model: "EOS R5" } }),
+    ),
+  },
+}));
+
 import { generatePhotoCritiqueWithRetry } from "@/lib/critique";
+import { kvClient } from "@/lib/kv";
 
 describe("/api/critique POST", () => {
   beforeEach(() => {
@@ -40,7 +52,8 @@ describe("/api/critique POST", () => {
     } as File;
 
     const mockFormData = {
-      get: (key: string) => (key === "image" ? mockFile : null),
+      get: (key: string) =>
+        key === "image" ? mockFile : key === "uploadId" ? "upload-123" : null,
     } as FormData;
 
     // NextRequestを模擬するためにカスタムオブジェクトを作成
@@ -52,7 +65,8 @@ describe("/api/critique POST", () => {
     const responseBody = await response.json();
 
     expect(response.status).toBe(200);
-    expect(responseBody).toEqual(mockCritiqueResult);
+    expect(responseBody.success).toBe(true);
+    expect(responseBody.data?.shareId).toBe("test-id-12345");
     expect(generatePhotoCritiqueWithRetry).toHaveBeenCalledWith(
       expect.any(Buffer),
       "image/jpeg",
@@ -61,11 +75,12 @@ describe("/api/critique POST", () => {
   });
 
   it("画像ファイルがない場合にエラーレスポンスを返す", async () => {
-    const formData = new FormData();
-    // ファイルを追加しない
+    const mockFormData = {
+      get: (key: string) => (key === "uploadId" ? "upload-123" : null),
+    } as FormData;
 
     const mockRequest = {
-      formData: () => Promise.resolve(formData),
+      formData: () => Promise.resolve(mockFormData),
     } as NextRequest;
 
     const response = await POST(mockRequest);
@@ -79,17 +94,20 @@ describe("/api/critique POST", () => {
   });
 
   it("画像以外のファイルの場合にエラーレスポンスを返す", async () => {
-    const formData = new FormData();
     const mockFile = {
       name: "test.txt",
       type: "text/plain",
       size: 1024,
       arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
     } as File;
-    formData.append("image", mockFile);
+
+    const mockFormData = {
+      get: (key: string) =>
+        key === "image" ? mockFile : key === "uploadId" ? "upload-123" : null,
+    } as FormData;
 
     const mockRequest = {
-      formData: () => Promise.resolve(formData),
+      formData: () => Promise.resolve(mockFormData),
     } as NextRequest;
 
     const response = await POST(mockRequest);
@@ -120,7 +138,8 @@ describe("/api/critique POST", () => {
     } as File;
 
     const mockFormData = {
-      get: (key: string) => (key === "image" ? mockFile : null),
+      get: (key: string) =>
+        key === "image" ? mockFile : key === "uploadId" ? "upload-123" : null,
     } as FormData;
 
     const mockRequest = {
@@ -147,7 +166,8 @@ describe("/api/critique POST", () => {
     } as File;
 
     const mockFormData = {
-      get: (key: string) => (key === "image" ? mockFile : null),
+      get: (key: string) =>
+        key === "image" ? mockFile : key === "uploadId" ? "upload-123" : null,
     } as FormData;
 
     const mockRequest = {
@@ -160,5 +180,86 @@ describe("/api/critique POST", () => {
     expect(response.status).toBe(500);
     expect(responseBody.success).toBe(false);
     expect(responseBody.error).toContain("Network error");
+  });
+
+  it("講評が成功した場合にKVストレージに結果を保存する", async () => {
+    const mockCritiqueResult: CritiqueResult = {
+      success: true,
+      data: {
+        technique: "良好なフォーカスが設定されています",
+        composition: "三分割法が効果的に使用されています",
+        color: "色彩のバランスが優れています",
+      },
+      processingTime: 2500,
+    };
+
+    vi.mocked(generatePhotoCritiqueWithRetry).mockResolvedValue(
+      mockCritiqueResult,
+    );
+
+    const mockFile = {
+      name: "test.jpg",
+      type: "image/jpeg",
+      size: 1024,
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
+    } as File;
+
+    const mockFormData = {
+      get: (key: string) =>
+        key === "image" ? mockFile : key === "uploadId" ? "upload-123" : null,
+    } as FormData;
+
+    const mockRequest = {
+      formData: () => Promise.resolve(mockFormData),
+    } as NextRequest;
+
+    const response = await POST(mockRequest);
+    const responseBody = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(responseBody.success).toBe(true);
+    expect(responseBody.data?.shareId).toBe("test-id-12345");
+
+    // KVストレージへの保存が呼ばれることを確認
+    expect(kvClient.saveCritique).toHaveBeenCalledWith({
+      id: "test-id-12345",
+      filename: "test.jpg",
+      technique: "良好なフォーカスが設定されています",
+      composition: "三分割法が効果的に使用されています",
+      color: "色彩のバランスが優れています",
+      exifData: expect.any(Object),
+      uploadedAt: expect.any(String),
+    });
+
+    expect(kvClient.saveShare).toHaveBeenCalledWith({
+      id: "test-id-12345",
+      critiqueId: "test-id-12345",
+      createdAt: expect.any(String),
+      expiresAt: expect.any(String),
+    });
+  });
+
+  it("uploadIdが提供されない場合にエラーレスポンスを返す", async () => {
+    const mockFile = {
+      name: "test.jpg",
+      type: "image/jpeg",
+      size: 1024,
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
+    } as File;
+
+    const mockFormData = {
+      get: (key: string) => (key === "image" ? mockFile : null),
+    } as FormData;
+
+    const mockRequest = {
+      formData: () => Promise.resolve(mockFormData),
+    } as NextRequest;
+
+    const response = await POST(mockRequest);
+    const responseBody = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(responseBody.success).toBe(false);
+    expect(responseBody.error).toBe("アップロードIDが必要です");
   });
 });

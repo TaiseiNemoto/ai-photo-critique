@@ -82,7 +82,7 @@ export const handlers = [
         success: false,
         error: "ファイルが選択されていません",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }),
 

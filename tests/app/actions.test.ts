@@ -93,9 +93,9 @@ describe("uploadImage Server Action", () => {
               success: false,
               error: "ファイルが選択されていません",
             },
-            { status: 400 }
+            { status: 400 },
           );
-        })
+        }),
       );
 
       // Arrange: 空のFormData
@@ -119,9 +119,9 @@ describe("uploadImage Server Action", () => {
               success: false,
               error: "ファイルが選択されていません",
             },
-            { status: 400 }
+            { status: 400 },
           );
-        })
+        }),
       );
 
       // Arrange: サイズ0のファイル
@@ -146,9 +146,9 @@ describe("uploadImage Server Action", () => {
               success: false,
               error: "サポートされていないファイル形式です",
             },
-            { status: 400 }
+            { status: 400 },
           );
-        })
+        }),
       );
 
       const unsupportedFile = new File(["content"], "test.txt", {
@@ -174,7 +174,7 @@ describe("uploadImage Server Action", () => {
       server.use(
         http.post("/api/upload", () => {
           return HttpResponse.error();
-        })
+        }),
       );
 
       const mockFile = createMockImageFile();
@@ -261,9 +261,9 @@ describe("generateCritique Server Action", () => {
               success: false,
               error: "講評生成に失敗しました",
             },
-            { status: 500 }
+            { status: 500 },
           );
-        })
+        }),
       );
 
       const mockFile = createMockImageFile();
@@ -283,7 +283,7 @@ describe("generateCritique Server Action", () => {
       server.use(
         http.post("/api/critique", () => {
           return HttpResponse.error();
-        })
+        }),
       );
 
       const mockFile = createMockImageFile();
