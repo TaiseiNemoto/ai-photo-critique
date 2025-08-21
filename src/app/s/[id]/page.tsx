@@ -6,31 +6,91 @@ import { ShareExifDetails } from "@/components/share/ShareExifDetails";
 import { ShareCallToAction } from "@/components/share/ShareCallToAction";
 import { ShareFooter } from "@/components/share/ShareFooter";
 import type { Metadata } from "next";
+import Link from "next/link";
 
-// OGP metadata for social sharing
-export const metadata: Metadata = {
-  title: "AI写真講評結果 - Photo-Critique",
-  description:
-    "技術・構図・色彩の3つの観点からAIが分析した写真講評結果をご覧ください。",
-  openGraph: {
-    title: "AI写真講評結果 - Photo-Critique",
-    description: "技術・構図・色彩の3つの観点からAIが分析した写真講評結果",
-    images: [
+// 動的メタデータ生成
+export async function generateMetadata({
+  params,
+}: SharePageProps): Promise<Metadata> {
+  const { id } = await params;
+
+  try {
+    // データAPIから共有データを取得
+    const response = await fetch(
+      `${process.env.VERCEL_URL ? "https://" + process.env.VERCEL_URL : "http://localhost:3000"}/api/data/${id}`,
       {
-        url: "/api/ogp?id=demo", // This would be dynamic in real app
-        width: 1200,
-        height: 630,
-        alt: "Photo-Critique AI講評結果",
+        cache: "no-store",
       },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "AI写真講評結果 - Photo-Critique",
-    description: "技術・構図・色彩の3つの観点からAIが分析した写真講評結果",
-    images: ["/api/ogp?id=demo"],
-  },
-};
+    );
+
+    if (!response.ok) {
+      // デフォルトメタデータを返す
+      return {
+        title: "AI写真講評結果 - Photo-Critique",
+        description:
+          "技術・構図・色彩の3つの観点からAIが分析した写真講評結果をご覧ください。",
+      };
+    }
+
+    const { data: critiqueData } = await response.json();
+
+    if (!critiqueData) {
+      return {
+        title: "AI写真講評結果 - Photo-Critique",
+        description:
+          "技術・構図・色彩の3つの観点からAIが分析した写真講評結果をご覧ください。",
+      };
+    }
+
+    // EXIF情報から動的にタイトルを生成
+    const camera = critiqueData.exif?.camera || "カメラ";
+    const lens = critiqueData.exif?.lens || "レンズ";
+    const title = `${camera}で撮影した写真のAI講評結果 - Photo-Critique`;
+    const description = `${camera}、${lens}で撮影された写真を技術・構図・色彩の3つの観点からAIが分析しました。`;
+
+    // OGP画像URLを動的に生成
+    const ogpImageUrl = `/api/ogp?id=${id}`;
+    const ogpDetailImageUrl = `/api/ogp?id=${id}&detail=true`;
+
+    return {
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        images: [
+          {
+            url: ogpImageUrl,
+            width: 1200,
+            height: 630,
+            alt: `${camera}で撮影した写真のAI講評結果`,
+          },
+          {
+            url: ogpDetailImageUrl,
+            width: 1200,
+            height: 630,
+            alt: `${camera}で撮影した写真の詳細AI講評結果`,
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: [ogpImageUrl],
+      },
+    };
+  } catch (error) {
+    console.error("Metadata generation error:", error);
+
+    // エラー時はデフォルトメタデータを返す
+    return {
+      title: "AI写真講評結果 - Photo-Critique",
+      description:
+        "技術・構図・色彩の3つの観点からAIが分析した写真講評結果をご覧ください。",
+    };
+  }
+}
 
 interface SharePageProps {
   params: Promise<{
@@ -39,49 +99,96 @@ interface SharePageProps {
 }
 
 export default async function SharePage({ params }: SharePageProps) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id } = await params;
-  // In real app, this would fetch data based on params.id
-  const critiqueData = {
-    image: "/placeholder.svg?height=400&width=600",
-    technical:
-      "• ピントは被写体の目にしっかりと合っており、シャープネスも適切です\n• 露出は全体的にバランスが取れており、ハイライトの飛びやシャドウの潰れもありません\n• ISO感度の設定も適切で、ノイズは最小限に抑えられています",
-    composition:
-      "• 三分割法の交点に被写体を配置し、安定感のある構図になっています\n• 前景・中景・背景の奥行き感が効果的に表現されています\n• 視線の流れが自然で、被写体への注目を促す構成です",
-    color:
-      "• 補色関係が効果的に活用され、被写体が際立っています\n• 全体的な色調は統一感があり、温かみのある印象を与えます\n• 彩度とコントラストのバランスが良く、自然な仕上がりです",
-    exif: {
-      fNumber: "f/2.8",
-      exposureTime: "1/250s",
-      iso: "200",
-      focalLength: "35mm",
-      lens: "Sony FE 24-70mm F2.8 GM",
-      camera: "Sony α7R V",
-    },
-  };
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl">
-          <ShareHeader />
+  try {
+    // データAPIから共有データを取得
+    const response = await fetch(
+      `${process.env.VERCEL_URL ? "https://" + process.env.VERCEL_URL : "http://localhost:3000"}/api/data/${id}`,
+      {
+        cache: "no-store", // 常に最新データを取得
+      },
+    );
 
-          <ShareBadge />
+    if (!response.ok) {
+      // エラーページを表示
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="container mx-auto px-4 py-8 max-w-4xl">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl text-center">
+              <h1 className="text-2xl font-bold text-gray-800 mb-4">
+                データが見つかりません
+              </h1>
+              <p className="text-gray-600 mb-6">
+                {response.status === 410
+                  ? "このデータは期限切れです"
+                  : "指定された共有データが見つかりませんでした"}
+              </p>
+              <Link
+                href="/"
+                className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                新しい写真を分析する
+              </Link>
+            </div>
+          </div>
+        </div>
+      );
+    }
 
-          <ImagePreview
-            src={critiqueData.image || "/placeholder.svg"}
-            alt="分析対象の写真"
-          />
+    const { data: critiqueData } = await response.json();
 
-          <ShareCritiqueCards critiqueData={critiqueData} />
+    if (!critiqueData) {
+      throw new Error("Invalid data format");
+    }
 
-          <ShareExifDetails exif={critiqueData.exif} />
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl">
+            <ShareHeader />
 
-          <ShareCallToAction />
+            <ShareBadge />
 
-          <ShareFooter />
+            <ImagePreview
+              src={critiqueData.image || "/placeholder.svg"}
+              alt="分析対象の写真"
+            />
+
+            <ShareCritiqueCards critiqueData={critiqueData} />
+
+            <ShareExifDetails exif={critiqueData.exif} />
+
+            <ShareCallToAction />
+
+            <ShareFooter />
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  } catch (error) {
+    console.error("Share page error:", error);
+
+    // エラーページを表示
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl text-center">
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">
+              エラーが発生しました
+            </h1>
+            <p className="text-gray-600 mb-6">
+              データの取得中にエラーが発生しました。時間をおいて再度お試しください。
+            </p>
+            <Link
+              href="/"
+              className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              新しい写真を分析する
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
