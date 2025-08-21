@@ -2,7 +2,7 @@
 
 ## 📊 全体進捗状況
 
-**現在位置**: Phase 1 Step 2 完了（データフロー統合） → Step 3 次のタスク
+**現在位置**: Phase 1 Step 3 途中（共有機能完成） → 3.1 OGP API完了・3.2 共有ページ改善待ち
 
 ```mermaid
 gantt
@@ -11,7 +11,7 @@ gantt
     section Phase 1: MVP完成
     API Route実装          :done, p1-1, 2025-08-14, 2025-08-19
     データフロー統合       :done, p1-2, 2025-08-19, 2025-08-20
-    共有機能完成           :active, p1-3, 2025-08-20, 3d
+    共有機能完成           :active, p1-3, 2025-08-20, 2025-08-21
     MVP検証               :p1-4, after p1-3, 1d
     section Phase 2: 品質向上
     UX/アクセシビリティ    :p2-1, after p1-4, 5d
@@ -79,14 +79,16 @@ gantt
 
 ### ⏳ Step 3: 共有機能完成 (3日)
 
-#### 3.1 `/api/ogp` Edge Function実装
+#### 3.1 `/api/ogp` Edge Function実装 ✅ 完了 (2025-08-21)
 
-- [ ] Satori + Resvg セットアップ
-- [ ] 動的OGP画像生成
-- [ ] 講評内容の画像化
-- [ ] フォント・レイアウト調整
+- [x] SVGベースOGP画像生成環境構築（Satori代替）
+- [x] 動的OGP画像生成（講評データ連携）
+- [x] 講評内容の画像化（詳細表示モード `?detail=true`）
+- [x] 日本語フォント・レイアウト調整（Hiragino Sans等）
+- [x] テストファースト開発（9テストケース全通過）
+- [x] エラーハンドリング・フォールバック機能
 
-#### 3.2 共有ページ改善
+#### 3.2 共有ページ改善 **次のタスク**
 
 - [ ] `/s/[id]` ページの完全実装
 - [ ] メタデータ動的生成
@@ -130,6 +132,7 @@ gantt
 - [x] **`/api/critique`** - Node Function (Gemini API + KV保存 + shareId生成) ✅
 - [x] **`/api/share`** - Node Function (短縮URL生成) ✅
 - [x] **`/api/data/[id]`** - Node Function (共有データ取得 + 期限切れチェック) ✅
+- [x] **`/api/ogp`** - Edge Function (動的OGP画像生成 + 日本語フォント対応) ✅ 2025-08-21
 
 #### Page Components
 
@@ -148,6 +151,7 @@ gantt
 - [x] **講評機能テスト** (`src/lib/critique.test.ts`)
 - [x] **KVクライアントテスト** (`src/lib/kv.test.ts`) - 9つのテストケース
 - [x] **API Routeテスト** - `/api/critique` (7テストケース), `/api/share` (4テストケース), `/api/data/[id]` (5テストケース)
+- [x] **OGP API テスト** (`src/app/api/ogp/route.test.ts`) - 9テストケース（標準・詳細・エラー系） ✅ 2025-08-21
 - [x] **Server Actionsテスト** (`tests/app/actions.test.ts`) - 12つのテストケース ✅ 2025-08-20更新
 - [x] **MSW設定** (`src/mocks/handlers.ts`) - API Routes + Gemini APIモック
 - [x] **永続化層統合テスト** - KV保存・取得・期限切れチェック完全対応
@@ -155,7 +159,6 @@ gantt
 #### ❌ 未実装テスト
 
 - [ ] **Edge Functionテスト** - `/api/upload`
-- [ ] **OGP生成テスト** - `/api/ogp`
 - [ ] **E2Eフローテスト** - アップロード→講評→共有
 - [ ] **エラーケーステスト** - API失敗、ネットワークエラー
 - [ ] **パフォーマンステスト** - レスポンス時間測定
@@ -178,9 +181,11 @@ gantt
 7. /api/share → 短縮URL生成 ✅
    ↓
 8. /api/data/[id] → 共有データ取得 ✅
+   ↓
+9. /api/ogp → 動的OGP画像生成 ✅
 ```
 
-**✅ 2025-08-20更新**: 永続化層統合完了。全108テストケース通過確認済み。
+**✅ 2025-08-21更新**: OGP API実装完了。9テストケース通過確認済み。
 
 ### 🎯 目標データフロー (MVP完成時)
 
@@ -193,11 +198,11 @@ gantt
    ↓
 4. generateCritique() → /api/critique (Node Function) ✅
    ↓
-5. Gemini API呼び出し + Upstash Redis更新 ← **次のタスク**
+5. Gemini API呼び出し + Upstash Redis更新 ✅
    ↓
-6. 短縮URL生成 + OGP画像生成
+6. 短縮URL生成 + OGP画像生成 ✅
    ↓
-7. 共有可能なレポート完成
+7. 共有可能なレポート完成 ← **次のタスク（共有ページ改善）**
 ```
 
 ---
@@ -274,5 +279,5 @@ gantt
 ---
 
 **作成日**: 2025-08-14  
-**最終更新**: 2025-08-20 (2.2 永続化層統合完了)  
-**次回レビュー予定**: 2025-08-23 (Step 3 共有機能完成時)
+**最終更新**: 2025-08-21 (3.1 OGP API実装完了)  
+**次回レビュー予定**: 2025-08-24 (Step 3 共有機能完成時)
