@@ -88,6 +88,8 @@ export default function GenerateButton({
         size="lg"
         onClick={onGenerate}
         disabled={isProcessing || disabled || showSuccess}
+        aria-describedby="generate-status"
+        aria-live={isProcessing ? "polite" : undefined}
         className={`
           px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 border-0
           ${
@@ -106,7 +108,7 @@ export default function GenerateButton({
         )}
       </Button>
 
-      {getStatusMessage()}
+      <div id="generate-status">{getStatusMessage()}</div>
     </div>
   );
 }

@@ -43,8 +43,11 @@ export default function ReportPage({ params }: ReportPageProps) {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+        <div className="text-center" role="status" aria-live="polite">
+          <div
+            className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"
+            aria-hidden="true"
+          ></div>
           <p className="text-gray-600">講評データを読み込み中...</p>
         </div>
       </div>
@@ -58,7 +61,10 @@ export default function ReportPage({ params }: ReportPageProps) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl">
+          <main
+            className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl"
+            role="main"
+          >
             <ReportHeader />
 
             <ImagePreview src={image.preview} />
@@ -80,7 +86,7 @@ export default function ReportPage({ params }: ReportPageProps) {
             {image.exif && <ExifDetails exif={image.exif} />}
 
             <ReportActions reportId="current" />
-          </div>
+          </main>
         </div>
       </div>
     );
@@ -108,7 +114,10 @@ export default function ReportPage({ params }: ReportPageProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl">
+        <main
+          className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl"
+          role="main"
+        >
           <ReportHeader />
 
           <ImagePreview src={reportData.image} />
@@ -130,7 +139,7 @@ export default function ReportPage({ params }: ReportPageProps) {
           <ExifDetails exif={reportData.exif} />
 
           <ReportActions reportId={id} />
-        </div>
+        </main>
       </div>
     </div>
   );

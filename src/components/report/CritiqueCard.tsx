@@ -8,10 +8,20 @@ interface CritiqueCardProps {
 
 export function CritiqueCard({ title, icon, content }: CritiqueCardProps) {
   return (
-    <Card className="border-l-4 border-l-gray-400 bg-white border-gray-200 shadow-sm">
+    <Card
+      className="border-l-4 border-l-gray-400 bg-white border-gray-200 shadow-sm"
+      role="region"
+      aria-labelledby={`critique-${title.toLowerCase()}`}
+    >
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-gray-800">
-          <span className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-bold border border-gray-200">
+        <CardTitle
+          id={`critique-${title.toLowerCase()}`}
+          className="flex items-center gap-2 text-gray-800"
+        >
+          <span
+            className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-bold border border-gray-200"
+            aria-hidden="true"
+          >
             {icon}
           </span>
           {title}

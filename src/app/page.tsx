@@ -132,7 +132,10 @@ export default function UploadPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl">
+        <main
+          className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl"
+          role="main"
+        >
           <AppHeader />
 
           {!uploadedImage ? (
@@ -152,7 +155,7 @@ export default function UploadPage() {
               />
             </div>
           )}
-        </div>
+        </main>
       </div>
     </div>
   );
