@@ -141,6 +141,7 @@ export default function UploadZone({ onImageUploaded }: UploadZoneProps) {
           role="button"
           tabIndex={0}
           aria-label="画像をアップロード"
+          aria-describedby="upload-instructions"
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
@@ -156,13 +157,19 @@ export default function UploadZone({ onImageUploaded }: UploadZoneProps) {
 
           {/* ローディング表示 */}
           {isUploading && (
-            <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10">
+            <div
+              className="absolute inset-0 bg-white/80 flex items-center justify-center z-10"
+              aria-live="polite"
+            >
               <div className="text-center">
                 <Loader2
                   className="h-8 w-8 animate-spin text-gray-600 mx-auto mb-2"
                   data-testid="loading-spinner"
+                  aria-hidden="true"
                 />
-                <p className="text-sm text-gray-600">画像を処理中...</p>
+                <p className="text-sm text-gray-600" role="status">
+                  画像を処理中...
+                </p>
               </div>
             </div>
           )}
@@ -214,7 +221,7 @@ export default function UploadZone({ onImageUploaded }: UploadZoneProps) {
             </Button>
           </div>
 
-          <p className="text-xs text-gray-400 mt-4">
+          <p id="upload-instructions" className="text-xs text-gray-400 mt-4">
             対応形式: JPEG, PNG, HEIC, WebP (最大20MB)
           </p>
         </div>
