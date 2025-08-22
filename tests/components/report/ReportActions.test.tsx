@@ -111,7 +111,9 @@ describe("ReportActions", () => {
     test("reportIdが'current'の場合シェアボタンが無効化される", () => {
       render(<ReportActions reportId="current" />);
 
-      const shareButton = screen.getByText("シェア用リンクをコピー");
+      const shareButton = screen.getByRole("button", {
+        name: /シェア用リンクをコピー/,
+      });
       expect(shareButton).toBeDisabled();
     });
 
