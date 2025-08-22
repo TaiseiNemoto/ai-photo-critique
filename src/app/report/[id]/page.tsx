@@ -59,17 +59,17 @@ export default function ReportPage({ params }: ReportPageProps) {
     const { image, critique } = currentCritique;
 
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="mobile-viewport bg-gray-50 scroll-smooth">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 max-w-4xl safe-area-inset">
           <main
-            className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl"
+            className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-gray-200 shadow-xl gpu-accelerated"
             role="main"
           >
             <ReportHeader />
 
             <ImagePreview src={image.preview} />
 
-            <div className="space-y-6 mb-8">
+            <div className="space-y-6 mb-8 swipe-indicator">
               <CritiqueCard
                 title="技術面"
                 icon="技"
@@ -113,9 +113,9 @@ export default function ReportPage({ params }: ReportPageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 max-w-4xl">
         <main
-          className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200 shadow-xl"
+          className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-gray-200 shadow-xl"
           role="main"
         >
           <ReportHeader />

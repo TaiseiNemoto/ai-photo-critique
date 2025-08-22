@@ -203,7 +203,7 @@ export default function UploadZone({ onImageUploaded }: UploadZoneProps) {
             <Button
               type="button"
               variant="outline"
-              className="w-full sm:w-auto bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+              className="w-full sm:w-auto bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100 min-h-[44px] touch-manipulation active:scale-95 transition-transform"
               onClick={(e) => {
                 e.stopPropagation();
                 handleCameraCapture();
@@ -214,7 +214,7 @@ export default function UploadZone({ onImageUploaded }: UploadZoneProps) {
             </Button>
             <Button
               type="button"
-              className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white border-0"
+              className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white border-0 min-h-[44px] touch-manipulation active:scale-95 transition-transform"
             >
               <ImageIcon className="h-4 w-4 mr-2" />
               ファイルを選択

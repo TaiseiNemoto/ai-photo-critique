@@ -91,13 +91,14 @@ export default function GenerateButton({
         aria-describedby="generate-status"
         aria-live={isProcessing ? "polite" : undefined}
         className={`
-          px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 border-0
+          px-6 sm:px-8 py-4 sm:py-3 text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl 
+          transition-all duration-200 border-0 w-full sm:w-auto min-h-[44px] active:scale-95 touch-manipulation
           ${
             showSuccess
-              ? "bg-green-600 text-white hover:bg-green-700"
+              ? "bg-green-600 text-white hover:bg-green-700 active:bg-green-800"
               : showError
-                ? "bg-red-600 text-white hover:bg-red-700"
-                : "bg-gray-900 text-white hover:bg-gray-800"
+                ? "bg-red-600 text-white hover:bg-red-700 active:bg-red-800"
+                : "bg-gray-900 text-white hover:bg-gray-800 active:bg-gray-950"
           }
         `}
       >

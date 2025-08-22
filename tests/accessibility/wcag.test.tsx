@@ -94,8 +94,8 @@ describe("WCAG AA準拠テスト", () => {
       expect(card).toBeInTheDocument();
       expect(card).toHaveAttribute("aria-labelledby", "critique-技術面");
 
-      const heading = screen.getByText("技術面");
-      expect(heading).toHaveAttribute("id", "critique-技術面");
+      const headingElement = screen.getByText("技術面").closest("[id]");
+      expect(headingElement).toHaveAttribute("id", "critique-技術面");
     });
   });
 

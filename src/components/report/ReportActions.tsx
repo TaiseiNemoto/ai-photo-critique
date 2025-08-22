@@ -40,18 +40,20 @@ export function ReportActions({ reportId }: ReportActionsProps) {
     <div className="flex flex-col sm:flex-row gap-4 justify-center">
       <Button
         onClick={handleShare}
-        className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white"
+        className="flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white min-h-[44px] touch-manipulation active:scale-95 transition-transform"
         disabled={reportId === "current"}
       >
         <Share2 className="h-4 w-4" data-testid="share-icon" />
-        シェア用リンクをコピー
+        <span className="text-sm sm:text-base">シェア用リンクをコピー</span>
       </Button>
       <Button
         variant="outline"
         asChild
-        className="text-gray-700 border-gray-300 hover:bg-gray-50 hover:text-gray-900 bg-white"
+        className="text-gray-700 border-gray-300 hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100 bg-white min-h-[44px] touch-manipulation active:scale-95 transition-transform"
       >
-        <Link href="/">別の写真を試す</Link>
+        <Link href="/" className="flex items-center justify-center">
+          <span className="text-sm sm:text-base">別の写真を試す</span>
+        </Link>
       </Button>
     </div>
   );

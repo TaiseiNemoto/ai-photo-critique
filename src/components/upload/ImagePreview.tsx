@@ -15,20 +15,20 @@ export default function ImagePreview({
 }: ImagePreviewProps) {
   return (
     <Card className="bg-white border-gray-200 shadow-sm">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4">
+      <CardContent className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
           <h3 className="text-lg font-semibold text-gray-900">プレビュー</h3>
           <Button
             variant="ghost"
             size="sm"
             onClick={onReset}
-            className="text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+            className="text-gray-500 hover:text-gray-900 hover:bg-gray-100 w-full sm:w-auto"
           >
             別の画像を選択
           </Button>
         </div>
 
-        <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden mb-4 border border-gray-200">
+        <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden mb-4 border border-gray-200 touch-none">
           <Image
             src={uploadedImage.preview || "/placeholder.svg"}
             alt="アップロード画像"

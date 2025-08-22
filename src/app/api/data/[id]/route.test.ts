@@ -31,8 +31,8 @@ describe("/api/data/[id] GET", () => {
     const mockShareData = {
       id: "test-id-12345",
       critiqueId: "test-id-12345",
-      createdAt: "2025-08-20T09:30:00.000Z",
-      expiresAt: "2025-08-21T09:30:00.000Z",
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24時間後
     };
 
     vi.mocked(kvClient.getCritique).mockResolvedValue(mockCritiqueData);

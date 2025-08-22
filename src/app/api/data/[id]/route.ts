@@ -11,10 +11,10 @@ interface DataResponse {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ): Promise<NextResponse> {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id || id.trim() === "") {
       const errorResponse: DataResponse = {
