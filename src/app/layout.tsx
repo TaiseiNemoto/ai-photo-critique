@@ -46,6 +46,13 @@ export default function RootLayout({
           type="font/woff2"
           crossOrigin="anonymous"
         />
+        {/* Core Web Vitals最適化 */}
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="//fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
       </head>
       <body className={`${inter.className} tap-highlight-none`}>
         <CritiqueProvider>{children}</CritiqueProvider>

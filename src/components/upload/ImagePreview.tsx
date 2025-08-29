@@ -34,6 +34,8 @@ export default function ImagePreview({
             alt="アップロード画像"
             fill
             className="object-contain"
+            priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 60vw"
           />
         </div>
 
