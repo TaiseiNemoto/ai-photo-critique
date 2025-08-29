@@ -17,7 +17,14 @@ export function ImagePreview({
           分析対象画像
         </h3>
         <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-          <Image src={src} alt={alt} fill className="object-cover" />
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            className="object-cover"
+            priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 60vw"
+          />
         </div>
       </CardContent>
     </Card>

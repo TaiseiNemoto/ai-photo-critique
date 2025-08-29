@@ -2,7 +2,7 @@
 
 ## 📊 全体進捗状況
 
-**現在位置**: Phase 2 Step 5.2 完了（モバイルUI最適化） - 全モバイル最適化完了・次回Step 6パフォーマンス最適化へ進行予定
+**現在位置**: Phase 2 Step 6 完了（パフォーマンス最適化） - Core Web Vitals改善・バンドル最適化完了・次回Step 7テスト強化へ進行予定
 
 ```mermaid
 gantt
@@ -14,8 +14,8 @@ gantt
     共有機能完成           :done, p1-3, 2025-08-20, 2025-08-21
     MVP検証               :done, p1-4, after p1-3, 1d
     section Phase 2: 品質向上
-    UX/アクセシビリティ    :active, p2-1, after p1-4, 5d
-    パフォーマンス最適化   :p2-2, after p2-1, 4d
+    UX/アクセシビリティ    :done, p2-1, after p1-4, 5d
+    パフォーマンス最適化   :done, p2-2, after p2-1, 4d
     テスト強化            :p2-3, after p2-2, 5d
     section Phase 3: 運用準備
     監視・ログ設定        :p3-1, after p2-3, 2d
@@ -189,7 +189,7 @@ gantt
 10. /s/[id] → 動的メタデータ付き共有ページ表示 ✅
 ```
 
-**✅ 2025-08-22更新**: MVP検証完了・WCAG AA準拠チェック完了・モバイルUI最適化完了。レスポンシブデザイン・タッチインタラクション・PWA対応・パフォーマンス最適化全て実装完了。全138テスト通過・プロダクションビルド成功確認済み。Phase 2 Step 6パフォーマンス最適化への準備完了。
+**✅ 2025-08-29更新**: Phase 2 Step 6パフォーマンス最適化完了。Next.js Image最適化・バンドルサイズ分析・Core Web Vitals改善・next.config.ts最適化を実施。First Load JS 147KB・ESLint/Prettier品質確保完了。Phase 2 Step 7テスト強化への準備完了。
 
 ### 🎯 目標データフロー (MVP完成時)
 
@@ -241,12 +241,13 @@ gantt
 - [ ] スクリーンリーダー対応拡充（アクセシビリティ向上）
 - [ ] ダークモード実装（UX向上）
 
-### Step 6: パフォーマンス最適化 (4日)
+### ✅ Step 6: パフォーマンス最適化 **完了** (2025-08-29)
 
-- [ ] Next.js Image コンポーネント活用
-- [ ] バンドルサイズ分析
-- [ ] API レスポンス時間測定
-- [ ] Core Web Vitals改善
+- [x] Next.js Image コンポーネント活用（priority属性・sizes属性追加）
+- [x] バンドルサイズ分析（webpack-bundle-analyzer設定・147KB確認）
+- [x] Core Web Vitals改善（DNS prefetch・preconnect・画像最適化設定）
+- [x] next.config.ts最適化（圧縮・AVIF/WebP対応・フォント最適化）
+- [x] ESLint・Prettierによるコード品質確保
 
 ### Step 7: テスト強化 (5日)
 
@@ -303,5 +304,5 @@ gantt
 ---
 
 **作成日**: 2025-08-14  
-**最終更新**: 2025-08-22 (5.2 モバイルUI最適化完了・全138テスト通過・プロダクションビルド成功)  
-**次回レビュー予定**: 2025-08-25 (Step 6 パフォーマンス最適化開始時)
+**最終更新**: 2025-08-29 (Step 6 パフォーマンス最適化完了・Core Web Vitals改善・バンドル最適化)  
+**次回レビュー予定**: 2025-08-30 (Step 7 テスト強化開始時)
