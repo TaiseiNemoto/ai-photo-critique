@@ -28,9 +28,9 @@ export interface UploadResult {
 export async function uploadImage(formData: FormData): Promise<UploadResult> {
   try {
     // APIエンドポイントに画像をアップロード
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : 'http://localhost:3000';
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000";
     const response = await fetch(`${baseUrl}/api/upload`, {
       method: "POST",
       body: formData,
@@ -88,9 +88,9 @@ export async function generateCritique(
 ): Promise<CritiqueResult> {
   try {
     // APIエンドポイントに画像を送信して講評生成
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : 'http://localhost:3000';
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000";
     const response = await fetch(`${baseUrl}/api/critique`, {
       method: "POST",
       body: formData,

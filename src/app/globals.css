@@ -137,7 +137,6 @@
     -webkit-overflow-scrolling: touch;
   }
 
-
   /* Performance optimizations */
   .gpu-accelerated {
     transform: translateZ(0);
