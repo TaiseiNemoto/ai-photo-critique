@@ -60,7 +60,7 @@ export default function ReportPage({ params }: ReportPageProps) {
 
     return (
       <div className="mobile-viewport bg-gray-50 scroll-smooth">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 max-w-4xl safe-area-inset">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 max-w-4xl">
           <main
             className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-gray-200 shadow-xl gpu-accelerated"
             role="main"
