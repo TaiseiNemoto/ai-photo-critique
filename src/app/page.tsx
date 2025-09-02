@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { UploadedImage, CritiqueData } from "@/types/upload";
-import { generateCritique } from "@/app/actions";
+import { uploadImageWithCritique } from "@/app/actions";
 import { useCritique } from "@/contexts/CritiqueContext";
 import AppHeader from "@/components/common/AppHeader";
 import UploadZone from "@/components/upload/UploadZone";
@@ -42,9 +42,8 @@ export default function UploadPage() {
     setIsProcessing(true);
     setCritiqueState({ status: "loading" });
 
-    toast.loading("AI講評を生成中...", {
+    const loadingToastId = toast.loading("AI講評を生成中...", {
       description: "技術・構図・色彩を分析しています",
-      duration: 2000,
     });
 
     try {
@@ -52,22 +51,25 @@ export default function UploadPage() {
       const formData = new FormData();
       formData.append("image", uploadedImage.file);
 
-      const result = await generateCritique(formData);
+      const result = await uploadImageWithCritique(formData);
 
-      if (result.success && result.data) {
+      // ローディングトーストを削除
+      toast.dismiss(loadingToastId);
+
+      if (result.critique.success && result.critique.data) {
         // 講評データを画像オブジェクトに追加
         setUploadedImage((prev) =>
           prev
             ? {
                 ...prev,
-                critique: result.data,
+                critique: result.critique.data,
               }
             : null,
         );
 
         setCritiqueState({
           status: "success",
-          data: result.data,
+          data: result.critique.data,
         });
 
         toast.success("講評が完了しました", {
@@ -77,11 +79,11 @@ export default function UploadPage() {
 
         // Context APIにデータを保存してSPA的に画面遷移
         setTimeout(() => {
-          if (uploadedImage && result.data) {
+          if (uploadedImage && result.critique.data) {
             // Context APIに講評データを保存
             setCritiqueData({
               image: uploadedImage,
-              critique: result.data,
+              critique: result.critique.data,
             });
 
             // Next.js routerでSPA的に画面遷移
@@ -91,16 +93,19 @@ export default function UploadPage() {
       } else {
         setCritiqueState({
           status: "error",
-          error: result.error || "講評生成に失敗しました",
+          error: result.critique.error || "講評生成に失敗しました",
         });
 
         toast.error("講評生成に失敗しました", {
-          description: result.error || "再度お試しください",
+          description: result.critique.error || "再度お試しください",
           duration: 3000,
         });
       }
     } catch (error) {
       console.error("Critique generation error:", error);
+
+      // ローディングトーストを削除
+      toast.dismiss(loadingToastId);
 
       setCritiqueState({
         status: "error",
