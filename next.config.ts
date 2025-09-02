@@ -16,10 +16,6 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 31536000, // 1年
   },
-  // フォントプリロードの最適化
-  optimizeFonts: true,
-  // Core Web Vitals改善
-  swcMinify: true,
 };
 
 export default withBundleAnalyzer(nextConfig);
