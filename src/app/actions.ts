@@ -8,6 +8,7 @@ import type { ExifData, CritiqueResult } from "@/types/upload";
 export interface UploadResult {
   success: boolean;
   data?: {
+    id: string;
     exifData: ExifData;
     processedImage: {
       dataUrl: string;
@@ -27,7 +28,10 @@ export interface UploadResult {
 export async function uploadImage(formData: FormData): Promise<UploadResult> {
   try {
     // APIエンドポイントに画像をアップロード
-    const response = await fetch("/api/upload", {
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/upload`, {
       method: "POST",
       body: formData,
     });
@@ -53,6 +57,7 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
     return {
       success: true,
       data: {
+        id: apiResponse.data.id,
         exifData: apiResponse.data.exifData,
         processedImage: apiResponse.data.processedImage,
       },
@@ -83,7 +88,10 @@ export async function generateCritique(
 ): Promise<CritiqueResult> {
   try {
     // APIエンドポイントに画像を送信して講評生成
-    const response = await fetch("/api/critique", {
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/critique`, {
       method: "POST",
       body: formData,
     });
@@ -149,8 +157,11 @@ export async function uploadImageWithCritique(formData: FormData): Promise<{
       };
     }
 
-    // 講評生成処理は既存のgenerateCritique関数を使用
-    const critiqueResult = await generateCritique(formData);
+    // 講評生成処理にアップロードIDを追加
+    const critiqueFormData = new FormData();
+    critiqueFormData.append("image", formData.get("image") as File);
+    critiqueFormData.append("uploadId", uploadResult.data.id);
+    const critiqueResult = await generateCritique(critiqueFormData);
 
     console.log(
       `Integrated processing completed in ${Date.now() - startTime}ms`,
