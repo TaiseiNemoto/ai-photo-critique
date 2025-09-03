@@ -64,7 +64,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         expiresAt: expiresAt.toISOString(),
       };
 
-      await kvClient.saveCritique(critiqueDataForStorage as CritiqueData & { expiresAt: string });
+      await kvClient.saveCritique(
+        critiqueDataForStorage as CritiqueData & { expiresAt: string },
+      );
 
       // 共有データを保存
       await kvClient.saveShare({
