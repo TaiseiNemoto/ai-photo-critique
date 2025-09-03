@@ -8,6 +8,11 @@ import { CritiqueProvider } from "@/contexts/CritiqueContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000",
+  ),
   title: "Photo-Critique - AI写真講評サービス",
   description:
     "あなたの写真を数秒でAI講評。技術・構図・色彩の3つの観点からプロレベルのフィードバックを瞬時に取得。",
@@ -39,13 +44,6 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <link
-          rel="preload"
-          href="/fonts/inter-var.woff2"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
         {/* Core Web Vitals最適化 */}
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link

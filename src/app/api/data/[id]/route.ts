@@ -24,13 +24,17 @@ export async function GET(
       return NextResponse.json(errorResponse, { status: 400 });
     }
 
-    // 講評データと共有データを並行して取得
-    const [critiqueData, shareData] = await Promise.all([
-      kvClient.getCritique(id),
-      kvClient.getShare(id),
-    ]);
+    // まず講評データを直接取得を試みる（新しい形式）
+    let critiqueData = await kvClient.getCritique(id);
+    const shareData = await kvClient.getShare(id);
 
-    if (!critiqueData || !shareData) {
+    // 新しい形式でデータが見つからない場合、従来の形式を試す
+    if (!critiqueData && shareData) {
+      // 従来の形式：shareDataのcritiqueIdから講評データを取得
+      critiqueData = await kvClient.getCritique(shareData.critiqueId);
+    }
+
+    if (!critiqueData) {
       const errorResponse: DataResponse = {
         success: false,
         error: "データが見つかりません",
@@ -38,16 +42,32 @@ export async function GET(
       return NextResponse.json(errorResponse, { status: 404 });
     }
 
-    // 期限切れチェック
-    const now = new Date();
-    const expiresAt = new Date(shareData.expiresAt);
+    // 期限切れチェック（shareDataがある場合のみ）
+    if (shareData) {
+      const now = new Date();
+      const expiresAt = new Date(shareData.expiresAt);
 
-    if (now > expiresAt) {
-      const errorResponse: DataResponse = {
-        success: false,
-        error: "このデータは期限切れです",
-      };
-      return NextResponse.json(errorResponse, { status: 410 });
+      if (now > expiresAt) {
+        const errorResponse: DataResponse = {
+          success: false,
+          error: "このデータは期限切れです",
+        };
+        return NextResponse.json(errorResponse, { status: 410 });
+      }
+    } else {
+      // 新しい形式では講評データ自体に期限が含まれている
+      if (critiqueData.expiresAt) {
+        const now = new Date();
+        const expiresAt = new Date(critiqueData.expiresAt);
+
+        if (now > expiresAt) {
+          const errorResponse: DataResponse = {
+            success: false,
+            error: "このデータは期限切れです",
+          };
+          return NextResponse.json(errorResponse, { status: 410 });
+        }
+      }
     }
 
     const successResponse: DataResponse = {
