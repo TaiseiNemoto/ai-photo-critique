@@ -56,7 +56,9 @@ export async function GET(
       }
     } else {
       // 新しい形式では講評データ自体に期限が含まれている
-      const critiqueDataWithExpiry = critiqueData as CritiqueData & { expiresAt?: string };
+      const critiqueDataWithExpiry = critiqueData as CritiqueData & {
+        expiresAt?: string;
+      };
       if (critiqueDataWithExpiry.expiresAt) {
         const now = new Date();
         const expiresAt = new Date(critiqueDataWithExpiry.expiresAt);
