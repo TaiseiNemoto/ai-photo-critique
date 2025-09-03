@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { kvClient } from "@/lib/kv";
+import { kvClient, type CritiqueData } from "@/lib/kv";
 
 interface ShareRequest {
   // 既存のcritiqueIdを使用する場合（後方互換性）
@@ -52,16 +52,19 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       const now = new Date();
       const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
-      // 講評データを保存
-      const critiqueData = {
+      // 講評データを従来形式に変換して保存
+      const critiqueDataForStorage = {
         id: shareId,
-        image,
-        critique,
-        createdAt: now.toISOString(),
+        filename: image.original || "uploaded-image",
+        technique: critique.technique,
+        composition: critique.composition,
+        color: critique.color,
+        exifData: image.exif || {},
+        uploadedAt: now.toISOString(),
         expiresAt: expiresAt.toISOString(),
       };
 
-      await kvClient.saveCritique(critiqueData);
+      await kvClient.saveCritique(critiqueDataForStorage as CritiqueData & { expiresAt: string });
 
       // 共有データを保存
       await kvClient.saveShare({

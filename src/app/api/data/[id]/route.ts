@@ -56,9 +56,10 @@ export async function GET(
       }
     } else {
       // 新しい形式では講評データ自体に期限が含まれている
-      if (critiqueData.expiresAt) {
+      const critiqueDataWithExpiry = critiqueData as CritiqueData & { expiresAt?: string };
+      if (critiqueDataWithExpiry.expiresAt) {
         const now = new Date();
-        const expiresAt = new Date(critiqueData.expiresAt);
+        const expiresAt = new Date(critiqueDataWithExpiry.expiresAt);
 
         if (now > expiresAt) {
           const errorResponse: DataResponse = {
@@ -73,7 +74,7 @@ export async function GET(
     const successResponse: DataResponse = {
       success: true,
       data: critiqueData,
-      shareData: shareData,
+      shareData: shareData || undefined,
     };
 
     return NextResponse.json(successResponse, { status: 200 });

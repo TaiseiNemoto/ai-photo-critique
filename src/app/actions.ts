@@ -160,7 +160,9 @@ export async function uploadImageWithCritique(formData: FormData): Promise<{
     // 講評生成処理にアップロードIDを追加
     const critiqueFormData = new FormData();
     critiqueFormData.append("image", formData.get("image") as File);
-    critiqueFormData.append("uploadId", uploadResult.data.id);
+    if (uploadResult.data?.id) {
+      critiqueFormData.append("uploadId", uploadResult.data.id);
+    }
     const critiqueResult = await generateCritique(critiqueFormData);
 
     console.log(
