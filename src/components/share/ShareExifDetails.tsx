@@ -10,7 +10,7 @@ interface ExifData {
 }
 
 interface ShareExifDetailsProps {
-  exif: ExifData;
+  exif?: ExifData | null;
 }
 
 export function ShareExifDetails({ exif }: ShareExifDetailsProps) {

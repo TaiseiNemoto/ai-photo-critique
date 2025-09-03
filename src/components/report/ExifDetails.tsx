@@ -3,10 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ExifData } from "@/types/upload";
 
 interface ExifDetailsProps {
-  exif: ExifData;
+  exif?: ExifData | null;
 }
 
 export function ExifDetails({ exif }: ExifDetailsProps) {
+  // exifデータが存在しない場合は何も表示しない
+  if (!exif) {
+    return null;
+  }
   return (
     <Card className="mb-8 bg-white border-gray-200 shadow-sm">
       <CardHeader>
