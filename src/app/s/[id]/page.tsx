@@ -43,8 +43,9 @@ export async function generateMetadata({
     }
 
     // EXIF情報から動的にタイトルを生成
-    const camera = critiqueData.exif?.camera || "カメラ";
-    const lens = critiqueData.exif?.lens || "レンズ";
+    const exifData = critiqueData.image?.exif || critiqueData.exif;
+    const camera = exifData?.camera || "カメラ";
+    const lens = exifData?.lens || "レンズ";
     const title = `${camera}で撮影した写真のAI講評結果 - Photo-Critique`;
     const description = `${camera}、${lens}で撮影された写真を技術・構図・色彩の3つの観点からAIが分析しました。`;
 
@@ -151,13 +152,31 @@ export default async function SharePage({ params }: SharePageProps) {
             <ShareBadge />
 
             <ImagePreview
-              src={critiqueData.image || "/placeholder.svg"}
+              src={
+                critiqueData.image?.preview ||
+                critiqueData.image ||
+                "/placeholder.svg"
+              }
               alt="分析対象の写真"
             />
 
-            <ShareCritiqueCards critiqueData={critiqueData} />
+            <ShareCritiqueCards
+              critiqueData={{
+                technical:
+                  critiqueData.critique?.technique ||
+                  critiqueData.technical ||
+                  "",
+                composition:
+                  critiqueData.critique?.composition ||
+                  critiqueData.composition ||
+                  "",
+                color: critiqueData.critique?.color || critiqueData.color || "",
+              }}
+            />
 
-            <ShareExifDetails exif={critiqueData.exif} />
+            <ShareExifDetails
+              exif={critiqueData.image?.exif || critiqueData.exif}
+            />
 
             <ShareCallToAction />
 
