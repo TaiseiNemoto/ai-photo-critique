@@ -25,8 +25,34 @@ vi.mock("sonner", () => ({
   },
 }));
 
+// CritiqueContextをモック
+vi.mock("@/contexts/CritiqueContext", () => ({
+  useCritique: vi.fn(() => ({
+    currentCritique: {
+      image: {
+        preview: "data:image/jpeg;base64,test",
+        original: "data:image/jpeg;base64,test",
+        processedSize: { width: 800, height: 600 },
+        originalSize: { width: 1600, height: 1200 },
+        size: 1024000,
+        exif: { camera: "Test Camera" },
+      },
+      critique: {
+        technique: "テスト技術評価",
+        composition: "テスト構図評価",
+        color: "テスト色彩評価",
+      },
+      timestamp: Date.now(),
+    },
+  })),
+}));
+
+// Fetch APIをモック
+global.fetch = vi.fn();
+
 describe("ReportActions", () => {
   let mockWriteText: ReturnType<typeof vi.fn>;
+  let mockFetch: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     // Clipboard APIをモック
@@ -44,6 +70,10 @@ describe("ReportActions", () => {
       },
       writable: true,
     });
+
+    // Fetch APIをモック
+    mockFetch = vi.fn();
+    global.fetch = mockFetch;
 
     // モック関数をリセット
     vi.clearAllMocks();
@@ -99,8 +129,28 @@ describe("ReportActions", () => {
       fireEvent.click(shareButton);
 
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith("コピーに失敗しました", {
-          description: "手動でURLをコピーしてください",
+        expect(toast.error).toHaveBeenCalledWith("シェアに失敗しました", {
+          description: "Clipboard API not supported",
+          duration: 5000,
+        });
+      });
+    });
+
+    test("APIコール失敗時にエラートーストが表示される", async () => {
+      const { toast } = await import("sonner");
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+      });
+
+      render(<ReportActions reportId="current" />);
+
+      const shareButton = screen.getByText("シェア用リンクをコピー");
+      fireEvent.click(shareButton);
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith("シェアに失敗しました", {
+          description: "シェアデータの保存に失敗しました",
           duration: 5000,
         });
       });
@@ -108,29 +158,66 @@ describe("ReportActions", () => {
   });
 
   describe("境界値テスト", () => {
-    test("reportIdが'current'の場合シェアボタンが無効化される", () => {
+    test("reportIdが'current'の場合でもシェアボタンが有効になる", () => {
       render(<ReportActions reportId="current" />);
 
       const shareButton = screen.getByRole("button", {
         name: /シェア用リンクをコピー/,
       });
-      expect(shareButton).toBeDisabled();
+      expect(shareButton).not.toBeDisabled();
     });
 
-    test("reportIdが'current'でシェアボタンクリック時に制限メッセージが表示される", async () => {
+    test("reportIdが'current'でシェアボタンクリック時にAPIコールが実行される", async () => {
       const { toast } = await import("sonner");
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            success: true,
+            shareId: "generated-share-id",
+            url: "/s/generated-share-id",
+          }),
+      });
+      mockWriteText.mockResolvedValue(undefined);
 
       render(<ReportActions reportId="current" />);
 
       const shareButton = screen.getByText("シェア用リンクをコピー");
+      fireEvent.click(shareButton);
 
-      // disabledなボタンでも強制的にイベントを発火させる
-      fireEvent.click(shareButton, { button: 0 });
-
-      // disabledボタンではクリックイベントが処理されないため、
-      // Clipboard APIも呼ばれず、toastも呼ばれない
-      expect(mockWriteText).not.toHaveBeenCalled();
-      expect(toast.error).not.toHaveBeenCalled();
+      await waitFor(() => {
+        expect(mockFetch).toHaveBeenCalledWith("/api/share", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            image: {
+              preview: "data:image/jpeg;base64,test",
+              original: "data:image/jpeg;base64,test",
+              processedSize: { width: 800, height: 600 },
+              originalSize: { width: 1600, height: 1200 },
+              size: 1024000,
+              exif: { camera: "Test Camera" },
+            },
+            critique: {
+              technique: "テスト技術評価",
+              composition: "テスト構図評価",
+              color: "テスト色彩評価",
+            },
+          }),
+        });
+        expect(mockWriteText).toHaveBeenCalledWith(
+          "https://example.com/s/generated-share-id",
+        );
+        expect(toast.success).toHaveBeenCalledWith(
+          "シェア用リンクをコピーしました",
+          {
+            description: "SNSやメッセージアプリで共有できます",
+            duration: 3000,
+          },
+        );
+      });
     });
 
     test("reportIdが空文字列の場合も正常に動作する", async () => {
@@ -164,8 +251,9 @@ describe("ReportActions", () => {
       fireEvent.click(shareButton);
 
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith("コピーに失敗しました", {
-          description: "手動でURLをコピーしてください",
+        expect(toast.error).toHaveBeenCalledWith("シェアに失敗しました", {
+          description:
+            "Cannot read properties of undefined (reading 'writeText')",
           duration: 5000,
         });
       });
