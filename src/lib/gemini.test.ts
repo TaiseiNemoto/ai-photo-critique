@@ -49,7 +49,7 @@ describe("GeminiClient", () => {
   describe("testConnection", () => {
     it("APIキーが設定されている場合、接続テストが成功する", async () => {
       const { GeminiClient } = await import("./gemini");
-      
+
       // モックのレスポンス設定
       mockGenerateContent.mockResolvedValue({
         text: "Hello, test response",
@@ -67,7 +67,7 @@ describe("GeminiClient", () => {
 
     it("APIキーが設定されていない場合、接続テストが失敗する", async () => {
       const { GeminiClient } = await import("./gemini");
-      
+
       // APIキーを削除
       delete process.env.GOOGLE_AI_API_KEY;
 
@@ -79,7 +79,7 @@ describe("GeminiClient", () => {
 
     it("API呼び出しが失敗した場合、接続テストが失敗する", async () => {
       const { GeminiClient } = await import("./gemini");
-      
+
       // モックでエラーを発生させる
       mockGenerateContent.mockRejectedValue(new Error("API Error"));
 
@@ -96,7 +96,7 @@ describe("GeminiClient", () => {
 
     it("正常な画像分析の場合、講評データを返す", async () => {
       const { GeminiClient } = await import("./gemini");
-      
+
       // モックのレスポンス設定
       const mockResponse = {
         text: JSON.stringify({
@@ -108,7 +108,10 @@ describe("GeminiClient", () => {
       mockGenerateContent.mockResolvedValue(mockResponse);
 
       const client = new GeminiClient();
-      const result = await client.analyzeCritique(mockImageBuffer, mockMimeType);
+      const result = await client.analyzeCritique(
+        mockImageBuffer,
+        mockMimeType,
+      );
 
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
@@ -117,6 +120,5 @@ describe("GeminiClient", () => {
       expect(result.data?.color).toContain("色");
       expect(typeof result.processingTime).toBe("number");
     });
-
   });
 });

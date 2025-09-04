@@ -29,7 +29,7 @@ describe("/api/upload POST", () => {
   it("ファイルが含まれていない場合、400エラーを返す", async () => {
     // 動的インポートでテスト対象をロード
     const { POST } = await import("./route");
-    
+
     // Arrange
     const formData = new FormData();
     const request = new NextRequest("http://localhost:3000/api/upload", {

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import SharePage, { generateMetadata } from "@/app/s/[id]/page";
 
 // fetchをモック
@@ -10,7 +10,7 @@ const mockCritiqueData = {
   id: "test-id",
   image: "/test-image.jpg",
   technical: "テクニカル講評内容",
-  composition: "構図講評内容", 
+  composition: "構図講評内容",
   color: "色彩講評内容",
   exif: {
     camera: "Canon EOS R5",
@@ -42,7 +42,9 @@ describe("SharePage", () => {
           data: mockCritiqueData,
         }),
       };
-      (fetch as any).mockResolvedValue(mockResponse);
+      (fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
+        mockResponse,
+      );
 
       // Act
       const result = await SharePage(mockSharePageProps);
@@ -64,13 +66,17 @@ describe("SharePage", () => {
             data: mockCritiqueData,
           }),
         };
-        (fetch as any).mockResolvedValue(mockResponse);
+        (fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
+          mockResponse,
+        );
 
         // Act
         const metadata = await generateMetadata(mockSharePageProps);
 
         // Assert
-        expect(metadata.title).toBe("Canon EOS R5で撮影した写真のAI講評結果 - Photo-Critique");
+        expect(metadata.title).toBe(
+          "Canon EOS R5で撮影した写真のAI講評結果 - Photo-Critique",
+        );
         expect(metadata.description).toBeTruthy();
       });
     });

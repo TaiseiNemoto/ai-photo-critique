@@ -168,7 +168,6 @@ describe("uploadImage Server Action", () => {
         expect(result.error).toBe("サポートされていないファイル形式です");
       }
     });
-
   });
 
   describe("境界値テスト", () => {
@@ -258,6 +257,5 @@ describe("generateCritique Server Action", () => {
       expect(result.success).toBe(false);
       expect(result.error).toBe("講評生成に失敗しました");
     });
-
   });
 });
