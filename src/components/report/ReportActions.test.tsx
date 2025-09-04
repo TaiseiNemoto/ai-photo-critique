@@ -27,9 +27,13 @@ vi.mock("@/contexts/CritiqueContext", () => ({
   useCritique: () => ({
     currentCritique: {
       image: { url: "test-image-url" },
-      critique: { technique: "test technique", composition: "test composition", color: "test color" }
-    }
-  })
+      critique: {
+        technique: "test technique",
+        composition: "test composition",
+        color: "test color",
+      },
+    },
+  }),
 }));
 
 describe("ReportActions", () => {
@@ -38,14 +42,17 @@ describe("ReportActions", () => {
     mockWriteText.mockResolvedValue(undefined);
     mockFetch.mockResolvedValue({
       ok: true,
-      json: async () => ({ success: true, shareUrl: "https://example.com/s/abc123" }),
+      json: async () => ({
+        success: true,
+        shareUrl: "https://example.com/s/abc123",
+      }),
     });
   });
 
   describe("正常系", () => {
     test("コンポーネントが正しくレンダリングされる", () => {
       render(<ReportActions reportId="test-report-123" />);
-      
+
       expect(screen.getByText("シェア用リンクをコピー")).toBeInTheDocument();
     });
 
@@ -56,23 +63,28 @@ describe("ReportActions", () => {
       fireEvent.click(shareButton);
 
       await waitFor(() => {
-        expect(mockWriteText).toHaveBeenCalledWith("https://example.com/s/abc123");
+        expect(mockWriteText).toHaveBeenCalledWith(
+          "https://example.com/s/abc123",
+        );
       });
     });
 
     test("成功時にトーストが表示される", async () => {
       const { toast } = await import("sonner");
-      
+
       render(<ReportActions reportId="test-report-123" />);
 
       const shareButton = screen.getByText("シェア用リンクをコピー");
       fireEvent.click(shareButton);
 
       await waitFor(() => {
-        expect(toast.success).toHaveBeenCalledWith("シェア用リンクをコピーしました", {
-          description: "SNSやメッセンジャーで共有できます",
-          duration: 3000,
-        });
+        expect(toast.success).toHaveBeenCalledWith(
+          "シェア用リンクをコピーしました",
+          {
+            description: "SNSやメッセンジャーで共有できます",
+            duration: 3000,
+          },
+        );
       });
     });
   });
@@ -97,7 +109,7 @@ describe("ReportActions", () => {
       // current以外の場合は直接URLをコピーするため、fetchは呼ばれない
       await waitFor(() => {
         expect(mockWriteText).toHaveBeenCalledWith(
-          expect.stringContaining(`/s/${longReportId}`)
+          expect.stringContaining(`/s/${longReportId}`),
         );
       });
     });

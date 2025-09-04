@@ -39,9 +39,7 @@ describe("Home Page", () => {
 
     // Assert
     expect(screen.getByText("Photo-Critique")).toBeInTheDocument();
-    expect(
-      screen.getByText("あなたの写真を数秒でAI講評"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("あなたの写真を数秒でAI講評")).toBeInTheDocument();
   });
 
   it("UploadZoneコンポーネントが表示される", () => {
@@ -58,7 +56,9 @@ describe("Home Page", () => {
     renderWithProvider(<Home />);
 
     // Assert
-    expect(screen.getByText(/技術・構図・色彩の3つの観点から/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/技術・構図・色彩の3つの観点から/),
+    ).toBeInTheDocument();
   });
 
   it("セマンティックなHTML構造を持つ", () => {
@@ -85,5 +85,4 @@ describe("Home Page", () => {
     const uploadButton = screen.getByLabelText("画像をアップロード");
     expect(uploadButton).toBeInTheDocument();
   });
-
 });

@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { Toaster } from "sonner";
 import UploadZone from "@/components/upload/UploadZone";
-import type { UploadedImage } from "@/types/upload";
 
 // Server Actionをモック化
 vi.mock("@/app/actions", () => ({
