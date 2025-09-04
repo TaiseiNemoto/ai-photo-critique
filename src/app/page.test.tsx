@@ -38,9 +38,9 @@ describe("Home Page", () => {
     renderWithProvider(<Home />);
 
     // Assert
-    expect(screen.getByText("AI Photo Critique")).toBeInTheDocument();
+    expect(screen.getByText("Photo-Critique")).toBeInTheDocument();
     expect(
-      screen.getByText("AIが写真を分析し、建設的な講評をお届けします"),
+      screen.getByText("あなたの写真を数秒でAI講評"),
     ).toBeInTheDocument();
   });
 
@@ -49,18 +49,16 @@ describe("Home Page", () => {
     renderWithProvider(<Home />);
 
     // Assert
-    expect(screen.getByText("写真をドラッグ&ドロップ")).toBeInTheDocument();
     expect(screen.getByText("ファイルを選択")).toBeInTheDocument();
+    expect(screen.getByText("撮影してアップロード")).toBeInTheDocument();
   });
 
-  it("機能カードが表示される", () => {
+  it("機能説明が表示される", () => {
     // Act
     renderWithProvider(<Home />);
 
     // Assert
-    expect(screen.getByText("瞬時の分析")).toBeInTheDocument();
-    expect(screen.getByText("3軸評価")).toBeInTheDocument();
-    expect(screen.getByText("簡単共有")).toBeInTheDocument();
+    expect(screen.getByText(/技術・構図・色彩の3つの観点から/)).toBeInTheDocument();
   });
 
   it("セマンティックなHTML構造を持つ", () => {
@@ -81,23 +79,11 @@ describe("Home Page", () => {
 
     // Assert
     const mainHeading = screen.getByRole("heading", { level: 1 });
-    expect(mainHeading).toHaveTextContent("AI Photo Critique");
+    expect(mainHeading).toHaveTextContent("Photo-Critique");
 
     // ファイル入力のアクセシビリティ
-    const fileInput = screen.getByLabelText(/写真を選択/);
-    expect(fileInput).toBeInTheDocument();
+    const uploadButton = screen.getByLabelText("画像をアップロード");
+    expect(uploadButton).toBeInTheDocument();
   });
 
-  it("レスポンシブデザインのクラスが適用されている", () => {
-    // Act
-    renderWithProvider(<Home />);
-
-    // Assert
-    const container = screen.getByRole("main");
-    expect(container).toHaveClass("min-h-screen");
-
-    // グリッドレイアウトのクラスを確認
-    const featureSection = container.querySelector(".grid");
-    expect(featureSection).toBeInTheDocument();
-  });
 });

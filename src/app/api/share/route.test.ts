@@ -82,7 +82,7 @@ describe("/api/share POST", () => {
     expect(response.status).toBe(400);
     expect(responseBody).toEqual({
       success: false,
-      error: "講評IDが必要です",
+      error: "講評IDまたは講評データが必要です",
     });
   });
 

@@ -13,9 +13,9 @@ describe("FeatureCards", () => {
     render(<FeatureCards />);
 
     // Assert
-    expect(screen.getByText("瞬時の分析")).toBeInTheDocument();
-    expect(screen.getByText("3軸評価")).toBeInTheDocument();
-    expect(screen.getByText("簡単共有")).toBeInTheDocument();
+    expect(screen.getByText("技術面")).toBeInTheDocument();
+    expect(screen.getByText("構図")).toBeInTheDocument();
+    expect(screen.getByText("色彩")).toBeInTheDocument();
   });
 
   it("各カードの説明文が表示される", () => {
@@ -24,24 +24,25 @@ describe("FeatureCards", () => {
 
     // Assert
     expect(
-      screen.getByText("AIが数秒で写真を解析し、即座にフィードバックを提供"),
+      screen.getByText("露出・ピント・ノイズなどの技術的評価"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("技術・構図・色彩の3つの観点から総合的に評価"),
+      screen.getByText("三分割法・対称性・視線誘導の分析"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("結果を簡単にSNSでシェアして、みんなと共有"),
+      screen.getByText("色調・彩度・コントラストの評価"),
     ).toBeInTheDocument();
   });
 
   it("適切なアイコンが表示される", () => {
     // Act
-    const { container } = render(<FeatureCards />);
+    render(<FeatureCards />);
 
     // Assert
-    // アイコンはSVG要素として描画される
-    const icons = container.querySelectorAll("svg");
-    expect(icons.length).toBeGreaterThanOrEqual(3);
+    // アイコンはテキストで表示される
+    expect(screen.getByText("技")).toBeInTheDocument();
+    expect(screen.getByText("構")).toBeInTheDocument();
+    expect(screen.getByText("色")).toBeInTheDocument();
   });
 
   it("レスポンシブグリッドレイアウトが適用される", () => {
