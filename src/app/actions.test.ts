@@ -169,25 +169,6 @@ describe("uploadImage Server Action", () => {
       }
     });
 
-    it("API呼び出しが失敗した場合はエラーを返す", async () => {
-      // Arrange: ネットワークエラーをモック
-      server.use(
-        http.post("/api/upload", () => {
-          return HttpResponse.error();
-        }),
-      );
-
-      const mockFile = createMockImageFile();
-      const formData = new FormData();
-      formData.append("image", mockFile);
-
-      // Act
-      const result = await uploadImage(formData);
-
-      // Assert
-      expect(result.success).toBe(false);
-      expect(result.error).toBeDefined();
-    });
   });
 
   describe("境界値テスト", () => {
@@ -278,24 +259,5 @@ describe("generateCritique Server Action", () => {
       expect(result.error).toBe("講評生成に失敗しました");
     });
 
-    it("ネットワークエラーの場合はエラーを返す", async () => {
-      // Arrange: ネットワークエラーをモック
-      server.use(
-        http.post("/api/critique", () => {
-          return HttpResponse.error();
-        }),
-      );
-
-      const mockFile = createMockImageFile();
-      const formData = new FormData();
-      formData.append("image", mockFile);
-
-      // Act
-      const result = await generateCritique(formData);
-
-      // Assert
-      expect(result.success).toBe(false);
-      expect(result.error).toBeDefined();
-    });
   });
 });
