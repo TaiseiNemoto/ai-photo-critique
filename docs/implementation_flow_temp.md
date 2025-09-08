@@ -55,6 +55,7 @@
 ### Step 1: 画像選択とブラウザ側処理
 
 **関連ファイル**:
+
 - `src/components/upload/UploadZone.tsx`
 - `src/lib/exif.ts`
 
@@ -74,6 +75,7 @@
 ### Step 2: アップロード画面での表示
 
 **関連ファイル**:
+
 - `src/app/page.tsx` (`UploadPage` コンポーネント)
 - `src/components/upload/ImagePreview.tsx`
 - `src/components/upload/ExifDisplay.tsx`
@@ -90,6 +92,7 @@
 ### Step 3: 講評生成ボタン押下
 
 **関連ファイル**:
+
 - `src/app/page.tsx` (`handleGenerateCritique()` 関数)
 
 **処理内容**:
@@ -102,6 +105,7 @@
 ### Step 4: Server Action による統合処理
 
 **関連ファイル**:
+
 - `src/app/actions.ts`
 
 #### 4-1: `uploadImageWithCritique()` メイン処理
@@ -133,6 +137,7 @@
 #### 5-1: `/api/upload` - 画像アップロード処理
 
 **関連ファイル**:
+
 - `src/app/api/upload/route.ts`
 - `src/lib/exif.ts`
 - `src/lib/image.ts`
@@ -155,6 +160,7 @@
 #### 5-2: `/api/critique` - AI講評生成処理
 
 **関連ファイル**:
+
 - `src/app/api/critique/route.ts`
 - `src/lib/critique.ts`
 - `src/lib/gemini.ts`
@@ -191,6 +197,7 @@
 ### Step 6: 結果処理と画面遷移
 
 **関連ファイル**:
+
 - `src/app/page.tsx` (`handleGenerateCritique()` 継続)
 - `src/contexts/CritiqueContext.tsx`
 
