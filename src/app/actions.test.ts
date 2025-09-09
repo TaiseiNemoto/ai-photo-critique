@@ -1,6 +1,66 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { uploadImage, generateCritique } from "@/app/actions";
 
+// 依存ライブラリのモック化
+vi.mock("@/lib/exif", () => ({
+  extractExifData: vi.fn(() => Promise.resolve({
+    make: "Canon",
+    model: "EOS R5",
+    fNumber: "5.6",
+    exposureTime: "1/60",
+    iso: "100"
+  }))
+}));
+
+vi.mock("@/lib/image", () => ({
+  processImage: vi.fn(() => {
+    const content = new Uint8Array(512);
+    const file = new File([content], "processed.jpg", { type: "image/jpeg" });
+    
+    // arrayBufferメソッドを追加
+    if (!file.arrayBuffer) {
+      Object.defineProperty(file, 'arrayBuffer', {
+        value: async function() {
+          const buffer = new ArrayBuffer(512);
+          const view = new Uint8Array(buffer);
+          view.set(content);
+          return buffer;
+        }
+      });
+    }
+    
+    return Promise.resolve({
+      processedFile: file,
+      originalSize: 1024,
+      processedSize: 512
+    });
+  })
+}));
+
+vi.mock("@/lib/critique", () => ({
+  generatePhotoCritiqueWithRetry: vi.fn(() => Promise.resolve({
+    success: true,
+    data: {
+      technique: "良好な露出設定です",
+      composition: "三分割法が効果的に使用されています", 
+      color: "色彩バランスが優れています"
+    },
+    processingTime: 2500
+  }))
+}));
+
+vi.mock("@/lib/kv", () => ({
+  kvClient: {
+    saveUpload: vi.fn(() => Promise.resolve()),
+    getUpload: vi.fn(() => Promise.resolve({
+      exifData: { make: "Canon", model: "EOS R5" }
+    })),
+    saveCritique: vi.fn(() => Promise.resolve()),
+    saveShare: vi.fn(() => Promise.resolve()),
+    generateId: vi.fn(() => "test-share-id-12345")
+  }
+}));
+
 // テストファイルのモック作成
 function createMockImageFile(
   name: string = "test.jpg",
