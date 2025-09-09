@@ -1,7 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { uploadImage, generateCritique } from "@/app/actions";
-import { server } from "@/mocks/server";
-import { http, HttpResponse } from "msw";
 
 // テストファイルのモック作成
 function createMockImageFile(
@@ -10,7 +8,21 @@ function createMockImageFile(
   size: number = 1024,
 ): File {
   const content = new Uint8Array(size);
-  return new File([content], name, { type });
+  const file = new File([content], name, { type });
+  
+  // arrayBufferメソッドを追加（Node.js環境での不足分を補完）
+  if (!file.arrayBuffer) {
+    Object.defineProperty(file, 'arrayBuffer', {
+      value: async function() {
+        const buffer = new ArrayBuffer(size);
+        const view = new Uint8Array(buffer);
+        view.set(content);
+        return buffer;
+      }
+    });
+  }
+  
+  return file;
 }
 
 describe("uploadImage Server Action", () => {
@@ -85,19 +97,6 @@ describe("uploadImage Server Action", () => {
 
   describe("異常系", () => {
     it("ファイルが選択されていない場合はエラーを返す", async () => {
-      // Arrange: API エラーレスポンスをモック
-      server.use(
-        http.post("/api/upload", () => {
-          return HttpResponse.json(
-            {
-              success: false,
-              error: "ファイルが選択されていません",
-            },
-            { status: 400 },
-          );
-        }),
-      );
-
       // Arrange: 空のFormData
       const formData = new FormData();
 
@@ -111,19 +110,6 @@ describe("uploadImage Server Action", () => {
     });
 
     it("空のファイルの場合はエラーを返す", async () => {
-      // Arrange: API エラーレスポンスをモック
-      server.use(
-        http.post("/api/upload", () => {
-          return HttpResponse.json(
-            {
-              success: false,
-              error: "ファイルが選択されていません",
-            },
-            { status: 400 },
-          );
-        }),
-      );
-
       // Arrange: サイズ0のファイル
       const mockFile = createMockImageFile("empty.jpg", "image/jpeg", 0);
       const formData = new FormData();
@@ -138,18 +124,6 @@ describe("uploadImage Server Action", () => {
     });
 
     it("サポートされていないファイル形式の場合はエラーを返す", async () => {
-      // Arrange: API エラーレスポンスをモック
-      server.use(
-        http.post("/api/upload", () => {
-          return HttpResponse.json(
-            {
-              success: false,
-              error: "サポートされていないファイル形式です",
-            },
-            { status: 400 },
-          );
-        }),
-      );
 
       const unsupportedFile = new File(["content"], "test.txt", {
         type: "text/plain",
@@ -214,13 +188,21 @@ describe("generateCritique Server Action", () => {
 
   describe("正常系", () => {
     it("画像に対するAI講評を生成できる", async () => {
-      // Arrange
+      // Arrange: まずアップロードを実行してuploadIdを取得
       const mockFile = createMockImageFile();
-      const formData = new FormData();
-      formData.append("image", mockFile);
+      const uploadFormData = new FormData();
+      uploadFormData.append("image", mockFile);
+      
+      const uploadResult = await uploadImage(uploadFormData);
+      expect(uploadResult.success).toBe(true);
+      
+      // Arrange: 講評生成用のFormData（uploadIdを含む）
+      const critiqueFormData = new FormData();
+      critiqueFormData.append("image", mockFile);
+      critiqueFormData.append("uploadId", uploadResult.data!.id);
 
       // Act
-      const result = await generateCritique(formData);
+      const result = await generateCritique(critiqueFormData);
 
       // Assert
       expect(result.success).toBe(true);
@@ -232,30 +214,18 @@ describe("generateCritique Server Action", () => {
   });
 
   describe("異常系", () => {
-    it("API呼び出しが失敗した場合はエラーを返す", async () => {
-      // Arrange: API エラーレスポンスをモック
-      server.use(
-        http.post("/api/critique", () => {
-          return HttpResponse.json(
-            {
-              success: false,
-              error: "講評生成に失敗しました",
-            },
-            { status: 500 },
-          );
-        }),
-      );
-
+    it("uploadIdが必要であることを確認する", async () => {
       const mockFile = createMockImageFile();
       const formData = new FormData();
       formData.append("image", mockFile);
+      // uploadIdを意図的に含めない
 
       // Act
       const result = await generateCritique(formData);
 
       // Assert
       expect(result.success).toBe(false);
-      expect(result.error).toBe("講評生成に失敗しました");
+      expect(result.error).toBe("アップロードIDが必要です");
     });
   });
 });

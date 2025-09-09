@@ -1,23 +1,8 @@
 "use server";
 
-import type { ExifData, CritiqueResult } from "@/types/upload";
-
-/**
- * 画像アップロードの結果を表す型
- */
-export interface UploadResult {
-  success: boolean;
-  data?: {
-    id: string;
-    exifData: ExifData;
-    processedImage: {
-      dataUrl: string;
-      originalSize: number;
-      processedSize: number;
-    };
-  };
-  error?: string;
-}
+import { uploadImageCore, type UploadResult } from "@/lib/upload";
+import { generateCritiqueCore } from "@/lib/critique-core";
+import type { CritiqueResult } from "@/types/upload";
 
 /**
  * 画像アップロード処理のServer Action
@@ -26,55 +11,8 @@ export interface UploadResult {
  * @returns 処理結果（成功時はEXIFデータと処理済み画像、失敗時はエラーメッセージ）
  */
 export async function uploadImage(formData: FormData): Promise<UploadResult> {
-  try {
-    // APIエンドポイントに画像をアップロード
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000";
-    const response = await fetch(`${baseUrl}/api/upload`, {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      return {
-        success: false,
-        error: errorData.error || "アップロードに失敗しました",
-      };
-    }
-
-    const apiResponse = await response.json();
-
-    if (!apiResponse.success) {
-      return {
-        success: false,
-        error: apiResponse.error || "アップロードに失敗しました",
-      };
-    }
-
-    // API Responseを既存の形式に変換
-    return {
-      success: true,
-      data: {
-        id: apiResponse.data.id,
-        exifData: apiResponse.data.exifData,
-        processedImage: apiResponse.data.processedImage,
-      },
-    };
-  } catch (error) {
-    console.error("Upload action error:", error);
-
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : "画像の処理中にエラーが発生しました";
-
-    return {
-      success: false,
-      error: errorMessage,
-    };
-  }
+  // ライブラリ関数を直接呼び出し（API Route経由を排除）
+  return await uploadImageCore(formData);
 }
 
 /**
@@ -86,48 +24,8 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
 export async function generateCritique(
   formData: FormData,
 ): Promise<CritiqueResult> {
-  try {
-    // APIエンドポイントに画像を送信して講評生成
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000";
-    const response = await fetch(`${baseUrl}/api/critique`, {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      return {
-        success: false,
-        error: errorData.error || "講評生成に失敗しました",
-      };
-    }
-
-    const apiResponse = await response.json();
-
-    if (!apiResponse.success) {
-      return {
-        success: false,
-        error: apiResponse.error || "講評生成に失敗しました",
-      };
-    }
-
-    // API Responseをそのまま返却（形式は既に統一済み）
-    return apiResponse;
-  } catch (error) {
-    console.error("Critique generation error:", error);
-
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : "AI講評の生成中にエラーが発生しました";
-
-    return {
-      success: false,
-      error: errorMessage,
-    };
-  }
+  // ライブラリ関数を直接呼び出し（API Route経由を排除）
+  return await generateCritiqueCore(formData);
 }
 
 /**
@@ -143,8 +41,8 @@ export async function uploadImageWithCritique(formData: FormData): Promise<{
   const startTime = Date.now();
 
   try {
-    // アップロード処理をAPI経由で実行
-    const uploadResult = await uploadImage(formData);
+    // アップロード処理を直接実行（ライブラリ関数呼び出し）
+    const uploadResult = await uploadImageCore(formData);
 
     if (!uploadResult.success) {
       const errorResult = {
@@ -157,13 +55,13 @@ export async function uploadImageWithCritique(formData: FormData): Promise<{
       };
     }
 
-    // 講評生成処理にアップロードIDを追加
+    // 講評生成処理にアップロードIDを追加（ライブラリ関数呼び出し）
     const critiqueFormData = new FormData();
     critiqueFormData.append("image", formData.get("image") as File);
     if (uploadResult.data?.id) {
       critiqueFormData.append("uploadId", uploadResult.data.id);
     }
-    const critiqueResult = await generateCritique(critiqueFormData);
+    const critiqueResult = await generateCritiqueCore(critiqueFormData);
 
     console.log(
       `Integrated processing completed in ${Date.now() - startTime}ms`,
