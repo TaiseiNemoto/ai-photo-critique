@@ -64,7 +64,7 @@ describe("ReportActions", () => {
 
       await waitFor(() => {
         expect(mockWriteText).toHaveBeenCalledWith(
-          "https://example.com/s/abc123",
+          "http://localhost:3000/s/test-report-123",
         );
       });
     });
@@ -81,7 +81,7 @@ describe("ReportActions", () => {
         expect(toast.success).toHaveBeenCalledWith(
           "シェア用リンクをコピーしました",
           {
-            description: "SNSやメッセンジャーで共有できます",
+            description: "SNSやメッセージアプリで共有できます",
             duration: 3000,
           },
         );
