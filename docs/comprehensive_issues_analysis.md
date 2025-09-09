@@ -20,7 +20,7 @@
 ### 🔴 Critical 課題（5件）
 
 - [ ] **C1** - 画像データの3重転送問題 ⭐⭐⭐⭐⭐
-- [ ] **C2** - Server Actions → API Routes アンチパターン ⭐⭐⭐⭐⭐
+- [x] **C2** - Server Actions → API Routes アンチパターン ⭐⭐⭐⭐⭐ ✅ **完了 (2025-09-09)**
 - [ ] **C3** - EXIF情報の重複処理 ⭐⭐⭐⭐
 - [ ] **C4** - 画像データの重複保存 ⭐⭐⭐⭐
 - [ ] **C5** - API設計の論理的矛盾 ⭐⭐⭐⭐
@@ -50,7 +50,7 @@
 
 ### 📊 サマリー
 
-**全19件** | 🔴 Critical: 5件 | 🟠 High: 4件 | 🟡 Medium: 4件 | 🟢 Low: 6件
+**全19件** | 🔴 Critical: 4件未完了 (1件完了) | 🟠 High: 4件 | 🟡 Medium: 4件 | 🟢 Low: 6件
 
 ---
 
@@ -82,7 +82,7 @@ critiqueFormData.append("image", formData.get("image") as File);
 
 **関連ファイル**: `src/components/upload/UploadZone.tsx:40`, `src/app/actions.ts:147,162`
 
-### C2. Server Actions → API Routes アンチパターン ⭐⭐⭐⭐⭐
+### C2. Server Actions → API Routes アンチパターン ⭐⭐⭐⭐⭐ ✅ **完了 (2025-09-09)**
 
 **問題概要**: Next.js 2025非推奨パターンの使用による構造的欠陥
 
@@ -108,6 +108,13 @@ export async function uploadImage(formData: FormData) {
 - **型安全性**: JSON変換による型情報の喪失
 
 **関連ファイル**: `src/app/actions.ts:31-37, 91-97`
+
+**✅ 修正完了**: 
+- Server Actionsを直接ライブラリ関数呼び出しに変更
+- API Route削除（`src/app/api/upload/route.ts`, `src/app/api/critique/route.ts`）
+- 新規ライブラリ作成（`src/lib/upload.ts`, `src/lib/critique-core.ts`）
+- Next.js 2025推奨パターン準拠、パフォーマンス・型安全性向上
+- **修正計画**: `docs/fixes/C2_server_actions_api_routes_antipattern.md`
 
 ### C3. EXIF情報の重複処理 ⭐⭐⭐⭐
 
