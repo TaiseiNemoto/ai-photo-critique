@@ -17,11 +17,13 @@ function extractAndValidateFile(formData: FormData): File | null {
 
 /**
  * AI講評生成処理のコア関数
- * 
+ *
  * @param formData - 講評対象の画像を含むFormData
  * @returns AI講評結果（成功時は3軸評価データ、失敗時はエラーメッセージ）
  */
-export async function generateCritiqueCore(formData: FormData): Promise<CritiqueResult> {
+export async function generateCritiqueCore(
+  formData: FormData,
+): Promise<CritiqueResult> {
   try {
     // アップロードIDの確認
     const uploadId = formData.get("uploadId") as string;

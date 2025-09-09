@@ -62,11 +62,13 @@ function generateUploadId(): string {
 
 /**
  * 画像アップロード処理のコア関数
- * 
+ *
  * @param formData - アップロードされた画像を含むFormData
  * @returns 処理結果（成功時はEXIFデータと処理済み画像、失敗時はエラーメッセージ）
  */
-export async function uploadImageCore(formData: FormData): Promise<UploadResult> {
+export async function uploadImageCore(
+  formData: FormData,
+): Promise<UploadResult> {
   try {
     // ファイルの抽出と基本検証
     const file = extractAndValidateFile(formData);
