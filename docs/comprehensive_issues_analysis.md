@@ -109,7 +109,8 @@ export async function uploadImage(formData: FormData) {
 
 **関連ファイル**: `src/app/actions.ts:31-37, 91-97`
 
-**✅ 修正完了**: 
+**✅ 修正完了**:
+
 - Server Actionsを直接ライブラリ関数呼び出しに変更
 - API Route削除（`src/app/api/upload/route.ts`, `src/app/api/critique/route.ts`）
 - 新規ライブラリ作成（`src/lib/upload.ts`, `src/lib/critique-core.ts`）
@@ -407,31 +408,37 @@ timestamp: Date.now(), // 使用されていない
 > **重要**: 以下の順序で実施することを強く推奨します。依存関係と効果を考慮した最適な進行順です。
 
 #### **着手順1: C2 - Server Actions → API Routes アンチパターン解消** ⭐⭐⭐⭐⭐
+
 **対象ファイル**: `src/app/actions.ts`  
 **理由**: 最も根本的なアーキテクチャ問題。これを解決しないと他の問題解決が困難  
 **影響**: 全体的なパフォーマンス改善の土台
 
 #### **着手順2: C1 - 画像データ3重転送問題の解消** ⭐⭐⭐⭐⭐
+
 **対象ファイル**: `src/components/upload/UploadZone.tsx`, `src/app/actions.ts`  
 **理由**: 最大のパフォーマンス・コスト問題。ユーザー体験に直結  
 **依存**: C2の解決後に実施（アーキテクチャ修正後）
 
 #### **着手順3: C3 - EXIF重複処理の解消** ⭐⭐⭐⭐
+
 **対象ファイル**: `src/components/upload/UploadZone.tsx`, `src/app/api/upload/route.ts`  
 **理由**: CPU・メモリリソースの無駄削減  
 **依存**: C1・C2の解決と連動
 
 #### **着手順4: C4 - 画像データ重複保存の解決** ⭐⭐⭐⭐
+
 **対象ファイル**: `src/app/api/upload/route.ts`, `src/app/api/critique/route.ts`  
 **理由**: ストレージコスト削減、データ整合性向上  
 **依存**: C1の解決後（データフロー整理後）
 
 #### **着手順5: C5 - API設計の矛盾解消** ⭐⭐⭐⭐
+
 **対象ファイル**: `src/app/api/critique/route.ts`  
 **理由**: 論理設計の修正、開発者体験向上  
 **依存**: C4の解決後（データ保存方式決定後）
 
 #### **着手順6: H1 - UploadZoneの責務違反** ⭐⭐⭐⭐
+
 **対象ファイル**: `src/components/upload/UploadZone.tsx`, `src/app/page.tsx`  
 **理由**: コンポーネント設計の正常化、保守性向上  
 **依存**: C1・C2の解決後（データフロー修正後）
@@ -529,17 +536,20 @@ timestamp: Date.now(), // 使用されていない
 ## 🚀 着手時の注意事項
 
 ### **依存関係の重要性**
+
 - **着手順1-2（C2→C1）**: この順序を守ることが重要。アーキテクチャ修正→データフロー修正の順
 - **着手順3-6**: 1-2の完了後に並行実施可能
 - **Phase 2以降**: Phase 1完了後に着手
 
 ### **各着手順の完了定義**
+
 1. 該当するテストが全て通過
-2. `npm run lint` でエラーなし  
+2. `npm run lint` でエラーなし
 3. 関連するドキュメント更新完了
 4. コードレビュー完了
 
 ### **リスク管理**
+
 - 各着手順で**必ずバックアップ**を取る
 - **段階的リリース**（1つずつデプロイ・検証）
 - **ロールバック手順**を事前準備
