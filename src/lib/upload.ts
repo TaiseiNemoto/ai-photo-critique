@@ -1,13 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
 import { extractExifData } from "@/lib/exif";
 import { processImage } from "@/lib/image";
 import { kvClient } from "@/lib/kv";
 import type { ExifData, ProcessedImageData } from "@/types/upload";
 
-// Node Runtime指定（Sharp画像処理のため）
-export const runtime = "nodejs";
-
-interface UploadApiResponse {
+/**
+ * 画像アップロードの結果を表す型
+ */
+export interface UploadResult {
   success: boolean;
   data?: {
     id: string;
@@ -18,7 +17,7 @@ interface UploadApiResponse {
 }
 
 /**
- * ファイルをFormDataから抽出し、基本検証を行う
+ * FormDataから画像ファイルを抽出し、基本検証を行う
  */
 function extractAndValidateFile(formData: FormData): File | null {
   const file = formData.get("image") as File;
@@ -61,21 +60,21 @@ function generateUploadId(): string {
   return `upload-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
+/**
+ * 画像アップロード処理のコア関数
+ * 
+ * @param formData - アップロードされた画像を含むFormData
+ * @returns 処理結果（成功時はEXIFデータと処理済み画像、失敗時はエラーメッセージ）
+ */
+export async function uploadImageCore(formData: FormData): Promise<UploadResult> {
   try {
-    // FormDataの取得
-    const formData = await request.formData();
-
     // ファイルの抽出と基本検証
     const file = extractAndValidateFile(formData);
     if (!file) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "ファイルが選択されていません",
-        } as UploadApiResponse,
-        { status: 400 },
-      );
+      return {
+        success: false,
+        error: "ファイルが選択されていません",
+      };
     }
 
     // EXIF抽出と画像処理を並列実行（パフォーマンス向上）
@@ -110,7 +109,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     await kvClient.saveUpload(uploadId, uploadData);
 
     // 成功レスポンス
-    const response: UploadApiResponse = {
+    return {
       success: true,
       data: {
         id: uploadId,
@@ -122,23 +121,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         },
       },
     };
-
-    return NextResponse.json(response, { status: 200 });
   } catch (error) {
-    // エラーログ出力（デバッグ用）
-    console.error("Upload API error:", error);
+    console.error("Upload core error:", error);
 
-    // ユーザーフレンドリーなエラーメッセージを返却
     const errorMessage =
       error instanceof Error
         ? error.message
         : "画像の処理中にエラーが発生しました";
 
-    const response: UploadApiResponse = {
+    return {
       success: false,
       error: errorMessage,
     };
-
-    return NextResponse.json(response, { status: 500 });
   }
 }

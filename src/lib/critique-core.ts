@@ -1,8 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
 import { generatePhotoCritiqueWithRetry } from "@/lib/critique";
+import { kvClient } from "@/lib/kv";
 import type { CritiqueResult } from "@/types/upload";
-
-export const runtime = "nodejs"; // Node Function実行環境を指定（Sharp使用のため）
 
 /**
  * FormDataから画像ファイルを抽出し、基本的なバリデーションを行う
@@ -17,37 +15,38 @@ function extractAndValidateFile(formData: FormData): File | null {
   return file;
 }
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
+/**
+ * AI講評生成処理のコア関数
+ * 
+ * @param formData - 講評対象の画像を含むFormData
+ * @returns AI講評結果（成功時は3軸評価データ、失敗時はエラーメッセージ）
+ */
+export async function generateCritiqueCore(formData: FormData): Promise<CritiqueResult> {
   try {
-    const formData = await request.formData();
-
     // アップロードIDの確認
     const uploadId = formData.get("uploadId") as string;
     if (!uploadId) {
-      const errorResponse: CritiqueResult = {
+      return {
         success: false,
         error: "アップロードIDが必要です",
       };
-      return NextResponse.json(errorResponse, { status: 400 });
     }
 
     // ファイルの抽出と基本検証
     const file = extractAndValidateFile(formData);
     if (!file) {
-      const errorResponse: CritiqueResult = {
+      return {
         success: false,
         error: "ファイルが選択されていません",
       };
-      return NextResponse.json(errorResponse, { status: 400 });
     }
 
     // ファイルの種類確認
     if (!file.type || !file.type.startsWith("image/")) {
-      const errorResponse: CritiqueResult = {
+      return {
         success: false,
         error: "画像ファイルを選択してください",
       };
-      return NextResponse.json(errorResponse, { status: 400 });
     }
 
     // 画像をBufferに変換
@@ -59,8 +58,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // 講評が成功した場合、KVストレージに保存
     if (result.success && result.data) {
-      const { kvClient } = await import("@/lib/kv");
-
       // アップロードデータからEXIF情報を取得
       const uploadData = await kvClient.getUpload(uploadId);
       const exifData = uploadData?.exifData || {};
@@ -98,25 +95,22 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         },
       };
 
-      return NextResponse.json(enhancedResult, { status: 200 });
+      return enhancedResult;
     }
 
     // 成功・失敗問わず、講評処理の結果をそのまま返す
-    const statusCode = result.success ? 200 : 500;
-    return NextResponse.json(result, { status: statusCode });
+    return result;
   } catch (error) {
-    console.error("Critique API error:", error);
+    console.error("Critique core error:", error);
 
     const errorMessage =
       error instanceof Error
         ? error.message
         : "AI講評の生成中にエラーが発生しました";
 
-    const errorResponse: CritiqueResult = {
+    return {
       success: false,
       error: errorMessage,
     };
-
-    return NextResponse.json(errorResponse, { status: 500 });
   }
 }
