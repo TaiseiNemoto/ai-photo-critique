@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Camera, Upload, ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { extractExifDataClient } from "@/lib/exif-client";
-import type { UploadedImage } from "@/types/upload";
+import type { UploadedImageWithFormData } from "@/types/upload";
 
 interface UploadZoneProps {
-  onImageUploaded: (image: UploadedImage) => void;
+  onImageUploaded: (image: UploadedImageWithFormData) => void;
 }
 
 /**
@@ -31,7 +31,7 @@ const ERROR_MESSAGES = {
  */
 const processImageFile = async (
   file: File,
-  onSuccess: (image: UploadedImage) => void,
+  onSuccess: (image: UploadedImageWithFormData) => void,
   onError: (error: string) => void,
 ): Promise<void> => {
   try {
@@ -41,11 +41,17 @@ const processImageFile = async (
     // クライアントサイドでEXIF抽出
     const exifData = await extractExifDataClient(file);
 
-    // 成功時: プレビュー画像とEXIF情報を返す
+    // FormDataにEXIF情報を追加
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("exifData", JSON.stringify(exifData));
+
+    // 成功時: プレビュー画像、EXIF情報、FormDataを返す
     onSuccess({
       file,
       preview,
       exif: exifData,
+      formData, // 追加
     });
   } catch (error) {
     console.error("Client-side processing error:", error);

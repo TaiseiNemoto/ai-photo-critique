@@ -2,10 +2,24 @@ import { Badge } from "@/components/ui/badge";
 import type { ExifData } from "@/types/upload";
 
 interface ExifDisplayProps {
-  exif: ExifData;
+  exif?: ExifData;
 }
 
 export default function ExifDisplay({ exif }: ExifDisplayProps) {
+  // EXIFデータがない、または全てのプロパティが空の場合は何も表示しない
+  if (
+    !exif ||
+    (!exif.fNumber &&
+      !exif.exposureTime &&
+      !exif.iso &&
+      !exif.lensModel &&
+      !exif.make &&
+      !exif.model &&
+      !exif.focalLength)
+  ) {
+    return null;
+  }
+
   return (
     <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
       <h4 className="text-sm font-medium text-gray-700 mb-3">撮影情報</h4>

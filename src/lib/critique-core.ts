@@ -54,7 +54,7 @@ export async function generateCritiqueCore(
       // アップロードIDがある場合はEXIF情報を取得
       const uploadId = formData.get("uploadId") as string;
       let exifData = {};
-      
+
       if (uploadId) {
         const uploadData = await kvClient.getUpload(uploadId);
         exifData = uploadData?.exifData || {};

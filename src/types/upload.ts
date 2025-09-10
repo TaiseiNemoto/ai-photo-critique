@@ -32,6 +32,11 @@ export interface UploadedImage {
   critique?: CritiqueData;
 }
 
+// FormData付きのアップロード画像型（EXIF最適化用）
+export interface UploadedImageWithFormData extends UploadedImage {
+  formData: FormData;
+}
+
 // API用の処理済み画像型
 export interface ProcessedImageData {
   dataUrl: string;

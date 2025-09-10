@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import type { UploadedImage, CritiqueData } from "@/types/upload";
+import type {
+  UploadedImage,
+  UploadedImageWithFormData,
+  CritiqueData,
+} from "@/types/upload";
 import { uploadImageWithCritique } from "@/app/actions";
 import { useCritique } from "@/contexts/CritiqueContext";
 import AppHeader from "@/components/common/AppHeader";
@@ -25,8 +29,15 @@ export default function UploadPage() {
     error?: string;
   }>({ status: "idle" });
 
-  const handleImageUploaded = (image: UploadedImage) => {
-    setUploadedImage(image);
+  const handleImageUploaded = (image: UploadedImageWithFormData) => {
+    // FormDataは講評生成時に使用し、UploadedImage部分のみ状態管理
+    const uploadedImage: UploadedImage = {
+      file: image.file,
+      preview: image.preview,
+      exif: image.exif,
+    };
+
+    setUploadedImage(uploadedImage);
     // 講評状態をリセット
     setCritiqueState({ status: "idle" });
 
@@ -34,6 +45,10 @@ export default function UploadPage() {
       description: "EXIF情報を解析中...",
       duration: 2000,
     });
+
+    // FormDataを一時保存（講評生成で使用）
+    (window as Window & { __uploadFormData?: FormData }).__uploadFormData =
+      image.formData;
   };
 
   const handleGenerateCritique = async () => {
@@ -47,11 +62,19 @@ export default function UploadPage() {
     });
 
     try {
-      // FormDataを作成してServer Actionを呼び出し
-      const formData = new FormData();
-      formData.append("image", uploadedImage.file);
+      // 保存されたFormData（EXIF情報付き）を使用
+      const formData = (window as Window & { __uploadFormData?: FormData })
+        .__uploadFormData;
+      let result;
 
-      const result = await uploadImageWithCritique(formData);
+      if (!formData) {
+        // フォールバック: FormDataが存在しない場合は従来方式
+        const fallbackFormData = new FormData();
+        fallbackFormData.append("image", uploadedImage.file);
+        result = await uploadImageWithCritique(fallbackFormData);
+      } else {
+        result = await uploadImageWithCritique(formData);
+      }
 
       // ローディングトーストを削除
       toast.dismiss(loadingToastId);

@@ -40,7 +40,7 @@ export default function ImagePreview({
         </div>
 
         {/* EXIF Summary */}
-        {uploadedImage.exif && <ExifDisplay exif={uploadedImage.exif} />}
+        <ExifDisplay exif={uploadedImage.exif} />
       </CardContent>
     </Card>
   );

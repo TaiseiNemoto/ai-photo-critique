@@ -1,18 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { uploadImage, generateCritique } from "@/app/actions";
 
-// 依存ライブラリのモック化
-vi.mock("@/lib/exif", () => ({
-  extractExifData: vi.fn(() =>
-    Promise.resolve({
-      make: "Canon",
-      model: "EOS R5",
-      fNumber: "5.6",
-      exposureTime: "1/60",
-      iso: "100",
-    }),
-  ),
-}));
+// 依存ライブラリのモック化（サーバーサイドEXIF処理は削除済み）
 
 vi.mock("@/lib/image", () => ({
   processImage: vi.fn(() => {
@@ -121,23 +110,36 @@ describe("uploadImage Server Action", () => {
       expect(result.error).toBeUndefined();
     });
 
-    it("EXIF情報を正しく抽出する", async () => {
-      // Arrange: EXIF付き画像のモック
+    it("クライアントサイドEXIF情報を正しく活用する", async () => {
+      // Arrange: クライアントから提供されるEXIF情報付きモック
       const mockFile = createMockImageFile("camera.jpg");
+      const mockExifData = { make: "Canon", model: "EOS R5" };
+
       const formData = new FormData();
       formData.append("image", mockFile);
+      formData.append("exifData", JSON.stringify(mockExifData));
 
       // Act
       const result = await uploadImage(formData);
 
-      // Assert: EXIF情報の構造を検証
+      // Assert: クライアントサイドEXIF情報が正しく使用される
       expect(result.success).toBe(true);
-      expect(result.data?.exifData).toEqual(
-        expect.objectContaining({
-          make: expect.any(String),
-          model: expect.any(String),
-        }),
-      );
+      expect(result.data?.exifData).toEqual(mockExifData);
+    });
+
+    it("EXIF情報がない場合は空オブジェクトを使用する", async () => {
+      // Arrange: EXIF情報なしの画像モック（新仕様）
+      const mockFile = createMockImageFile("no_exif.jpg");
+      const formData = new FormData();
+      formData.append("image", mockFile);
+      // exifDataを追加しない
+
+      // Act
+      const result = await uploadImage(formData);
+
+      // Assert: 空オブジェクトが設定される（EXIF欠損を許容）
+      expect(result.success).toBe(true);
+      expect(result.data?.exifData).toEqual({});
     });
 
     it("画像を適切にリサイズ・圧縮する", async () => {

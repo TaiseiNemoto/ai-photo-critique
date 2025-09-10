@@ -16,7 +16,7 @@ describe("クライアントサイドEXIF抽出", () => {
   it("Fileからクライアントサイドでexifデータを抽出できる", async () => {
     // モックファイルの作成
     const mockFile = new File([""], "test.jpg", { type: "image/jpeg" });
-    
+
     // exifrのモック設定
     const { default: exifr } = await import("exifr");
     const mockedExifrParse = vi.mocked(exifr.parse);
@@ -36,7 +36,7 @@ describe("クライアントサイドEXIF抽出", () => {
     // 期待値の確認
     expect(result).toEqual({
       make: "Canon",
-      model: "EOS R5", 
+      model: "EOS R5",
       lensModel: "RF24-70mm F2.8 L IS USM",
       fNumber: "F2.8",
       exposureTime: "1/60",
@@ -50,7 +50,7 @@ describe("クライアントサイドEXIF抽出", () => {
 
   it("EXIF情報がない場合は空のオブジェクトを返す", async () => {
     const mockFile = new File([""], "test.jpg", { type: "image/jpeg" });
-    
+
     const { default: exifr } = await import("exifr");
     const mockedExifrParse = vi.mocked(exifr.parse);
     mockedExifrParse.mockResolvedValue(null);
@@ -62,7 +62,7 @@ describe("クライアントサイドEXIF抽出", () => {
 
   it("EXIF抽出でエラーが発生した場合は空のオブジェクトを返す", async () => {
     const mockFile = new File([""], "test.jpg", { type: "image/jpeg" });
-    
+
     const { default: exifr } = await import("exifr");
     const mockedExifrParse = vi.mocked(exifr.parse);
     mockedExifrParse.mockRejectedValue(new Error("EXIF extraction failed"));
