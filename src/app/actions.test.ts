@@ -279,18 +279,16 @@ describe("generateCritique Server Action", () => {
   });
 
   describe("異常系", () => {
-    it("uploadIdが必要であることを確認する", async () => {
-      const mockFile = createMockImageFile();
+    it("ファイルが選択されていない場合はエラーを返す", async () => {
       const formData = new FormData();
-      formData.append("image", mockFile);
-      // uploadIdを意図的に含めない
+      // ファイルを意図的に含めない
 
       // Act
       const result = await generateCritique(formData);
 
       // Assert
       expect(result.success).toBe(false);
-      expect(result.error).toBe("アップロードIDが必要です");
+      expect(result.error).toBe("ファイルが選択されていません");
     });
   });
 });

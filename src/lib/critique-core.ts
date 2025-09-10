@@ -16,7 +16,7 @@ function extractAndValidateFile(formData: FormData): File | null {
 }
 
 /**
- * AI講評生成処理のコア関数
+ * AI講評生成処理のコア関数（画像ファイル付き）
  *
  * @param formData - 講評対象の画像を含むFormData
  * @returns AI講評結果（成功時は3軸評価データ、失敗時はエラーメッセージ）
@@ -25,15 +25,6 @@ export async function generateCritiqueCore(
   formData: FormData,
 ): Promise<CritiqueResult> {
   try {
-    // アップロードIDの確認
-    const uploadId = formData.get("uploadId") as string;
-    if (!uploadId) {
-      return {
-        success: false,
-        error: "アップロードIDが必要です",
-      };
-    }
-
     // ファイルの抽出と基本検証
     const file = extractAndValidateFile(formData);
     if (!file) {
@@ -60,9 +51,14 @@ export async function generateCritiqueCore(
 
     // 講評が成功した場合、KVストレージに保存
     if (result.success && result.data) {
-      // アップロードデータからEXIF情報を取得
-      const uploadData = await kvClient.getUpload(uploadId);
-      const exifData = uploadData?.exifData || {};
+      // アップロードIDがある場合はEXIF情報を取得
+      const uploadId = formData.get("uploadId") as string;
+      let exifData = {};
+      
+      if (uploadId) {
+        const uploadData = await kvClient.getUpload(uploadId);
+        exifData = uploadData?.exifData || {};
+      }
 
       // 共有用IDを生成
       const shareId = kvClient.generateId();
