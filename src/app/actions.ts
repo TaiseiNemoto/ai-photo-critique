@@ -61,7 +61,7 @@ export async function uploadImageWithCritique(formData: FormData): Promise<{
     if (uploadResult.data?.id) {
       critiqueFormData.append("uploadId", uploadResult.data.id);
     }
-    
+
     const critiqueResult = await generateCritiqueCore(critiqueFormData);
 
     console.log(

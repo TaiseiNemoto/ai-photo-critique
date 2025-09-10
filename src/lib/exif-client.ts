@@ -3,14 +3,14 @@ import type { ExifData } from "@/types/upload";
 
 /**
  * クライアントサイドでファイルからEXIF情報を抽出する
- * 
+ *
  * @param file - EXIF情報を抽出するファイル
  * @returns EXIF情報（抽出できない場合は空オブジェクト）
  */
 export async function extractExifDataClient(file: File): Promise<ExifData> {
   try {
     const rawExifData = await exifr.parse(file);
-    
+
     if (!rawExifData) {
       return {};
     }

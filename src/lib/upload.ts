@@ -1,4 +1,4 @@
-import { extractExifData } from "@/lib/exif";
+// EXIF抽出はクライアントサイドで実行済み（サーバーサイド重複処理を排除）
 import { processImage } from "@/lib/image";
 import { kvClient } from "@/lib/kv";
 import type { ExifData, ProcessedImageData } from "@/types/upload";
@@ -79,11 +79,27 @@ export async function uploadImageCore(
       };
     }
 
-    // EXIF抽出と画像処理を並列実行（パフォーマンス向上）
-    const [exifData, processedImageResult] = await Promise.all([
-      extractExifData(file),
-      processImage(file),
-    ]);
+    // クライアントから送信されたEXIF情報を取得
+    const clientExifJson = formData.get("exifData") as string;
+    let exifData: ExifData = {}; // デフォルト空オブジェクト
+
+    if (clientExifJson) {
+      try {
+        exifData = JSON.parse(clientExifJson);
+        console.log("Using client-side EXIF data");
+      } catch (error) {
+        console.warn(
+          "Invalid EXIF data from client, using empty object:",
+          error,
+        );
+        exifData = {}; // EXIF欠損を許容
+      }
+    } else {
+      console.log("No client EXIF data provided, using empty object");
+    }
+
+    // 画像処理のみ実行（EXIF抽出は削除）
+    const processedImageResult = await processImage(file);
 
     // 処理済み画像をbase64データURLに変換
     const dataUrl = await convertToDataUrl(

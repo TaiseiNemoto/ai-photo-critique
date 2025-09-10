@@ -79,11 +79,11 @@ describe("UploadZone コンポーネント統合テスト", () => {
 
       // このテストはコンポーネントがクライアントサイド処理に変更されたことを確認
       // 実際のドロップ操作のテストは統合テストで行う
-      
+
       // Server Actionは呼ばれない（モックなので）
       const { uploadImage } = await import("@/app/actions");
       expect(uploadImage).not.toHaveBeenCalled();
-      
+
       // extractExifDataClientの関数がインポートされていることを確認
       expect(typeof extractExifDataClient).toBe("function");
     });
