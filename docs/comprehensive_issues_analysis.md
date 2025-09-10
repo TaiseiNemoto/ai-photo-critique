@@ -19,7 +19,7 @@
 
 ### 🔴 Critical 課題（5件）
 
-- [ ] **C1** - 画像データの3重転送問題 ⭐⭐⭐⭐⭐
+- [x] **C1** - 画像データの3重転送問題 ⭐⭐⭐⭐⭐ ✅ **完了 (2025-09-10)**
 - [x] **C2** - Server Actions → API Routes アンチパターン ⭐⭐⭐⭐⭐ ✅ **完了 (2025-09-09)**
 - [ ] **C3** - EXIF情報の重複処理 ⭐⭐⭐⭐
 - [ ] **C4** - 画像データの重複保存 ⭐⭐⭐⭐
@@ -50,7 +50,7 @@
 
 ### 📊 サマリー
 
-**全19件** | 🔴 Critical: 4件未完了 (1件完了) | 🟠 High: 4件 | 🟡 Medium: 4件 | 🟢 Low: 6件
+**全19件** | 🔴 Critical: 3件未完了 (2件完了) | 🟠 High: 4件 | 🟡 Medium: 4件 | 🟢 Low: 6件
 
 ---
 
@@ -81,6 +81,16 @@ critiqueFormData.append("image", formData.get("image") as File);
 - **リスク**: Vercelの転送制限・タイムアウト抵触
 
 **関連ファイル**: `src/components/upload/UploadZone.tsx:40`, `src/app/actions.ts:147,162`
+
+**✅ 修正完了**:
+
+- 統合アップロード戦略により画像転送を3回→1回に削減（66%削減）
+- UploadZoneをクライアントサイドプレビュー専用に変更
+- クライアントサイドEXIF抽出機能を新規実装（`src/lib/exif-client.ts`）
+- 画像選択時のDB保存を排除、講評生成時のみ1回保存
+- 無駄なDBリソース使用を完全排除（画像選択のみユーザー）
+- プレビュー表示の即座化でUX大幅向上
+- **修正計画**: `docs/fixes/C1_image_triple_transfer_elimination.md`
 
 ### C2. Server Actions → API Routes アンチパターン ⭐⭐⭐⭐⭐ ✅ **完了 (2025-09-09)**
 
@@ -117,7 +127,7 @@ export async function uploadImage(formData: FormData) {
 - Next.js 2025推奨パターン準拠、パフォーマンス・型安全性向上
 - **修正計画**: `docs/fixes/C2_server_actions_api_routes_antipattern.md`
 
-### C3. EXIF情報の重複処理 ⭐⭐⭐⭐
+### C3. EXIF情報の重複処理 ⭐⭐⭐⭐ 🔄 **部分解決 (C1で改善)**
 
 **問題概要**: 同一ファイルからEXIF抽出が2回実行される無駄
 
@@ -133,6 +143,12 @@ const [exifData, processedImageBuffer] = await Promise.all([
   processImage(file),
 ]);
 ```
+
+**🔄 C1修正による改善状況**:
+- クライアントサイドEXIF抽出は継続（プレビュー用として必要）
+- サーバーサイド処理は講評生成時の1回のみに削減
+- 画像選択のみユーザーはEXIF抽出1回のみ
+- ただし、講評生成時にはクライアント・サーバー両方でEXIF処理が発生
 
 **影響**:
 
