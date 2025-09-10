@@ -55,12 +55,13 @@ export async function uploadImageWithCritique(formData: FormData): Promise<{
       };
     }
 
-    // 講評生成処理にアップロードIDを追加（ライブラリ関数呼び出し）
+    // 講評生成処理にアップロードIDを追加（同一ファイルを再利用）
     const critiqueFormData = new FormData();
     critiqueFormData.append("image", formData.get("image") as File);
     if (uploadResult.data?.id) {
       critiqueFormData.append("uploadId", uploadResult.data.id);
     }
+    
     const critiqueResult = await generateCritiqueCore(critiqueFormData);
 
     console.log(

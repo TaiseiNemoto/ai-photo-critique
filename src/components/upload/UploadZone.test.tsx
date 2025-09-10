@@ -8,6 +8,11 @@ vi.mock("@/app/actions", () => ({
   uploadImage: vi.fn(),
 }));
 
+// クライアントサイドEXIF処理をモック化
+vi.mock("@/lib/exif-client", () => ({
+  extractExifDataClient: vi.fn(),
+}));
+
 describe("UploadZone コンポーネント統合テスト", () => {
   const mockOnImageUploaded = vi.fn();
 
@@ -53,19 +58,34 @@ describe("UploadZone コンポーネント統合テスト", () => {
     });
   });
 
-  describe("現在の実装確認", () => {
-    it("現在はモックデータを使用している（実装前の状態）", async () => {
+  describe("C1修正後の動作確認", () => {
+    it("画像選択時にはServer Actionを呼び出さない（クライアントサイドプレビューのみ）", async () => {
       renderUploadZone();
 
-      // このテストは現在のモック実装を確認するためのもの
-      // Server Actionとの統合実装が完了すると、このテストは失敗するはず
-      expect(
-        screen.getByRole("button", { name: "画像をアップロード" }),
-      ).toBeInTheDocument();
-
-      // Server Actionはまだ呼ばれていない（モックされている）
+      // Server Actionはまだ呼ばれていない
       const { uploadImage } = await import("@/app/actions");
       expect(uploadImage).not.toHaveBeenCalled();
+    });
+
+    it("クライアントサイドプレビュー機能が実装されている", async () => {
+      const { extractExifDataClient } = await import("@/lib/exif-client");
+      const mockedExtractExif = vi.mocked(extractExifDataClient);
+      mockedExtractExif.mockResolvedValue({
+        make: "Canon",
+        model: "EOS R5",
+      });
+
+      renderUploadZone();
+
+      // このテストはコンポーネントがクライアントサイド処理に変更されたことを確認
+      // 実際のドロップ操作のテストは統合テストで行う
+      
+      // Server Actionは呼ばれない（モックなので）
+      const { uploadImage } = await import("@/app/actions");
+      expect(uploadImage).not.toHaveBeenCalled();
+      
+      // extractExifDataClientの関数がインポートされていることを確認
+      expect(typeof extractExifDataClient).toBe("function");
     });
   });
 

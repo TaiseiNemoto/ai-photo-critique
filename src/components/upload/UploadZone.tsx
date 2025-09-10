@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Camera, Upload, ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { uploadImage } from "@/app/actions";
+import { extractExifDataClient } from "@/lib/exif-client";
 import type { UploadedImage } from "@/types/upload";
 
 interface UploadZoneProps {
@@ -27,28 +27,29 @@ const ERROR_MESSAGES = {
 } as const;
 
 /**
- * 画像ファイルをServer Actionで処理する関数
+ * 画像ファイルをクライアントサイドでプレビュー処理する関数
  */
 const processImageFile = async (
   file: File,
   onSuccess: (image: UploadedImage) => void,
   onError: (error: string) => void,
 ): Promise<void> => {
-  const formData = new FormData();
-  formData.append("image", file);
+  try {
+    // クライアントサイドでプレビュー作成
+    const preview = URL.createObjectURL(file);
 
-  const result = await uploadImage(formData);
+    // クライアントサイドでEXIF抽出
+    const exifData = await extractExifDataClient(file);
 
-  if (result.success && result.data) {
-    // 成功時: 処理済み画像のデータURLをpreviewとして使用
+    // 成功時: プレビュー画像とEXIF情報を返す
     onSuccess({
       file,
-      preview: result.data.processedImage.dataUrl,
-      exif: result.data.exifData,
+      preview,
+      exif: exifData,
     });
-  } else {
-    // エラー時: エラーメッセージを返す
-    onError(result.error || ERROR_MESSAGES.UNKNOWN_ERROR);
+  } catch (error) {
+    console.error("Client-side processing error:", error);
+    onError(ERROR_MESSAGES.UNKNOWN_ERROR);
   }
 };
 
