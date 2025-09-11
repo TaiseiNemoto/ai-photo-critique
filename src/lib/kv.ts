@@ -5,6 +5,7 @@ export interface CritiqueData {
   composition: string;
   color: string;
   exifData: Record<string, unknown>;
+  imageData: string;  // Base64 data URL
   uploadedAt: string;
 }
 
@@ -127,47 +128,11 @@ class KvClient {
     return null;
   }
 
-  // 画像データの保存（Base64エンコード済み、24時間TTL）
-  async saveImage(id: string, imageData: string): Promise<void> {
-    const client = await this.getClient();
-    const key = `image:${id}`;
-    await client.setex(key, 24 * 60 * 60, imageData);
-  }
-
-  // アップロードデータの保存（24時間TTL）
-  async saveUpload(
-    id: string,
-    uploadData: Record<string, unknown>,
-  ): Promise<void> {
-    const client = await this.getClient();
-    const key = `upload:${id}`;
-    await client.setex(key, 24 * 60 * 60, JSON.stringify(uploadData));
-  }
-
-  // アップロードデータの取得
-  async getUpload(id: string): Promise<Record<string, unknown> | null> {
-    const client = await this.getClient();
-    const key = `upload:${id}`;
-    const data = await client.get(key);
-
-    if (!data) return null;
-
-    // Upstash Redis の場合、データが既にパースされて返される場合がある
-    if (typeof data === "string") {
-      return JSON.parse(data);
-    } else if (typeof data === "object") {
-      return data as Record<string, unknown>;
-    }
-
-    return null;
-  }
-
-  // 画像データの取得
-  async getImage(id: string): Promise<string | null> {
-    const client = await this.getClient();
-    const key = `image:${id}`;
-    return (await client.get(key)) as string | null;
-  }
+  // 注意: 以下の関数は画像データ重複保存解消のため削除
+  // - saveImage() : 単独の画像保存は不要（CritiqueDataに統合）
+  // - saveUpload() : アップロードデータ保存は不要（講評時に統合）
+  // - getUpload() : アップロードデータ取得は不要
+  // - getImage() : 単独の画像取得は不要（CritiqueDataから取得）
 
   // データの削除
   async delete(key: string): Promise<void> {

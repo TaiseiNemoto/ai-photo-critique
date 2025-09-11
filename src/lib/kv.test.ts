@@ -22,6 +22,7 @@ describe("KV Client", () => {
         composition: "テスト構図評価",
         color: "テスト色彩評価",
         exifData: { camera: "Test Camera" },
+        imageData: "data:image/jpeg;base64,AAAAAAAAAAAAAAAAAAAAAAA=",
         uploadedAt: new Date().toISOString(),
       };
 
@@ -31,6 +32,27 @@ describe("KV Client", () => {
       // 取得
       const retrieved = await kvClient.getCritique(testData.id);
       expect(retrieved).toEqual(testData);
+    });
+
+    it("画像データ統合後のCritiqueDataが正しく保存・取得できること", async () => {
+      const testData: CritiqueData = {
+        id: "test-critique-with-image",
+        filename: "test-image.jpg",
+        technique: "統合テスト技術評価",
+        composition: "統合テスト構図評価",
+        color: "統合テスト色彩評価",
+        exifData: { camera: "Integrated Test Camera", iso: 200 },
+        imageData: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD",
+        uploadedAt: new Date().toISOString(),
+      };
+
+      // 保存
+      await kvClient.saveCritique(testData);
+
+      // 取得
+      const retrieved = await kvClient.getCritique(testData.id);
+      expect(retrieved).toEqual(testData);
+      expect(retrieved?.imageData).toBe(testData.imageData);
     });
 
     it("存在しない批評データを取得すると null が返ること", async () => {
@@ -62,25 +84,8 @@ describe("KV Client", () => {
     });
   });
 
-  describe("画像データの操作", () => {
-    it("画像データの保存と取得ができること", async () => {
-      const testImageId = "test-image-1";
-      const testImageData =
-        "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD"; // Base64テストデータ
-
-      // 保存
-      await kvClient.saveImage(testImageId, testImageData);
-
-      // 取得
-      const retrieved = await kvClient.getImage(testImageId);
-      expect(retrieved).toBe(testImageData);
-    });
-
-    it("存在しない画像データを取得すると null が返ること", async () => {
-      const result = await kvClient.getImage("non-existent-image-id");
-      expect(result).toBeNull();
-    });
-  });
+  // 注意: 画像データの操作テストは重複保存解消のため削除
+  // 画像データはCritiqueDataに統合されるため、単独の保存・取得は不要
 
   describe("ユーティリティ機能", () => {
     it("IDが生成できること", () => {
@@ -101,6 +106,7 @@ describe("KV Client", () => {
         composition: "テスト",
         color: "テスト",
         exifData: {},
+        imageData: "data:image/jpeg;base64,TESTDATA",
         uploadedAt: new Date().toISOString(),
       };
 

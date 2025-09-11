@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { uploadImageCore } from "./upload";
 import * as imageModule from "./image";
-import { kvClient } from "./kv";
+// import { kvClient } from "./kv"; // 重複保存解消のため削除
 
 // 依存モジュールのモック化（サーバーサイドEXIF処理は削除済み）
 vi.mock("./image");
@@ -23,7 +23,8 @@ describe("uploadImageCore", () => {
     vi.clearAllMocks();
 
     // デフォルトモック設定（サーバーサイドEXIF処理は削除済み）
-    vi.mocked(kvClient.saveUpload).mockResolvedValue(undefined);
+    // 注意: saveUploadは重複保存解消のため削除
+    // vi.mocked(kvClient.saveUpload).mockResolvedValue(undefined);
     vi.mocked(imageModule.processImage).mockResolvedValue({
       processedFile: createMockFile("processed.jpg", "image/jpeg"),
       originalSize: { width: 4000, height: 3000 },
@@ -106,7 +107,7 @@ describe("uploadImageCore", () => {
       expect(result.error).toBe("ファイルが選択されていません");
     });
 
-    it("画像処理とKV保存が正常に実行される", async () => {
+    it("画像処理が正常に実行される（KV保存は削除済み）", async () => {
       // Arrange
       const mockFile = createMockFile("test.jpg", "image/jpeg");
       const mockExifData = { camera: "Test Camera" };
@@ -121,7 +122,11 @@ describe("uploadImageCore", () => {
       // Assert
       expect(result.success).toBe(true);
       expect(imageModule.processImage).toHaveBeenCalledWith(mockFile);
-      expect(kvClient.saveUpload).toHaveBeenCalled();
+      
+      // 重要: saveUploadは重複保存解消のため削除済み
+      // expect(kvClient.saveUpload).toHaveBeenCalled(); // 削除
+      expect(result.data?.id).toBeDefined();
+      expect(result.data?.processedImage).toBeDefined();
     });
   });
 });
