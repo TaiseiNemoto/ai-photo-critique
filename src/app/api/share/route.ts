@@ -52,7 +52,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       const now = new Date();
       const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
-      // 講評データを従来形式に変換して保存
+      // 講評データを従来形式に変換して保存（画像データ統合）
       const critiqueDataForStorage = {
         id: shareId,
         filename: image.original || "uploaded-image",
@@ -60,6 +60,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         composition: critique.composition,
         color: critique.color,
         exifData: image.exif || {},
+        imageData: image.preview || "", // Base64画像データを統合
         uploadedAt: now.toISOString(),
         expiresAt: expiresAt.toISOString(),
       };

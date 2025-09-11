@@ -1,6 +1,6 @@
 // EXIF抽出はクライアントサイドで実行済み（サーバーサイド重複処理を排除）
 import { processImage } from "@/lib/image";
-import { kvClient } from "@/lib/kv";
+// import { kvClient } from "@/lib/kv"; // 重複保存解消のため削除
 import type { ExifData, ProcessedImageData } from "@/types/upload";
 
 /**
@@ -110,21 +110,12 @@ export async function uploadImageCore(
     // 一意のIDを生成
     const uploadId = generateUploadId();
 
-    // アップロードデータをKVに保存
-    const uploadData = {
-      id: uploadId,
-      filename: file.name,
-      exifData,
-      processedImage: {
-        dataUrl,
-        originalSize: processedImageResult.originalSize,
-        processedSize: processedImageResult.processedSize,
-      },
-      uploadedAt: new Date().toISOString(),
-    };
+    // 注意: 以前はアップロードデータをKVに保存していたが、重複保存解消のため削除
+    // const uploadData = { ... }; // 削除済み
 
-    // KVストレージに保存（24時間TTL）
-    await kvClient.saveUpload(uploadId, uploadData);
+    // 注意: 以前はKVにアップロードデータを保存していたが、
+    // 重複保存解消のため削除。画像データは講評時にCritiqueDataに統合保存される。
+    // await kvClient.saveUpload(uploadId, uploadData); // 削除
 
     // 成功レスポンス
     return {

@@ -51,19 +51,22 @@ export async function generateCritiqueCore(
 
     // 講評が成功した場合、KVストレージに保存
     if (result.success && result.data) {
-      // アップロードIDがある場合はEXIF情報を取得
-      const uploadId = formData.get("uploadId") as string;
-      let exifData = {};
-
-      if (uploadId) {
-        const uploadData = await kvClient.getUpload(uploadId);
-        exifData = uploadData?.exifData || {};
-      }
+      // 注意: uploadIdベースのEXIF取得は削除済み
+      // 重複保存解消により、EXIFデータは講評時に画像ファイルから直接取得
+      const exifData = {};
+      
+      // uploadIdの処理は完全に削除（重複保存解消）
+      // const uploadId = formData.get("uploadId") as string; // 削除
 
       // 共有用IDを生成
       const shareId = kvClient.generateId();
 
-      // 講評データを保存
+      // 画像をBase64データURLに変換
+      const arrayBuffer = await file.arrayBuffer();
+      const base64 = Buffer.from(arrayBuffer).toString("base64");
+      const imageData = `data:${file.type};base64,${base64}`;
+
+      // 講評データを保存（画像データも含めて統合）
       await kvClient.saveCritique({
         id: shareId,
         filename: file.name,
@@ -71,6 +74,7 @@ export async function generateCritiqueCore(
         composition: result.data.composition,
         color: result.data.color,
         exifData: exifData as Record<string, unknown>,
+        imageData: imageData,
         uploadedAt: new Date().toISOString(),
       });
 
