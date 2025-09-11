@@ -82,7 +82,7 @@ export interface CritiqueData {
   composition: string;
   color: string;
   exifData: Record<string, unknown>;
-  imageData: string;              // ← 新規追加（Base64 data URL）
+  imageData: string; // ← 新規追加（Base64 data URL）
   uploadedAt: string;
 }
 
@@ -109,7 +109,7 @@ export async function uploadImageCore(
       id: uploadId,
       exifData,
       processedImage: {
-        dataUrl,  // ← この値を後で講評データに保存
+        dataUrl, // ← この値を後で講評データに保存
         originalSize: processedImageResult.originalSize,
         processedSize: processedImageResult.processedSize,
       },
@@ -153,7 +153,7 @@ export async function generateCritiqueCore(
       composition: result.data.composition,
       color: result.data.color,
       exifData: exifData as Record<string, unknown>,
-      imageData: imageData,           // ← 新規追加
+      imageData: imageData, // ← 新規追加
       uploadedAt: new Date().toISOString(),
     });
 
@@ -171,14 +171,17 @@ export async function generateCritiqueCore(
 const critiqueData = await kvClient.getCritique(critiqueId);
 
 if (!critiqueData) {
-  return NextResponse.json({ error: "講評データが見つかりません" }, { status: 404 });
+  return NextResponse.json(
+    { error: "講評データが見つかりません" },
+    { status: 404 },
+  );
 }
 
 // critiqueData.imageData に画像データが含まれているため、
 // 別途画像データを取得する処理は不要
 return NextResponse.json({
   critique: critiqueData,
-  image: critiqueData.imageData,  // ← 統合されたデータから取得
+  image: critiqueData.imageData, // ← 統合されたデータから取得
 });
 ```
 
@@ -302,7 +305,7 @@ npm run build     # ビルド成功確認
 
 ### データ移行の考慮
 
-- [ ] 既存のupload:*キーは自然なTTL期限で削除される（24時間）
+- [ ] 既存のupload:\*キーは自然なTTL期限で削除される（24時間）
 - [ ] 移行期間中の互換性は不要（開発環境のため）
 - [ ] 本番環境の場合は段階的移行が必要
 

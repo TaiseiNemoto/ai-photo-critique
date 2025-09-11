@@ -122,7 +122,7 @@ describe("uploadImageCore", () => {
       // Assert
       expect(result.success).toBe(true);
       expect(imageModule.processImage).toHaveBeenCalledWith(mockFile);
-      
+
       // 重要: saveUploadは重複保存解消のため削除済み
       // expect(kvClient.saveUpload).toHaveBeenCalled(); // 削除
       expect(result.data?.id).toBeDefined();

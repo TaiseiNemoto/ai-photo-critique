@@ -54,7 +54,7 @@ export async function generateCritiqueCore(
       // 注意: uploadIdベースのEXIF取得は削除済み
       // 重複保存解消により、EXIFデータは講評時に画像ファイルから直接取得
       const exifData = {};
-      
+
       // uploadIdの処理は完全に削除（重複保存解消）
       // const uploadId = formData.get("uploadId") as string; // 削除
 
