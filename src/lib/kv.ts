@@ -5,7 +5,7 @@ export interface CritiqueData {
   composition: string;
   color: string;
   exifData: Record<string, unknown>;
-  imageData: string;  // Base64 data URL
+  imageData: string; // Base64 data URL
   uploadedAt: string;
 }
 

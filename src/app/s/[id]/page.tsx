@@ -43,7 +43,8 @@ export async function generateMetadata({
     }
 
     // EXIF情報から動的にタイトルを生成
-    const exifData = critiqueData.exifData || critiqueData.image?.exif || critiqueData.exif;
+    const exifData =
+      critiqueData.exifData || critiqueData.image?.exif || critiqueData.exif;
     const camera = exifData?.camera || "カメラ";
     const lens = exifData?.lens || "レンズ";
     const title = `${camera}で撮影した写真のAI講評結果 - Photo-Critique`;
@@ -171,15 +172,16 @@ export default async function SharePage({ params }: SharePageProps) {
                   critiqueData.composition ||
                   critiqueData.critique?.composition ||
                   "",
-                color: 
-                  critiqueData.color ||
-                  critiqueData.critique?.color || 
-                  "",
+                color: critiqueData.color || critiqueData.critique?.color || "",
               }}
             />
 
             <ShareExifDetails
-              exif={critiqueData.exifData || critiqueData.image?.exif || critiqueData.exif}
+              exif={
+                critiqueData.exifData ||
+                critiqueData.image?.exif ||
+                critiqueData.exif
+              }
             />
 
             <ShareCallToAction />
