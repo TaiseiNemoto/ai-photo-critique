@@ -27,7 +27,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           success: false,
           error: "リクエストの形式が正しくありません",
         } as ShareResponse,
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           success: false,
           error: "講評データにshareIdが見つかりません",
         } as ShareResponse,
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           success: false,
           error: "講評データが見つかりません",
         } as ShareResponse,
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         shareId: critique.shareId,
         url: `/s/${critique.shareId}`,
       } as ShareResponse,
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Share API error:", error);
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         success: false,
         error: errorMessage,
       } as ShareResponse,
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
