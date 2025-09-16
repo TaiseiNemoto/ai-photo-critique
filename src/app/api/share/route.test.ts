@@ -33,14 +33,15 @@ describe("/api/share POST", () => {
     vi.mocked(kvClient.getCritique).mockResolvedValue(mockCritiqueData);
 
     const mockRequest = {
-      json: () => Promise.resolve({ 
-        critique: { 
-          shareId: "critique-123",
-          technique: "良好なフォーカスが設定されています",
-          composition: "三分割法が効果的に使用されています",
-          color: "色彩のバランスが優れています",
-        } 
-      }),
+      json: () =>
+        Promise.resolve({
+          critique: {
+            shareId: "critique-123",
+            technique: "良好なフォーカスが設定されています",
+            composition: "三分割法が効果的に使用されています",
+            color: "色彩のバランスが優れています",
+          },
+        }),
     } as NextRequest;
 
     const response = await POST(mockRequest);
@@ -62,14 +63,15 @@ describe("/api/share POST", () => {
     vi.mocked(kvClient.getCritique).mockResolvedValue(null);
 
     const mockRequest = {
-      json: () => Promise.resolve({ 
-        critique: { 
-          shareId: "nonexistent-123",
-          technique: "良好なフォーカスが設定されています",
-          composition: "三分割法が効果的に使用されています",
-          color: "色彩のバランスが優れています",
-        } 
-      }),
+      json: () =>
+        Promise.resolve({
+          critique: {
+            shareId: "nonexistent-123",
+            technique: "良好なフォーカスが設定されています",
+            composition: "三分割法が効果的に使用されています",
+            color: "色彩のバランスが優れています",
+          },
+        }),
     } as NextRequest;
 
     const response = await POST(mockRequest);
@@ -113,13 +115,13 @@ describe("/api/share POST", () => {
   });
 
   // === 新しいテストケース（課題C4対応） ===
-  
+
   it("既存のshareIdがある場合、保存処理を行わずにshareIdを返却する", async () => {
     const mockCritiqueData = {
       id: "existing-share-id-123",
       filename: "test.jpg",
       technique: "良好なフォーカスが設定されています",
-      composition: "三分割法が効果的に使用されています", 
+      composition: "三分割法が効果的に使用されています",
       color: "色彩のバランスが優れています",
       exifData: { make: "Canon", model: "EOS R5" },
       uploadedAt: "2025-08-20T09:30:00.000Z",
@@ -128,14 +130,15 @@ describe("/api/share POST", () => {
     vi.mocked(kvClient.getCritique).mockResolvedValue(mockCritiqueData);
 
     const mockRequest = {
-      json: () => Promise.resolve({
-        critique: {
-          shareId: "existing-share-id-123",
-          technique: "良好なフォーカスが設定されています",
-          composition: "三分割法が効果的に使用されています",
-          color: "色彩のバランスが優れています",
-        }
-      }),
+      json: () =>
+        Promise.resolve({
+          critique: {
+            shareId: "existing-share-id-123",
+            technique: "良好なフォーカスが設定されています",
+            composition: "三分割法が効果的に使用されています",
+            color: "色彩のバランスが優れています",
+          },
+        }),
     } as NextRequest;
 
     const response = await POST(mockRequest);
@@ -150,7 +153,7 @@ describe("/api/share POST", () => {
 
     // 既存データの確認のみ実行されることを確認
     expect(kvClient.getCritique).toHaveBeenCalledWith("existing-share-id-123");
-    
+
     // 重要: 保存処理が呼ばれないことを確認（重複保存防止）
     expect(kvClient.saveCritique).not.toHaveBeenCalled();
     expect(kvClient.saveShare).not.toHaveBeenCalled();
@@ -158,14 +161,15 @@ describe("/api/share POST", () => {
 
   it("shareIdがない場合、400エラーを返す", async () => {
     const mockRequest = {
-      json: () => Promise.resolve({
-        critique: {
-          technique: "良好なフォーカスが設定されています",
-          composition: "三分割法が効果的に使用されています", 
-          color: "色彩のバランスが優れています",
-          // shareIdが存在しない
-        }
-      }),
+      json: () =>
+        Promise.resolve({
+          critique: {
+            technique: "良好なフォーカスが設定されています",
+            composition: "三分割法が効果的に使用されています",
+            color: "色彩のバランスが優れています",
+            // shareIdが存在しない
+          },
+        }),
     } as NextRequest;
 
     const response = await POST(mockRequest);
@@ -187,14 +191,15 @@ describe("/api/share POST", () => {
     vi.mocked(kvClient.getCritique).mockResolvedValue(null);
 
     const mockRequest = {
-      json: () => Promise.resolve({
-        critique: {
-          shareId: "nonexistent-share-id-123",
-          technique: "良好なフォーカスが設定されています",
-          composition: "三分割法が効果的に使用されています",
-          color: "色彩のバランスが優れています",
-        }
-      }),
+      json: () =>
+        Promise.resolve({
+          critique: {
+            shareId: "nonexistent-share-id-123",
+            technique: "良好なフォーカスが設定されています",
+            composition: "三分割法が効果的に使用されています",
+            color: "色彩のバランスが優れています",
+          },
+        }),
     } as NextRequest;
 
     const response = await POST(mockRequest);
@@ -207,7 +212,9 @@ describe("/api/share POST", () => {
     });
 
     // 確認処理のみ実行され、保存処理は呼ばれないことを確認
-    expect(kvClient.getCritique).toHaveBeenCalledWith("nonexistent-share-id-123");
+    expect(kvClient.getCritique).toHaveBeenCalledWith(
+      "nonexistent-share-id-123",
+    );
     expect(kvClient.saveCritique).not.toHaveBeenCalled();
     expect(kvClient.saveShare).not.toHaveBeenCalled();
   });

@@ -14,6 +14,7 @@
 **重複保存の流れ:**
 
 1. **講評生成時** (`src/lib/critique-core.ts:70-88`)
+
    ```typescript
    // 1回目の保存
    await kvClient.saveCritique({ id: shareId, ... });
@@ -54,14 +55,15 @@
 ### 1. シェアAPI (`src/app/api/share/route.ts`) の大幅簡素化
 
 #### 修正前（重複保存あり）
+
 ```typescript
 // 新しい形式のデータが提供された場合
 if (image && critique) {
   const shareId = kvClient.generateId();
-  
+
   // 講評データを再保存（重複・不要）
   await kvClient.saveCritique(critiqueDataForStorage);
-  
+
   // 共有データも再保存（重複・不要）
   await kvClient.saveShare({
     id: shareId,
@@ -69,7 +71,7 @@ if (image && critique) {
     createdAt: now.toISOString(),
     expiresAt: expiresAt.toISOString(),
   });
-  
+
   return NextResponse.json({
     success: true,
     shareId: shareId,
@@ -84,42 +86,51 @@ const critiqueData = await kvClient.getCritique(critiqueId);
 ```
 
 #### 修正後（保存処理完全削除）
+
 ```typescript
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const body = await request.json();
     const { critique } = body;
-    
+
     // shareIdの存在確認
     if (!critique?.shareId) {
-      return NextResponse.json({
-        success: false,
-        error: "講評データにshareIdが見つかりません",
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "講評データにshareIdが見つかりません",
+        },
+        { status: 400 },
+      );
     }
-    
+
     // 既存データの存在確認のみ
     const existingData = await kvClient.getCritique(critique.shareId);
     if (!existingData) {
-      return NextResponse.json({
-        success: false,
-        error: "講評データが見つかりません",
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "講評データが見つかりません",
+        },
+        { status: 404 },
+      );
     }
-    
+
     // 既存のshareIdをそのまま返却（保存処理なし）
     return NextResponse.json({
       success: true,
       shareId: critique.shareId,
       url: `/s/${critique.shareId}`,
     });
-    
   } catch (error) {
     console.error("Share API error:", error);
-    return NextResponse.json({
-      success: false,
-      error: "共有URL生成中にエラーが発生しました",
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "共有URL生成中にエラーが発生しました",
+      },
+      { status: 500 },
+    );
   }
 }
 ```
@@ -127,6 +138,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 ### 2. 型定義の簡素化
 
 #### `ShareRequest` インターフェース修正
+
 ```typescript
 // 修正前
 interface ShareRequest {
@@ -165,18 +177,19 @@ npm run build     # ビルド確認
 ### Phase 2: テスト作成（RED）
 
 1. **失敗するテスト作成**
+
    ```typescript
    it("既存のshareIdがある場合、保存処理を行わずにshareIdを返却する", async () => {
      // shareIdを含む講評データでPOST
      // 保存処理が呼ばれないことを確認
      // 正しいshareIdが返却されることを確認
    });
-   
+
    it("shareIdがない場合、400エラーを返す", async () => {
      // shareIdなしの講評データでPOST
      // 400エラーが返されることを確認
    });
-   
+
    it("存在しないshareIdの場合、404エラーを返す", async () => {
      // 存在しないshareIdでPOST
      // 404エラーが返されることを確認
