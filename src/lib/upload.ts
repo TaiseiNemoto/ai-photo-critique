@@ -2,7 +2,10 @@
 import { processImage } from "@/lib/image";
 // import { kvClient } from "@/lib/kv"; // 重複保存解消のため削除
 import type { ExifData, ProcessedImageData } from "@/types/upload";
-import { extractFileFromFormData, extractStringFromFormData } from "./form-utils";
+import {
+  extractFileFromFormData,
+  extractStringFromFormData,
+} from "./form-utils";
 
 /**
  * 画像アップロードの結果を表す型
@@ -83,7 +86,9 @@ export async function uploadImageCore(
     }
 
     // クライアントから送信されたEXIF情報を取得
-    const exifDataResult = extractStringFromFormData(formData, "exifData", { optional: true });
+    const exifDataResult = extractStringFromFormData(formData, "exifData", {
+      optional: true,
+    });
     let exifData: ExifData = {}; // デフォルト空オブジェクト
 
     if (exifDataResult.success && exifDataResult.data) {

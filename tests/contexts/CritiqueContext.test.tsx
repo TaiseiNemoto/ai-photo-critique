@@ -4,7 +4,12 @@ import type { UploadedImage, CritiqueData } from "@/types/upload";
 
 // テスト用のコンポーネント
 function TestComponent() {
-  const { currentCritique, setCritiqueData, clearCritiqueData, hasCritiqueData } = useCritique();
+  const {
+    currentCritique,
+    setCritiqueData,
+    clearCritiqueData,
+    hasCritiqueData,
+  } = useCritique();
 
   return (
     <div>
@@ -85,7 +90,7 @@ describe("CritiqueContext - 状態管理統一", () => {
     render(
       <CritiqueProvider>
         <TestComponent />
-      </CritiqueProvider>
+      </CritiqueProvider>,
     );
 
     // 初期状態：講評データなし
@@ -101,7 +106,9 @@ describe("CritiqueContext - 状態管理統一", () => {
     // Context APIで管理されていることを確認
     expect(screen.getByTestId("has-critique")).toHaveTextContent("true");
     expect(screen.getByTestId("image-file-name")).toHaveTextContent("test.jpg");
-    expect(screen.getByTestId("critique-share-id")).toHaveTextContent("test-share-id");
+    expect(screen.getByTestId("critique-share-id")).toHaveTextContent(
+      "test-share-id",
+    );
 
     // データクリア
     act(() => {
@@ -117,7 +124,7 @@ describe("CritiqueContext - 状態管理統一", () => {
     render(
       <CritiqueProvider>
         <TestComponent />
-      </CritiqueProvider>
+      </CritiqueProvider>,
     );
 
     // 講評データ設定
@@ -133,7 +140,7 @@ describe("CritiqueContext - 状態管理統一", () => {
     render(
       <CritiqueProvider>
         <TestComponent />
-      </CritiqueProvider>
+      </CritiqueProvider>,
     );
 
     // 講評データ設定
@@ -144,7 +151,9 @@ describe("CritiqueContext - 状態管理統一", () => {
     // Context APIがデータの唯一のソースであることを確認
     expect(screen.getByTestId("has-critique")).toHaveTextContent("true");
     expect(screen.getByTestId("image-file-name")).toHaveTextContent("test.jpg");
-    expect(screen.getByTestId("critique-share-id")).toHaveTextContent("test-share-id");
+    expect(screen.getByTestId("critique-share-id")).toHaveTextContent(
+      "test-share-id",
+    );
     expect(screen.getByTestId("has-timestamp")).toHaveTextContent("false");
   });
 });
