@@ -80,16 +80,6 @@ export default function UploadPage() {
       toast.dismiss(loadingToastId);
 
       if (result.critique.success && result.critique.data) {
-        // 講評データを画像オブジェクトに追加
-        setUploadedImage((prev) =>
-          prev
-            ? {
-                ...prev,
-                critique: result.critique.data,
-              }
-            : null,
-        );
-
         setCritiqueState({
           status: "success",
           data: result.critique.data,
