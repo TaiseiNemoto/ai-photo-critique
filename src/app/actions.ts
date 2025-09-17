@@ -3,6 +3,7 @@
 import { uploadImageCore, type UploadResult } from "@/lib/upload";
 import { generateCritiqueCore } from "@/lib/critique-core";
 import type { CritiqueResult } from "@/types/upload";
+import { extractFileFromFormData } from "@/lib/form-utils";
 
 /**
  * 画像アップロード処理のServer Action
@@ -56,8 +57,21 @@ export async function uploadImageWithCritique(formData: FormData): Promise<{
     }
 
     // 講評生成処理（重複保存解消により、uploadIdは不要）
+    const fileResult = extractFileFromFormData(formData, "image");
+
+    if (!fileResult.success) {
+      const errorResult: CritiqueResult = {
+        success: false,
+        error: fileResult.error,
+      };
+      return {
+        upload: uploadResult,
+        critique: errorResult,
+      };
+    }
+
     const critiqueFormData = new FormData();
-    critiqueFormData.append("image", formData.get("image") as File);
+    critiqueFormData.append("image", fileResult.data);
     // 注意: uploadIdは削除済み（重複保存解消のため不要）
 
     const critiqueResult = await generateCritiqueCore(critiqueFormData);

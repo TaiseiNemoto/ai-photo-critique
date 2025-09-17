@@ -1,18 +1,19 @@
 import { generatePhotoCritiqueWithRetry } from "@/lib/critique";
 import { kvClient } from "@/lib/kv";
 import type { CritiqueResult } from "@/types/upload";
+import { extractFileFromFormData } from "./form-utils";
 
 /**
  * FormDataから画像ファイルを抽出し、基本的なバリデーションを行う
  */
 function extractAndValidateFile(formData: FormData): File | null {
-  const file = formData.get("image") as File;
+  const fileResult = extractFileFromFormData(formData, "image");
 
-  if (!file || file.size === 0) {
+  if (!fileResult.success) {
     return null;
   }
 
-  return file;
+  return fileResult.data;
 }
 
 /**
