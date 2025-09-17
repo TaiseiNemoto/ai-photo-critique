@@ -8,7 +8,6 @@ interface CritiqueContextType {
   currentCritique: {
     image: UploadedImage;
     critique: CritiqueData;
-    timestamp: number;
   } | null;
 
   // 講評データを設定する関数
@@ -32,17 +31,13 @@ export function CritiqueProvider({ children }: { children: ReactNode }) {
   const [currentCritique, setCurrentCritique] = useState<{
     image: UploadedImage;
     critique: CritiqueData;
-    timestamp: number;
   } | null>(null);
 
   const setCritiqueData = (data: {
     image: UploadedImage;
     critique: CritiqueData;
   }) => {
-    setCurrentCritique({
-      ...data,
-      timestamp: Date.now(),
-    });
+    setCurrentCritique(data);
   };
 
   const clearCritiqueData = () => {
