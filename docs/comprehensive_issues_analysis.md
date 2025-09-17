@@ -27,7 +27,7 @@
 
 ### 🟠 High 課題（4件）
 
-- [ ] **H1** - UploadZoneの責務違反 ⭐⭐⭐⭐
+- [x] **H1** - UploadZoneの責務違反 ⭐⭐⭐⭐ ✅ **完了 (2025-09-17)**
 - [ ] **H2** - 状態管理の二重化・循環依存 ⭐⭐⭐
 - [ ] **H3** - 型安全性の喪失 ⭐⭐⭐
 - [ ] **H4** - 不十分なエラーハンドリング統一性 ⭐⭐⭐
@@ -50,7 +50,7 @@
 
 ### 📊 サマリー
 
-**全19件** | 🔴 Critical: 全5件完了 ✅ | 🟠 High: 4件 | 🟡 Medium: 4件 | 🟢 Low: 6件
+**全19件** | 🔴 Critical: 全5件完了 ✅ | 🟠 High: 1件完了・3件残 | 🟡 Medium: 4件 | 🟢 Low: 6件
 
 ---
 
@@ -225,15 +225,15 @@ const uploadData = await kvClient.getUpload(uploadId); // ← これで十分だ
 
 ## 🟠 High 課題（高優先度）
 
-### H1. UploadZoneの責務違反 ⭐⭐⭐⭐
+### H1. UploadZoneの責務違反 ⭐⭐⭐⭐ ✅ **完了 (2025-09-17)**
 
 **問題概要**: UIコンポーネントが本来の責務を逸脱してサーバー処理を実行
 
 **詳細**:
 
 ```typescript
-// UploadZone.tsx - UI部品がサーバー処理を実行
-const result = await uploadImage(formData); // ← 責務違反
+// 旧実装の問題（現在は修正済み）
+const result = await uploadImage(formData); // ← 責務違反だった
 ```
 
 **本来の責務**: ファイル選択・ドロップ・クライアントプレビューのみ
@@ -244,7 +244,16 @@ const result = await uploadImage(formData); // ← 責務違反
 - **テスタビリティ**: UIテストとサーバー処理テストの分離困難
 - **再利用性**: コンポーネントの独立性喪失
 
-**関連ファイル**: `src/components/upload/UploadZone.tsx:40`
+**✅ 修正完了**:
+
+- **責務分離の完了**: UploadZoneはクライアントサイド処理のみに限定
+- **processImageFile関数**: プレビュー作成・EXIF抽出・FormData準備のみ
+- **サーバー処理の移動**: page.tsx`handleGenerateCritique`でサーバー処理実行
+- **テスタビリティ向上**: UIテストとサーバー処理テストが完全分離
+- **関心の分離確立**: UI部品は純粋なクライアントサイド処理のみ
+- **副次効果**: C1・C2課題の修正過程で自然に解決済み
+
+**関連ファイル**: `src/components/upload/UploadZone.tsx`, `src/app/page.tsx`
 
 ### H2. 状態管理の二重化・循環依存 ⭐⭐⭐
 
