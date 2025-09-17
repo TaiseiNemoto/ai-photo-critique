@@ -12,7 +12,7 @@ export type FormDataResult<T> =
  */
 export function extractFileFromFormData(
   formData: FormData,
-  fieldName: string
+  fieldName: string,
 ): FormDataResult<File> {
   const value = formData.get(fieldName);
 
@@ -49,7 +49,7 @@ export function extractFileFromFormData(
 export function extractStringFromFormData(
   formData: FormData,
   fieldName: string,
-  options?: { optional?: boolean }
+  options?: { optional?: boolean },
 ): FormDataResult<string> {
   const value = formData.get(fieldName);
 

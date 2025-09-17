@@ -1,11 +1,16 @@
 import { describe, it, expect } from "vitest";
-import { extractFileFromFormData, extractStringFromFormData } from "./form-utils";
+import {
+  extractFileFromFormData,
+  extractStringFromFormData,
+} from "./form-utils";
 
 describe("form-utils", () => {
   describe("extractFileFromFormData", () => {
     it("should extract valid File object", () => {
       const formData = new FormData();
-      const file = new File(["test content"], "test.jpg", { type: "image/jpeg" });
+      const file = new File(["test content"], "test.jpg", {
+        type: "image/jpeg",
+      });
       formData.append("image", file);
 
       const result = extractFileFromFormData(formData, "image");
@@ -33,7 +38,9 @@ describe("form-utils", () => {
       const result = extractFileFromFormData(formData, "image");
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe("フィールド 'image' はファイルである必要があります");
+        expect(result.error).toBe(
+          "フィールド 'image' はファイルである必要があります",
+        );
       }
     });
 
@@ -65,7 +72,9 @@ describe("form-utils", () => {
     it("should return success with empty string when field is missing and optional", () => {
       const formData = new FormData();
 
-      const result = extractStringFromFormData(formData, "exifData", { optional: true });
+      const result = extractStringFromFormData(formData, "exifData", {
+        optional: true,
+      });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data).toBe("");
@@ -90,7 +99,9 @@ describe("form-utils", () => {
       const result = extractStringFromFormData(formData, "exifData");
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe("フィールド 'exifData' は文字列である必要があります");
+        expect(result.error).toBe(
+          "フィールド 'exifData' は文字列である必要があります",
+        );
       }
     });
   });

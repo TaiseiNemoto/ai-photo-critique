@@ -12,6 +12,7 @@
 同一データ（講評結果）をローカルStateとContext APIで重複管理している設計欠陥。
 
 **問題箇所**:
+
 ```typescript
 // page.tsx:84-96 - ローカル状態での管理
 setUploadedImage((prev) => ({ ...prev, critique: data }));
@@ -64,14 +65,15 @@ setCritiqueData({ image: uploadedImage, critique: data });
 ### Phase 1: Red（失敗テスト作成）
 
 1. **Context API状態管理のテスト作成**
+
    ```typescript
    // tests/contexts/CritiqueContext.test.tsx
-   describe('CritiqueContext - 状態管理統一', () => {
-     it('講評データはContext APIのみで管理される', () => {
+   describe("CritiqueContext - 状態管理統一", () => {
+     it("講評データはContext APIのみで管理される", () => {
        // Context APIでの状態管理テスト
      });
 
-     it('未使用timestampフィールドが削除されている', () => {
+     it("未使用timestampフィールドが削除されている", () => {
        // timestamp削除確認テスト
      });
    });
@@ -80,8 +82,8 @@ setCritiqueData({ image: uploadedImage, critique: data });
 2. **page.tsx重複排除テスト作成**
    ```typescript
    // tests/app/page.test.tsx
-   describe('UploadPage - 状態管理統一', () => {
-     it('講評データはローカル状態に保持されない', () => {
+   describe("UploadPage - 状態管理統一", () => {
+     it("講評データはローカル状態に保持されない", () => {
        // ローカル状態の重複排除テスト
      });
    });

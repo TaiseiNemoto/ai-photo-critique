@@ -19,6 +19,7 @@ const result = await uploadImage(formData); // ← 責務違反
 ### 本来の責務
 
 UploadZoneコンポーネントは以下のクライアントサイド処理のみを担うべき：
+
 - ファイル選択・ドロップ処理
 - クライアントプレビュー作成
 - EXIF情報のクライアントサイド抽出
@@ -68,6 +69,7 @@ const processImageFile = async (
 ```
 
 **✅ 確認点**:
+
 - サーバー処理（`uploadImage`）を実行しない
 - クライアントサイド処理のみに限定
 - 責務が明確に分離されている
@@ -96,6 +98,7 @@ const handleGenerateCritique = async () => {
 ```
 
 **✅ 確認点**:
+
 - サーバー処理はページレベルで実行
 - UIコンポーネントとビジネスロジックが分離
 - 適切な責務分担が実現
