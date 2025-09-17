@@ -2,6 +2,7 @@
 import { processImage } from "@/lib/image";
 // import { kvClient } from "@/lib/kv"; // 重複保存解消のため削除
 import type { ExifData, ProcessedImageData } from "@/types/upload";
+import { extractFileFromFormData, extractStringFromFormData } from "./form-utils";
 
 /**
  * 画像アップロードの結果を表す型
@@ -20,11 +21,13 @@ export interface UploadResult {
  * FormDataから画像ファイルを抽出し、基本検証を行う
  */
 function extractAndValidateFile(formData: FormData): File | null {
-  const file = formData.get("image") as File;
+  const fileResult = extractFileFromFormData(formData, "image");
 
-  if (!file || file.size === 0) {
+  if (!fileResult.success) {
     return null;
   }
+
+  const file = fileResult.data;
 
   // ファイルサイズ制限（10MB）
   const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -80,12 +83,12 @@ export async function uploadImageCore(
     }
 
     // クライアントから送信されたEXIF情報を取得
-    const clientExifJson = formData.get("exifData") as string;
+    const exifDataResult = extractStringFromFormData(formData, "exifData", { optional: true });
     let exifData: ExifData = {}; // デフォルト空オブジェクト
 
-    if (clientExifJson) {
+    if (exifDataResult.success && exifDataResult.data) {
       try {
-        exifData = JSON.parse(clientExifJson);
+        exifData = JSON.parse(exifDataResult.data);
         console.log("Using client-side EXIF data");
       } catch (error) {
         console.warn(
