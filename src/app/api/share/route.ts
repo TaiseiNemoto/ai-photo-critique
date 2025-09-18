@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { kvClient } from "@/lib/kv";
+import { ErrorHandler } from "@/lib/error-handling";
+import { ErrorCode } from "@/lib/error-codes";
 
 interface ShareRequest {
   critique: {
@@ -22,12 +24,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     try {
       body = await request.json();
     } catch {
+      const appError = ErrorHandler.createError("INVALID_REQUEST" as ErrorCode);
       return NextResponse.json(
         {
           success: false,
-          error: "リクエストの形式が正しくありません",
+          error: appError.message,
         } as ShareResponse,
-        { status: 400 },
+        { status: appError.statusCode },
       );
     }
 
@@ -35,24 +38,26 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // shareIdの必須チェック
     if (!critique?.shareId) {
+      const appError = ErrorHandler.createError("INVALID_FORM_DATA" as ErrorCode, "講評データにshareIdが見つかりません");
       return NextResponse.json(
         {
           success: false,
-          error: "講評データにshareIdが見つかりません",
+          error: appError.message,
         } as ShareResponse,
-        { status: 400 },
+        { status: appError.statusCode },
       );
     }
 
     // 既存データの存在確認（保存処理は一切なし）
     const existingData = await kvClient.getCritique(critique.shareId);
     if (!existingData) {
+      const appError = ErrorHandler.createError("DATA_NOT_FOUND" as ErrorCode);
       return NextResponse.json(
         {
           success: false,
-          error: "講評データが見つかりません",
+          error: appError.message,
         } as ShareResponse,
-        { status: 404 },
+        { status: appError.statusCode },
       );
     }
 
@@ -66,19 +71,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       { status: 200 },
     );
   } catch (error) {
-    console.error("Share API error:", error);
-
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : "共有URLの生成中にエラーが発生しました";
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: errorMessage,
-      } as ShareResponse,
-      { status: 500 },
-    );
+    return ErrorHandler.handleAPIRouteError(error);
   }
 }
