@@ -132,6 +132,6 @@ describe("/api/data/[id] GET", () => {
 
     expect(response.status).toBe(500);
     expect(responseBody.success).toBe(false);
-    expect(responseBody.error).toContain("Redis connection error");
+    expect(responseBody.error).toBe("処理中にエラーが発生しました");
   });
 });

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { kvClient } from "@/lib/kv";
 import type { CritiqueData, ShareData } from "@/lib/kv";
+import { ErrorHandler } from "@/lib/error-handling";
+import { ErrorCode } from "@/lib/error-codes";
 
 interface DataResponse {
   success: boolean;
@@ -17,11 +19,12 @@ export async function GET(
     const { id } = await params;
 
     if (!id || id.trim() === "") {
+      const appError = ErrorHandler.createError("INVALID_ID" as ErrorCode);
       const errorResponse: DataResponse = {
         success: false,
-        error: "有効なIDが必要です",
+        error: appError.message,
       };
-      return NextResponse.json(errorResponse, { status: 400 });
+      return NextResponse.json(errorResponse, { status: appError.statusCode });
     }
 
     // まず講評データを直接取得を試みる（新しい形式）
@@ -35,11 +38,12 @@ export async function GET(
     }
 
     if (!critiqueData) {
+      const appError = ErrorHandler.createError("DATA_NOT_FOUND" as ErrorCode);
       const errorResponse: DataResponse = {
         success: false,
-        error: "データが見つかりません",
+        error: appError.message,
       };
-      return NextResponse.json(errorResponse, { status: 404 });
+      return NextResponse.json(errorResponse, { status: appError.statusCode });
     }
 
     // 期限切れチェック（shareDataがある場合のみ）
@@ -48,11 +52,12 @@ export async function GET(
       const expiresAt = new Date(shareData.expiresAt);
 
       if (now > expiresAt) {
+        const appError = ErrorHandler.createError("DATA_EXPIRED" as ErrorCode);
         const errorResponse: DataResponse = {
           success: false,
-          error: "このデータは期限切れです",
+          error: appError.message,
         };
-        return NextResponse.json(errorResponse, { status: 410 });
+        return NextResponse.json(errorResponse, { status: appError.statusCode });
       }
     } else {
       // 新しい形式では講評データ自体に期限が含まれている
@@ -64,11 +69,12 @@ export async function GET(
         const expiresAt = new Date(critiqueDataWithExpiry.expiresAt);
 
         if (now > expiresAt) {
+          const appError = ErrorHandler.createError("DATA_EXPIRED" as ErrorCode);
           const errorResponse: DataResponse = {
             success: false,
-            error: "このデータは期限切れです",
+            error: appError.message,
           };
-          return NextResponse.json(errorResponse, { status: 410 });
+          return NextResponse.json(errorResponse, { status: appError.statusCode });
         }
       }
     }
@@ -81,18 +87,6 @@ export async function GET(
 
     return NextResponse.json(successResponse, { status: 200 });
   } catch (error) {
-    console.error("Data API error:", error);
-
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : "データの取得中にエラーが発生しました";
-
-    const errorResponse: DataResponse = {
-      success: false,
-      error: errorMessage,
-    };
-
-    return NextResponse.json(errorResponse, { status: 500 });
+    return ErrorHandler.handleAPIRouteError(error);
   }
 }

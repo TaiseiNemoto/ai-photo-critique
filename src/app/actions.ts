@@ -3,7 +3,8 @@
 import { uploadImageCore, type UploadResult } from "@/lib/upload";
 import { generateCritiqueCore } from "@/lib/critique-core";
 import type { CritiqueResult } from "@/types/upload";
-import { extractFileFromFormData } from "@/lib/form-utils";
+import { extractFileFromFormDataV2 } from "@/lib/form-utils";
+import { ErrorHandler } from "@/lib/error-handling";
 
 /**
  * 画像アップロード処理のServer Action
@@ -57,12 +58,12 @@ export async function uploadImageWithCritique(formData: FormData): Promise<{
     }
 
     // 講評生成処理（重複保存解消により、uploadIdは不要）
-    const fileResult = extractFileFromFormData(formData, "image");
+    const fileResult = extractFileFromFormDataV2(formData, "image");
 
     if (!fileResult.success) {
       const errorResult: CritiqueResult = {
         success: false,
-        error: fileResult.error,
+        error: fileResult.error.message,
       };
       return {
         upload: uploadResult,
@@ -85,12 +86,9 @@ export async function uploadImageWithCritique(formData: FormData): Promise<{
       critique: critiqueResult,
     };
   } catch (error) {
-    console.error("Integrated processing error:", error);
-
-    const errorMessage =
-      error instanceof Error ? error.message : "処理中にエラーが発生しました";
-
+    const errorResult = ErrorHandler.handleServerActionError(error);
     const processingTime = Date.now() - startTime;
+    const errorMessage = !errorResult.success ? errorResult.error.message : "予期しないエラーが発生しました";
 
     return {
       upload: {

@@ -80,7 +80,7 @@ describe("/api/share POST", () => {
     expect(response.status).toBe(404);
     expect(responseBody).toEqual({
       success: false,
-      error: "講評データが見つかりません",
+      error: "データが見つかりません",
     });
   });
 
@@ -95,7 +95,7 @@ describe("/api/share POST", () => {
     expect(response.status).toBe(400);
     expect(responseBody).toEqual({
       success: false,
-      error: "講評データにshareIdが見つかりません",
+      error: "送信されたデータが無効です",
     });
   });
 
@@ -178,7 +178,7 @@ describe("/api/share POST", () => {
     expect(response.status).toBe(400);
     expect(responseBody).toEqual({
       success: false,
-      error: "講評データにshareIdが見つかりません",
+      error: "送信されたデータが無効です",
     });
 
     // データ取得・保存処理が呼ばれないことを確認
@@ -208,7 +208,7 @@ describe("/api/share POST", () => {
     expect(response.status).toBe(404);
     expect(responseBody).toEqual({
       success: false,
-      error: "講評データが見つかりません",
+      error: "データが見つかりません",
     });
 
     // 確認処理のみ実行され、保存処理は呼ばれないことを確認

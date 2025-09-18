@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { kvClient } from "@/lib/kv";
+import { ErrorHandler } from "@/lib/error-handling";
 
 export const runtime = "edge";
 
@@ -141,7 +142,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("OGP画像生成エラー:", error);
-    return new Response("Failed to generate OGP image", { status: 500 });
+    const errorResult = ErrorHandler.handleAPIRouteError(error);
+    return new Response("Failed to generate OGP image", { status: errorResult.status });
   }
 }

@@ -5,6 +5,7 @@ import { Share2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useCritique } from "@/contexts/CritiqueContext";
+import { ErrorHandler } from "@/lib/error-handling";
 
 interface ReportActionsProps {
   reportId: string;
@@ -50,10 +51,10 @@ export function ReportActions({ reportId }: ReportActionsProps) {
         duration: 3000,
       });
     } catch (error) {
-      console.error("Share failed:", error);
+      const errorResult = ErrorHandler.handleServerActionError(error);
+      const errorMessage = !errorResult.success ? errorResult.error.message : "予期しないエラーが発生しました";
       toast.error("シェアに失敗しました", {
-        description:
-          error instanceof Error ? error.message : "再度お試しください",
+        description: errorMessage,
         duration: 5000,
       });
     }
