@@ -38,7 +38,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // shareIdの必須チェック
     if (!critique?.shareId) {
-      const appError = ErrorHandler.createError("INVALID_FORM_DATA" as ErrorCode, "講評データにshareIdが見つかりません");
+      const appError = ErrorHandler.createError(
+        "INVALID_FORM_DATA" as ErrorCode,
+        "講評データにshareIdが見つかりません",
+      );
       return NextResponse.json(
         {
           success: false,

@@ -57,7 +57,9 @@ export async function GET(
           success: false,
           error: appError.message,
         };
-        return NextResponse.json(errorResponse, { status: appError.statusCode });
+        return NextResponse.json(errorResponse, {
+          status: appError.statusCode,
+        });
       }
     } else {
       // 新しい形式では講評データ自体に期限が含まれている
@@ -69,12 +71,16 @@ export async function GET(
         const expiresAt = new Date(critiqueDataWithExpiry.expiresAt);
 
         if (now > expiresAt) {
-          const appError = ErrorHandler.createError("DATA_EXPIRED" as ErrorCode);
+          const appError = ErrorHandler.createError(
+            "DATA_EXPIRED" as ErrorCode,
+          );
           const errorResponse: DataResponse = {
             success: false,
             error: appError.message,
           };
-          return NextResponse.json(errorResponse, { status: appError.statusCode });
+          return NextResponse.json(errorResponse, {
+            status: appError.statusCode,
+          });
         }
       }
     }

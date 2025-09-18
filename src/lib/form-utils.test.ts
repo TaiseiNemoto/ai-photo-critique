@@ -144,7 +144,9 @@ describe("form-utils", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.code).toBe(ErrorCode.INVALID_FILE_TYPE);
-        expect(result.error.details).toContain("フィールド 'image' はファイルである必要があります");
+        expect(result.error.details).toContain(
+          "フィールド 'image' はファイルである必要があります",
+        );
       }
     });
 
@@ -181,14 +183,18 @@ describe("form-utils", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.code).toBe(ErrorCode.INVALID_FORM_DATA);
-        expect(result.error.details).toContain("必須フィールド 'text' が見つかりません");
+        expect(result.error.details).toContain(
+          "必須フィールド 'text' が見つかりません",
+        );
       }
     });
 
     it("should return empty string when optional field is missing", () => {
       const formData = new FormData();
 
-      const result = extractStringFromFormDataV2(formData, "text", { optional: true });
+      const result = extractStringFromFormDataV2(formData, "text", {
+        optional: true,
+      });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data).toBe("");
@@ -204,7 +210,9 @@ describe("form-utils", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.code).toBe(ErrorCode.INVALID_FORM_DATA);
-        expect(result.error.details).toContain("フィールド 'text' は文字列である必要があります");
+        expect(result.error.details).toContain(
+          "フィールド 'text' は文字列である必要があります",
+        );
       }
     });
   });

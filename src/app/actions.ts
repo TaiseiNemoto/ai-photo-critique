@@ -88,7 +88,9 @@ export async function uploadImageWithCritique(formData: FormData): Promise<{
   } catch (error) {
     const errorResult = ErrorHandler.handleServerActionError(error);
     const processingTime = Date.now() - startTime;
-    const errorMessage = !errorResult.success ? errorResult.error.message : "予期しないエラーが発生しました";
+    const errorMessage = !errorResult.success
+      ? errorResult.error.message
+      : "予期しないエラーが発生しました";
 
     return {
       upload: {

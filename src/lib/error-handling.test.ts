@@ -115,10 +115,11 @@ describe("ErrorHandler", () => {
     });
   });
 
-
   describe("logError", () => {
     it("should log error with proper format", () => {
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
       const error: AppError = {
         code: "TEST_ERROR",
@@ -134,7 +135,7 @@ describe("ErrorHandler", () => {
           code: "TEST_ERROR",
           message: "Test message",
           timestamp: expect.any(String),
-        })
+        }),
       );
 
       consoleSpy.mockRestore();
@@ -153,7 +154,9 @@ describe("ErrorHandler", () => {
     });
 
     it("should not identify validation errors as retryable", () => {
-      const validationError = ErrorHandler.createError(ErrorCode.FILE_NOT_SELECTED);
+      const validationError = ErrorHandler.createError(
+        ErrorCode.FILE_NOT_SELECTED,
+      );
       expect(ErrorHandler.isRetryableError(validationError)).toBe(false);
     });
 

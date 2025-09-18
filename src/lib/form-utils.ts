@@ -23,7 +23,8 @@ function createAppError(code: ErrorCode, details?: string): AppError {
     details,
     statusCode: ERROR_STATUS_CODES[code],
     timestamp: new Date().toISOString(),
-    stack: process.env.NODE_ENV === "development" ? new Error().stack : undefined,
+    stack:
+      process.env.NODE_ENV === "development" ? new Error().stack : undefined,
   };
 }
 
@@ -82,7 +83,10 @@ export function extractFileFromFormDataV2(
   if (!(value instanceof File)) {
     return {
       success: false,
-      error: createAppError(ErrorCode.INVALID_FILE_TYPE, `フィールド '${fieldName}' はファイルである必要があります`),
+      error: createAppError(
+        ErrorCode.INVALID_FILE_TYPE,
+        `フィールド '${fieldName}' はファイルである必要があります`,
+      ),
     };
   }
 
@@ -154,14 +158,20 @@ export function extractStringFromFormDataV2(
     }
     return {
       success: false,
-      error: createAppError(ErrorCode.INVALID_FORM_DATA, `必須フィールド '${fieldName}' が見つかりません`),
+      error: createAppError(
+        ErrorCode.INVALID_FORM_DATA,
+        `必須フィールド '${fieldName}' が見つかりません`,
+      ),
     };
   }
 
   if (typeof value !== "string") {
     return {
       success: false,
-      error: createAppError(ErrorCode.INVALID_FORM_DATA, `フィールド '${fieldName}' は文字列である必要があります`),
+      error: createAppError(
+        ErrorCode.INVALID_FORM_DATA,
+        `フィールド '${fieldName}' は文字列である必要があります`,
+      ),
     };
   }
 
