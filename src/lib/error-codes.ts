@@ -54,9 +54,11 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
 
   // 外部サービスエラー
   [ErrorCode.GEMINI_API_ERROR]: "AI分析サービスでエラーが発生しました",
-  [ErrorCode.GEMINI_QUOTA_EXCEEDED]: "AI分析の利用制限に達しました。しばらく待ってから再度お試しください",
+  [ErrorCode.GEMINI_QUOTA_EXCEEDED]:
+    "AI分析の利用制限に達しました。しばらく待ってから再度お試しください",
   [ErrorCode.GEMINI_UNAUTHORIZED]: "AI分析サービスの認証に失敗しました",
-  [ErrorCode.GEMINI_TIMEOUT]: "AI分析がタイムアウトしました。再度お試しください",
+  [ErrorCode.GEMINI_TIMEOUT]:
+    "AI分析がタイムアウトしました。再度お試しください",
   [ErrorCode.REDIS_CONNECTION_ERROR]: "データベース接続でエラーが発生しました",
 
   // データアクセスエラー

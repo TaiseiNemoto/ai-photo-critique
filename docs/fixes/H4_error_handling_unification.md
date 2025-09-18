@@ -39,12 +39,12 @@ export type Result<T> =
 
 // 階層化されたエラー型
 export interface AppError {
-  code: string;           // エラーコード（一意識別用）
-  message: string;        // ユーザー向けメッセージ（日本語）
-  details?: string;       // 開発者向け詳細（英語可）
-  statusCode?: number;    // HTTPステータス（API Route用）
-  timestamp: string;      // エラー発生時刻
-  stack?: string;         // スタックトレース（開発環境のみ）
+  code: string; // エラーコード（一意識別用）
+  message: string; // ユーザー向けメッセージ（日本語）
+  details?: string; // 開発者向け詳細（英語可）
+  statusCode?: number; // HTTPステータス（API Route用）
+  timestamp: string; // エラー発生時刻
+  stack?: string; // スタックトレース（開発環境のみ）
 }
 ```
 
@@ -121,16 +121,16 @@ export class ErrorHandler {
 
 ```typescript
 // tests/lib/error-handling.test.ts
-describe('ErrorHandler', () => {
-  it('should create standardized error objects', () => {
+describe("ErrorHandler", () => {
+  it("should create standardized error objects", () => {
     const error = ErrorHandler.createError(ErrorCode.FILE_NOT_SELECTED);
-    expect(error.code).toBe('FILE_NOT_SELECTED');
-    expect(error.message).toBe('ファイルが選択されていません');
+    expect(error.code).toBe("FILE_NOT_SELECTED");
+    expect(error.message).toBe("ファイルが選択されていません");
     expect(error.timestamp).toBeDefined();
   });
 
-  it('should handle Server Action errors with proper Result type', () => {
-    const result = ErrorHandler.handleServerActionError(new Error('test'));
+  it("should handle Server Action errors with proper Result type", () => {
+    const result = ErrorHandler.handleServerActionError(new Error("test"));
     expect(result.success).toBe(false);
     expect(result.error.code).toBeDefined();
   });
@@ -148,7 +148,8 @@ export class ErrorHandler {
       message: ERROR_MESSAGES[code],
       details,
       timestamp: new Date().toISOString(),
-      stack: process.env.NODE_ENV === 'development' ? new Error().stack : undefined,
+      stack:
+        process.env.NODE_ENV === "development" ? new Error().stack : undefined,
     };
   }
 }
@@ -165,16 +166,19 @@ export class ErrorHandler {
 ## 📊 期待効果
 
 ### UX改善
+
 - **統一されたエラーメッセージ**: ユーザーが理解しやすい一貫した表示
 - **適切なエラー誘導**: エラーコードに基づく具体的な解決案提示
 - **エラー状態の可視化**: 処理状況とエラー原因の明確化
 
 ### 開発体験向上
+
 - **デバッグ効率**: 統一されたログ形式でエラー追跡が容易
 - **型安全性**: AppError型によるコンパイル時エラー検知
 - **保守性**: 中央集約化されたエラー処理ロジック
 
 ### パフォーマンス
+
 - **エラー処理時間**: 統一されたハンドラーによる処理最適化
 - **メモリ使用量**: 重複したエラー処理コードの削減
 
@@ -183,11 +187,13 @@ export class ErrorHandler {
 ### 修正ファイル（19ファイル）
 
 #### 新規作成（3ファイル）
+
 - `src/lib/error-handling.ts` - 統一エラーハンドラー
 - `src/lib/error-codes.ts` - エラーコード定義
 - `src/types/error.ts` - エラー型定義
 
 #### 修正（16ファイル）
+
 - `src/app/actions.ts` - Server Actions統一
 - `src/lib/form-utils.ts` - Result型拡張
 - `src/lib/upload.ts` - エラー型統一
@@ -204,43 +210,51 @@ export class ErrorHandler {
 - `src/types/upload.ts` - 型定義更新
 
 #### テストファイル（2ファイル）
+
 - `src/lib/error-handling.test.ts` - 新規テスト
 - 既存テストファイルの更新
 
 ### 削除ファイル
+
 - なし（既存機能の互換性を保持）
 
 ## ✅ 完了定義
 
 ### 機能要件
+
 - [ ] 全レイヤーで統一されたエラー型（AppError）を使用
 - [ ] エラーコードによる分類・識別が可能
 - [ ] 日本語による一貫したユーザー向けメッセージ
 - [ ] 開発者向け詳細情報の提供（開発環境のみ）
 
 ### 技術要件
+
 - [ ] `npm run test` で全テストが通過
 - [ ] `npm run lint` でエラーなし
 - [ ] `npm run build` で正常にビルド完了
 - [ ] TypeScriptの型チェックでエラーなし
 
 ### 動作要件
+
 - [ ] 画像アップロード〜講評生成の全フローでエラーハンドリングが統一
 - [ ] 各種エラーケース（ファイル未選択、形式不正、ネットワークエラー等）で適切なメッセージ表示
 - [ ] エラー発生時もアプリケーションが適切に動作継続
 
 ### パフォーマンス要件
+
 - [ ] エラー処理による処理時間の劣化なし
 - [ ] メモリ使用量の改善（重複したエラー処理コードの削減）
 
 ## 🚨 注意事項
 
 ### 互換性の維持
+
 - 既存のエラーハンドリングを段階的に移行
 - 一時的に複数のエラー型が混在する期間あり
 - API契約（外部インターフェース）は変更しない
 
 ### 段階的移行
+
 1. **Phase 1**: 新しいエラー基盤の構築
 2. **Phase 2**: Server Actionsの移行
 3. **Phase 3**: API Routesの移行
@@ -248,6 +262,7 @@ export class ErrorHandler {
 5. **Phase 5**: 旧コードのクリーンアップ
 
 ### リスク軽減
+
 - 各Phase完了時に動作確認を実施
 - 問題発生時は前Phaseにロールバック可能
 - 本番環境での段階的デプロイ推奨

@@ -17,7 +17,8 @@ export class ErrorHandler {
       details,
       statusCode: ERROR_STATUS_CODES[code],
       timestamp: new Date().toISOString(),
-      stack: process.env.NODE_ENV === "development" ? new Error().stack : undefined,
+      stack:
+        process.env.NODE_ENV === "development" ? new Error().stack : undefined,
     };
   }
 
@@ -32,7 +33,10 @@ export class ErrorHandler {
     } else if (typeof error === "string") {
       appError = this.createError(ErrorCode.UNKNOWN_ERROR, error);
     } else {
-      appError = this.createError(ErrorCode.UNKNOWN_ERROR, "Unknown error occurred");
+      appError = this.createError(
+        ErrorCode.UNKNOWN_ERROR,
+        "Unknown error occurred",
+      );
     }
 
     this.logError(appError);
@@ -52,7 +56,10 @@ export class ErrorHandler {
     if (error instanceof Error) {
       appError = this.createError(ErrorCode.PROCESSING_ERROR, error.message);
     } else {
-      appError = this.createError(ErrorCode.UNKNOWN_ERROR, "Unknown error occurred");
+      appError = this.createError(
+        ErrorCode.UNKNOWN_ERROR,
+        "Unknown error occurred",
+      );
     }
 
     this.logError(appError);
@@ -68,7 +75,6 @@ export class ErrorHandler {
       status: appError.statusCode || 500,
     });
   }
-
 
   /**
    * エラーのログ出力
@@ -128,13 +134,23 @@ export class ErrorHandler {
   static analyzeFileValidationError(error: Error): ErrorCode {
     const message = error.message.toLowerCase();
 
-    if (message.includes("選択されていません") || message.includes("not selected")) {
+    if (
+      message.includes("選択されていません") ||
+      message.includes("not selected")
+    ) {
       return ErrorCode.FILE_NOT_SELECTED;
     }
-    if (message.includes("大きすぎます") || message.includes("too large") || message.includes("20mb")) {
+    if (
+      message.includes("大きすぎます") ||
+      message.includes("too large") ||
+      message.includes("20mb")
+    ) {
       return ErrorCode.FILE_TOO_LARGE;
     }
-    if (message.includes("サポートされていない") || message.includes("unsupported")) {
+    if (
+      message.includes("サポートされていない") ||
+      message.includes("unsupported")
+    ) {
       return ErrorCode.UNSUPPORTED_FORMAT;
     }
     if (message.includes("空です") || message.includes("empty")) {

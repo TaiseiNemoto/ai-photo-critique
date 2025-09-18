@@ -143,6 +143,8 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     const errorResult = ErrorHandler.handleAPIRouteError(error);
-    return new Response("Failed to generate OGP image", { status: errorResult.status });
+    return new Response("Failed to generate OGP image", {
+      status: errorResult.status,
+    });
   }
 }

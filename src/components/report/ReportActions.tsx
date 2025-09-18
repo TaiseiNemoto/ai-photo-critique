@@ -52,7 +52,9 @@ export function ReportActions({ reportId }: ReportActionsProps) {
       });
     } catch (error) {
       const errorResult = ErrorHandler.handleServerActionError(error);
-      const errorMessage = !errorResult.success ? errorResult.error.message : "予期しないエラーが発生しました";
+      const errorMessage = !errorResult.success
+        ? errorResult.error.message
+        : "予期しないエラーが発生しました";
       toast.error("シェアに失敗しました", {
         description: errorMessage,
         duration: 5000,
