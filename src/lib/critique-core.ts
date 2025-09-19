@@ -1,7 +1,10 @@
 import { generatePhotoCritiqueWithRetry } from "@/lib/critique";
 import { kvClient } from "@/lib/kv";
 import type { CritiqueResult, ExifData } from "@/types/upload";
-import { extractFileFromFormData, extractStringFromFormData } from "./form-utils";
+import {
+  extractFileFromFormData,
+  extractStringFromFormData,
+} from "./form-utils";
 
 /**
  * FormDataから画像ファイルを抽出し、基本的なバリデーションを行う
@@ -61,7 +64,9 @@ export async function generateCritiqueCore(
         exifData = {}; // EXIF欠損を許容
       }
     } else {
-      console.log("No client EXIF data provided for critique, using empty object");
+      console.log(
+        "No client EXIF data provided for critique, using empty object",
+      );
     }
 
     // 画像をBufferに変換

@@ -15,7 +15,8 @@
 
 ```typescript
 // page.tsx - 単一責任原則違反の巨大コンポーネント
-export default function UploadPage() { // 178行
+export default function UploadPage() {
+  // 178行
   // 複数の責務が混在:
   // 1. 状態管理 (uploadedImage, isProcessing, critiqueState)
   // 2. アップロード処理 (handleImageUploaded)
@@ -25,7 +26,8 @@ export default function UploadPage() { // 178行
   // 6. UI レンダリング
 
   // グローバル汚染
-  (window as Window & { __uploadFormData?: FormData }).__uploadFormData = image.formData;
+  (window as Window & { __uploadFormData?: FormData }).__uploadFormData =
+    image.formData;
 }
 ```
 
@@ -58,14 +60,14 @@ export default function UploadPage() { // 178行
 #### `src/hooks/useUploadState.ts` (新規作成)
 
 ```typescript
-import { useState, useRef } from 'react';
-import type { UploadedImage, CritiqueData } from '@/types/upload';
+import { useState, useRef } from "react";
+import type { UploadedImage, CritiqueData } from "@/types/upload";
 
 export type UploadState = {
   uploadedImage: UploadedImage | null;
   isProcessing: boolean;
   critique: {
-    status: 'idle' | 'loading' | 'success' | 'error';
+    status: "idle" | "loading" | "success" | "error";
     data?: CritiqueData;
     error?: string;
   };
@@ -75,22 +77,22 @@ export function useUploadState() {
   const [state, setState] = useState<UploadState>({
     uploadedImage: null,
     isProcessing: false,
-    critique: { status: 'idle' },
+    critique: { status: "idle" },
   });
 
   // グローバル汚染を削除し、useRefで管理
   const formDataRef = useRef<FormData | null>(null);
 
   const setUploadedImage = (image: UploadedImage | null) => {
-    setState(prev => ({ ...prev, uploadedImage: image }));
+    setState((prev) => ({ ...prev, uploadedImage: image }));
   };
 
   const setProcessing = (processing: boolean) => {
-    setState(prev => ({ ...prev, isProcessing: processing }));
+    setState((prev) => ({ ...prev, isProcessing: processing }));
   };
 
-  const setCritiqueState = (critique: UploadState['critique']) => {
-    setState(prev => ({ ...prev, critique }));
+  const setCritiqueState = (critique: UploadState["critique"]) => {
+    setState((prev) => ({ ...prev, critique }));
   };
 
   const resetState = () => {
@@ -100,7 +102,7 @@ export function useUploadState() {
     setState({
       uploadedImage: null,
       isProcessing: false,
-      critique: { status: 'idle' },
+      critique: { status: "idle" },
     });
     formDataRef.current = null;
   };
@@ -119,11 +121,11 @@ export function useUploadState() {
 #### `src/hooks/useCritiqueGeneration.ts` (新規作成)
 
 ```typescript
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
-import { useCritique } from '@/contexts/CritiqueContext';
-import { uploadImageWithCritique } from '@/app/actions';
-import type { UploadedImage } from '@/types/upload';
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useCritique } from "@/contexts/CritiqueContext";
+import { uploadImageWithCritique } from "@/app/actions";
+import type { UploadedImage } from "@/types/upload";
 
 // 定数化
 const TIMING = {
@@ -134,13 +136,13 @@ const TIMING = {
 } as const;
 
 const MESSAGES = {
-  CRITIQUE_LOADING: 'AI講評を生成中...',
-  CRITIQUE_LOADING_DESC: '技術・構図・色彩を分析しています',
-  CRITIQUE_SUCCESS: '講評が完了しました',
-  CRITIQUE_SUCCESS_DESC: '結果ページに移動します',
-  CRITIQUE_ERROR: '講評生成に失敗しました',
-  CRITIQUE_NETWORK_ERROR: 'ネットワークエラーが発生しました',
-  CRITIQUE_NETWORK_DESC: 'ネットワーク接続を確認してください',
+  CRITIQUE_LOADING: "AI講評を生成中...",
+  CRITIQUE_LOADING_DESC: "技術・構図・色彩を分析しています",
+  CRITIQUE_SUCCESS: "講評が完了しました",
+  CRITIQUE_SUCCESS_DESC: "結果ページに移動します",
+  CRITIQUE_ERROR: "講評生成に失敗しました",
+  CRITIQUE_NETWORK_ERROR: "ネットワークエラーが発生しました",
+  CRITIQUE_NETWORK_DESC: "ネットワーク接続を確認してください",
 } as const;
 
 export function useCritiqueGeneration() {
@@ -154,21 +156,22 @@ export function useCritiqueGeneration() {
     onCritiqueStateChange: (state: any) => void,
   ) => {
     onProcessingChange(true);
-    onCritiqueStateChange({ status: 'loading' });
+    onCritiqueStateChange({ status: "loading" });
 
     const loadingToastId = toast.loading(MESSAGES.CRITIQUE_LOADING, {
       description: MESSAGES.CRITIQUE_LOADING_DESC,
     });
 
     try {
-      const formData = formDataRef.current || createFallbackFormData(uploadedImage);
+      const formData =
+        formDataRef.current || createFallbackFormData(uploadedImage);
       const result = await uploadImageWithCritique(formData);
 
       toast.dismiss(loadingToastId);
 
       if (result.critique.success && result.critique.data) {
         onCritiqueStateChange({
-          status: 'success',
+          status: "success",
           data: result.critique.data,
         });
 
@@ -182,13 +185,13 @@ export function useCritiqueGeneration() {
             image: uploadedImage,
             critique: result.critique.data!,
           });
-          router.push('/report/current');
+          router.push("/report/current");
         }, TIMING.NAVIGATION_DELAY);
       } else {
         handleCritiqueError(result.critique.error, onCritiqueStateChange);
       }
     } catch (error) {
-      console.error('Critique generation error:', error);
+      console.error("Critique generation error:", error);
       toast.dismiss(loadingToastId);
       handleNetworkError(onCritiqueStateChange);
     } finally {
@@ -201,32 +204,35 @@ export function useCritiqueGeneration() {
 
 function createFallbackFormData(uploadedImage: UploadedImage): FormData {
   const formData = new FormData();
-  formData.append('image', uploadedImage.file);
+  formData.append("image", uploadedImage.file);
   if (uploadedImage.exif) {
-    formData.append('exifData', JSON.stringify(uploadedImage.exif));
+    formData.append("exifData", JSON.stringify(uploadedImage.exif));
   }
   return formData;
 }
 
-function handleCritiqueError(error: string | undefined, onCritiqueStateChange: (state: any) => void) {
+function handleCritiqueError(
+  error: string | undefined,
+  onCritiqueStateChange: (state: any) => void,
+) {
   onCritiqueStateChange({
-    status: 'error',
+    status: "error",
     error: error || MESSAGES.CRITIQUE_ERROR,
   });
 
   toast.error(MESSAGES.CRITIQUE_ERROR, {
-    description: error || '再度お試しください',
+    description: error || "再度お試しください",
     duration: TIMING.TOAST_ERROR_DURATION,
   });
 }
 
 function handleNetworkError(onCritiqueStateChange: (state: any) => void) {
   onCritiqueStateChange({
-    status: 'error',
+    status: "error",
     error: MESSAGES.CRITIQUE_NETWORK_ERROR,
   });
 
-  toast.error('エラーが発生しました', {
+  toast.error("エラーが発生しました", {
     description: MESSAGES.CRITIQUE_NETWORK_DESC,
     duration: TIMING.TOAST_ERROR_DURATION,
   });
@@ -236,10 +242,10 @@ function handleNetworkError(onCritiqueStateChange: (state: any) => void) {
 #### `src/hooks/useUploadFlow.ts` (新規作成)
 
 ```typescript
-import { toast } from 'sonner';
-import { useUploadState } from './useUploadState';
-import { useCritiqueGeneration } from './useCritiqueGeneration';
-import type { UploadedImageWithFormData } from '@/types/upload';
+import { toast } from "sonner";
+import { useUploadState } from "./useUploadState";
+import { useCritiqueGeneration } from "./useCritiqueGeneration";
+import type { UploadedImageWithFormData } from "@/types/upload";
 
 export function useUploadFlow() {
   const {
@@ -261,10 +267,10 @@ export function useUploadFlow() {
     };
 
     setUploadedImage(uploadedImage);
-    setCritiqueState({ status: 'idle' });
+    setCritiqueState({ status: "idle" });
 
-    toast.success('画像をアップロードしました', {
-      description: 'EXIF情報を解析中...',
+    toast.success("画像をアップロードしました", {
+      description: "EXIF情報を解析中...",
       duration: 2000,
     });
 
@@ -284,8 +290,8 @@ export function useUploadFlow() {
 
   const resetUpload = () => {
     resetState();
-    toast('画像をリセットしました', {
-      description: '新しい画像を選択してください',
+    toast("画像をリセットしました", {
+      description: "新しい画像を選択してください",
       duration: 2000,
     });
   };
