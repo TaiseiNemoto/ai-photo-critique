@@ -71,6 +71,10 @@ export default function UploadPage() {
         // フォールバック: FormDataが存在しない場合は従来方式
         const fallbackFormData = new FormData();
         fallbackFormData.append("image", uploadedImage.file);
+        // EXIFデータも追加
+        if (uploadedImage.exif) {
+          fallbackFormData.append("exifData", JSON.stringify(uploadedImage.exif));
+        }
         result = await uploadImageWithCritique(fallbackFormData);
       } else {
         result = await uploadImageWithCritique(formData);

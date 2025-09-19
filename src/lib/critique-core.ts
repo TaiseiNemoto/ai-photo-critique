@@ -1,7 +1,7 @@
 import { generatePhotoCritiqueWithRetry } from "@/lib/critique";
 import { kvClient } from "@/lib/kv";
-import type { CritiqueResult } from "@/types/upload";
-import { extractFileFromFormData } from "./form-utils";
+import type { CritiqueResult, ExifData } from "@/types/upload";
+import { extractFileFromFormData, extractStringFromFormData } from "./form-utils";
 
 /**
  * FormDataから画像ファイルを抽出し、基本的なバリデーションを行う
@@ -43,6 +43,27 @@ export async function generateCritiqueCore(
       };
     }
 
+    // クライアントから送信されたEXIF情報を取得
+    const exifDataResult = extractStringFromFormData(formData, "exifData", {
+      optional: true,
+    });
+    let exifData: ExifData = {}; // デフォルト空オブジェクト
+
+    if (exifDataResult.success && exifDataResult.data) {
+      try {
+        exifData = JSON.parse(exifDataResult.data);
+        console.log("Using client-side EXIF data for critique");
+      } catch (error) {
+        console.warn(
+          "Invalid EXIF data from client, using empty object:",
+          error,
+        );
+        exifData = {}; // EXIF欠損を許容
+      }
+    } else {
+      console.log("No client EXIF data provided for critique, using empty object");
+    }
+
     // 画像をBufferに変換
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
@@ -52,13 +73,6 @@ export async function generateCritiqueCore(
 
     // 講評が成功した場合、KVストレージに保存
     if (result.success && result.data) {
-      // 注意: uploadIdベースのEXIF取得は削除済み
-      // 重複保存解消により、EXIFデータは講評時に画像ファイルから直接取得
-      const exifData = {};
-
-      // uploadIdの処理は完全に削除（重複保存解消）
-      // const uploadId = formData.get("uploadId") as string; // 削除
-
       // 共有用IDを生成
       const shareId = kvClient.generateId();
 
