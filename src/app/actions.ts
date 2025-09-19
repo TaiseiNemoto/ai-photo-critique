@@ -3,7 +3,7 @@
 import { uploadImageCore, type UploadResult } from "@/lib/upload";
 import { generateCritiqueCore } from "@/lib/critique-core";
 import type { CritiqueResult } from "@/types/upload";
-import { extractFileFromFormDataV2 } from "@/lib/form-utils";
+import { extractFileFromFormDataV2, extractStringFromFormData } from "@/lib/form-utils";
 import { ErrorHandler } from "@/lib/error-handling";
 
 /**
@@ -73,6 +73,14 @@ export async function uploadImageWithCritique(formData: FormData): Promise<{
 
     const critiqueFormData = new FormData();
     critiqueFormData.append("image", fileResult.data);
+
+    // 元のFormDataからEXIFデータを取得して新しいFormDataに追加
+    const exifDataResult = extractStringFromFormData(formData, "exifData", {
+      optional: true,
+    });
+    if (exifDataResult.success && exifDataResult.data) {
+      critiqueFormData.append("exifData", exifDataResult.data);
+    }
     // 注意: uploadIdは削除済み（重複保存解消のため不要）
 
     const critiqueResult = await generateCritiqueCore(critiqueFormData);
