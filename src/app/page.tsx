@@ -7,12 +7,8 @@ import ImagePreview from "@/components/upload/ImagePreview";
 import GenerateButton from "@/components/upload/GenerateButton";
 
 export default function UploadPage() {
-  const {
-    state,
-    handleImageUploaded,
-    handleGenerateCritique,
-    resetUpload,
-  } = useUploadFlow();
+  const { state, handleImageUploaded, handleGenerateCritique, resetUpload } =
+    useUploadFlow();
 
   return (
     <div className="mobile-viewport bg-gray-50 scroll-smooth">

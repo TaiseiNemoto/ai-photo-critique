@@ -3,7 +3,10 @@
 import { uploadImageCore, type UploadResult } from "@/lib/upload";
 import { generateCritiqueCore } from "@/lib/critique-core";
 import type { CritiqueResult } from "@/types/upload";
-import { extractFileFromFormDataV2, extractStringFromFormData } from "@/lib/form-utils";
+import {
+  extractFileFromFormDataV2,
+  extractStringFromFormData,
+} from "@/lib/form-utils";
 import { ErrorHandler } from "@/lib/error-handling";
 
 /**

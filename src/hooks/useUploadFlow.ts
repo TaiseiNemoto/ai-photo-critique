@@ -1,7 +1,7 @@
-import { toast } from 'sonner';
-import { useUploadState } from './useUploadState';
-import { useCritiqueGeneration } from './useCritiqueGeneration';
-import type { UploadedImageWithFormData } from '@/types/upload';
+import { toast } from "sonner";
+import { useUploadState } from "./useUploadState";
+import { useCritiqueGeneration } from "./useCritiqueGeneration";
+import type { UploadedImageWithFormData } from "@/types/upload";
 
 export function useUploadFlow() {
   const {
@@ -23,10 +23,10 @@ export function useUploadFlow() {
     };
 
     setUploadedImage(uploadedImage);
-    setCritiqueState({ status: 'idle' });
+    setCritiqueState({ status: "idle" });
 
-    toast.success('画像をアップロードしました', {
-      description: 'EXIF情報を解析中...',
+    toast.success("画像をアップロードしました", {
+      description: "EXIF情報を解析中...",
       duration: 2000,
     });
 
@@ -46,8 +46,8 @@ export function useUploadFlow() {
 
   const resetUpload = () => {
     resetState();
-    toast('画像をリセットしました', {
-      description: '新しい画像を選択してください',
+    toast("画像をリセットしました", {
+      description: "新しい画像を選択してください",
       duration: 2000,
     });
   };
