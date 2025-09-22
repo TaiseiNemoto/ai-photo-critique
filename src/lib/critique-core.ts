@@ -2,22 +2,10 @@ import { generatePhotoCritiqueWithRetry } from "@/lib/critique";
 import { kvClient } from "@/lib/kv";
 import type { CritiqueResult, ExifData } from "@/types/upload";
 import {
-  extractFileFromFormData,
   extractStringFromFormData,
 } from "./form-utils";
+import { extractAndValidateFile } from "./validation";
 
-/**
- * FormDataから画像ファイルを抽出し、基本的なバリデーションを行う
- */
-function extractAndValidateFile(formData: FormData): File | null {
-  const fileResult = extractFileFromFormData(formData, "image");
-
-  if (!fileResult.success) {
-    return null;
-  }
-
-  return fileResult.data;
-}
 
 /**
  * AI講評生成処理のコア関数（画像ファイル付き）

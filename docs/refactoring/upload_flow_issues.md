@@ -1,0 +1,207 @@
+# 画像アップロード〜講評生成フロー リファクタリング課題
+
+## 📋 リファクタリング進捗チェックリスト
+
+### Phase 1: 短期的改善（基本的な重複排除）
+
+- [x] **1. 共通関数の統合** ✅ **完了** (2025-09-22)
+  - [x] `extractAndValidateFile`重複関数の調査
+  - [x] `src/lib/validation.ts`に統合バリデーション関数作成
+  - [x] 既存ファイルから重複関数削除
+  - [x] 13のテストケース追加
+  - [x] 全テスト通過・リントエラー解消
+  - **効果**: DRY原則遵守、バリデーション基準統一
+
+- [ ] **2. EXIF処理の統合** 🔄 **次のタスク**
+  - [ ] EXIF重複処理の調査
+  - [ ] 共通EXIF処理関数の作成
+  - [ ] 両ファイルでの重複処理削除
+  - [ ] パフォーマンス改善確認
+
+### Phase 2: 中期的改善（アーキテクチャ改善）
+
+- [ ] **3. uploadImageWithCritiqueの分離**
+  - [ ] 単一責任原則違反の解消
+  - [ ] アップロード処理と講評生成処理の独立化
+  - [ ] 117行の巨大関数の分割
+
+- [ ] **4. データフロー最適化**
+  - [ ] 画像Buffer変換の重複排除
+  - [ ] 再利用可能な中間データ構造導入
+  - [ ] AI処理用とKV保存用データの統合
+
+### Phase 3: 長期的改善（設計改善）
+
+- [ ] **5. エラーハンドリング戦略の統一**
+  - [ ] 統一されたエラー型定義
+  - [ ] レイヤー間エラー伝播ルール策定
+  - [ ] 分散エラーハンドリングの集約
+
+- [ ] **6. アーキテクチャの明確化**
+  - [ ] UI層・ビジネスロジック層・データ層の責任分離
+  - [ ] 多層構造の簡素化
+  - [ ] 依存関係の整理
+
+---
+
+## 🔍 構造的問題点の詳細
+
+### ✅ 解決済み問題
+
+#### ~~2. 重複するファイル検証ロジック~~ ✅ **解決済み**
+
+**解決内容**:
+- `src/lib/validation.ts`に統合バリデーション関数を作成
+- `extractAndValidateImageFile`（新API）と`extractAndValidateFile`（後方互換）を提供
+- 完全なファイルサイズ・形式チェック機能を統一
+- 13のテストケースで品質保証
+
+**修正ファイル**:
+- ➕ `src/lib/validation.ts` - 統合バリデーション関数
+- ➕ `src/lib/validation.test.ts` - 包括的テスト
+- ✏️ `src/lib/upload.ts` - 重複関数削除
+- ✏️ `src/lib/critique-core.ts` - 重複関数削除
+
+---
+
+### 🔄 未解決問題
+
+#### 1. 単一責任原則の違反
+
+**問題箇所**: `src/app/actions.ts:uploadImageWithCritique`
+
+**詳細**:
+- ❌ 1つの関数で画像アップロード + 講評生成の両方を実行
+- ❌ 117行の巨大な関数でエラーハンドリングが複雑
+- ❌ 失敗時の処理分岐が多すぎ、テストと保守が困難
+
+**優先度**: 🟡 Medium
+
+---
+
+#### 3. EXIF処理の重複
+
+**問題箇所**:
+- `src/lib/upload.ts:uploadImageCore` (L90-107)
+- `src/lib/critique-core.ts:generateCritiqueCore` (L49-70)
+
+**詳細**:
+- ❌ 両方の関数で同じFormDataから同じEXIF情報を抽出・パース
+- ❌ 無駄な処理、性能の低下
+
+```typescript
+// 重複している処理パターン
+const exifDataResult = extractStringFromFormData(formData, "exifData", {
+  optional: true,
+});
+let exifData: ExifData = {};
+if (exifDataResult.success && exifDataResult.data) {
+  try {
+    exifData = JSON.parse(exifDataResult.data);
+  } catch (error) {
+    // エラーハンドリング...
+  }
+}
+```
+
+**優先度**: 🟡 Medium
+
+---
+
+#### 4. データフローの非効率性
+
+**問題箇所**: `src/lib/critique-core.ts:generateCritiqueCore`
+
+**詳細**:
+- ❌ 画像を2回Buffer変換（AI処理用 + KV保存用）
+- ❌ アップロード時の処理済み画像データを再利用できていない
+
+**優先度**: 🔵 Low
+
+---
+
+#### 5. 処理の流れが追いづらい（多層構造）
+
+**問題のあるフロー**:
+```
+page.tsx
+  → useUploadFlow
+    → useCritiqueGeneration
+      → uploadImageWithCritique
+        → uploadImageCore + generateCritiqueCore
+          → 実際の処理
+```
+
+**詳細**:
+- ❌ 責任の境界が不明確
+- ❌ どのレイヤーが何を担当するかが分かりにくい設計
+
+**優先度**: 🔵 Low
+
+---
+
+#### 6. エラーハンドリングの分散
+
+**問題のある分散箇所**:
+- フロントエンド（hooks）
+- Server Actions
+- Core Functions
+
+**詳細**:
+- ❌ 各レイヤーでそれぞれエラーハンドリング
+- ❌ 統一されたエラー処理戦略がない
+
+**優先度**: 🔵 Low
+
+---
+
+#### 7. FormDataの複雑な受け渡し
+
+**問題箇所**: `src/app/actions.ts:uploadImageWithCritique` (L60-80)
+
+**詳細**:
+- ❌ uploadImageWithCritique内でFormDataを再構築
+- ❌ フロントエンドからServer Actionsまで同じFormDataを維持する必要性
+- ❌ データの受け渡しが複雑で、バグの温床となりやすい
+
+**優先度**: 🔵 Low
+
+---
+
+## ✅ Server ActionsからAPI Routes呼び出しについて
+
+**結論：適切な実装** ✅
+
+調査結果、Server ActionsはAPI Routesを直接呼び出しておらず、libディレクトリのコア関数（`uploadImageCore`、`generateCritiqueCore`）を直接呼び出しています。API Routesは以下の別用途で使用されており、これは適切なアーキテクチャです：
+
+- `/api/data/[id]` - 共有データの取得
+- `/api/share` - 共有URL生成
+- `/api/ogp` - OGP画像生成
+
+---
+
+## 📊 期待される効果
+
+これらの改善により以下の効果が期待されます：
+
+- **保守性の向上**: コードの理解と修正が容易に
+- **テスタビリティの向上**: 単一責任により単体テストが書きやすく
+- **パフォーマンス向上**: 重複処理の排除
+- **バグの減少**: 複雑な処理フローの簡素化
+- **開発効率の向上**: 明確な責任分離による並行開発の促進
+
+---
+
+## 🚀 次のステップ
+
+**現在のタスク**: Phase 1-2「EXIF処理の統合」
+
+1. EXIF重複処理の詳細調査
+2. 修正計画のドキュメント化
+3. TDD方式での実装
+4. テスト・リント・ビルド確認
+
+**将来のタスク**:
+- Phase 2以降は優先度と工数を検討して順次実施
+- 各Phase完了後に影響範囲のテストを実施
+- 段階的なリファクタリングによりリスクを最小化
