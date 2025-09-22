@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { TIMING } from "@/lib/constants";
 import { useUploadState } from "./useUploadState";
 import { useCritiqueGeneration } from "./useCritiqueGeneration";
 import type { UploadedImageWithFormData } from "@/types/upload";
@@ -27,7 +28,7 @@ export function useUploadFlow() {
 
     toast.success("画像をアップロードしました", {
       description: "EXIF情報を解析中...",
-      duration: 2000,
+      duration: TIMING.TOAST_INFO_DURATION,
     });
 
     formDataRef.current = image.formData;
@@ -48,7 +49,7 @@ export function useUploadFlow() {
     resetState();
     toast("画像をリセットしました", {
       description: "新しい画像を選択してください",
-      duration: 2000,
+      duration: TIMING.TOAST_INFO_DURATION,
     });
   };
 
