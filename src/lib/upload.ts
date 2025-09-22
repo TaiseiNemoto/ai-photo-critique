@@ -3,9 +3,9 @@ import { processImage } from "@/lib/image";
 // import { kvClient } from "@/lib/kv"; // 重複保存解消のため削除
 import type { ExifData, ProcessedImageData } from "@/types/upload";
 import {
-  extractFileFromFormData,
   extractStringFromFormData,
 } from "./form-utils";
+import { extractAndValidateFile } from "./validation";
 
 /**
  * 画像アップロードの結果を表す型
@@ -20,32 +20,6 @@ export interface UploadResult {
   error?: string;
 }
 
-/**
- * FormDataから画像ファイルを抽出し、基本検証を行う
- */
-function extractAndValidateFile(formData: FormData): File | null {
-  const fileResult = extractFileFromFormData(formData, "image");
-
-  if (!fileResult.success) {
-    return null;
-  }
-
-  const file = fileResult.data;
-
-  // ファイルサイズ制限（10MB）
-  const MAX_FILE_SIZE = 10 * 1024 * 1024;
-  if (file.size > MAX_FILE_SIZE) {
-    throw new Error("ファイルサイズが大きすぎます（最大10MB）");
-  }
-
-  // ファイル形式チェック
-  const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-  if (!allowedTypes.includes(file.type)) {
-    throw new Error("サポートされていないファイル形式です");
-  }
-
-  return file;
-}
 
 /**
  * 処理済みファイルをBase64データURLに変換
