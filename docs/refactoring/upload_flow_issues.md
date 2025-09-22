@@ -51,12 +51,14 @@
 #### ~~2. 重複するファイル検証ロジック~~ ✅ **解決済み**
 
 **解決内容**:
+
 - `src/lib/validation.ts`に統合バリデーション関数を作成
 - `extractAndValidateImageFile`（新API）と`extractAndValidateFile`（後方互換）を提供
 - 完全なファイルサイズ・形式チェック機能を統一
 - 13のテストケースで品質保証
 
 **修正ファイル**:
+
 - ➕ `src/lib/validation.ts` - 統合バリデーション関数
 - ➕ `src/lib/validation.test.ts` - 包括的テスト
 - ✏️ `src/lib/upload.ts` - 重複関数削除
@@ -71,6 +73,7 @@
 **問題箇所**: `src/app/actions.ts:uploadImageWithCritique`
 
 **詳細**:
+
 - ❌ 1つの関数で画像アップロード + 講評生成の両方を実行
 - ❌ 117行の巨大な関数でエラーハンドリングが複雑
 - ❌ 失敗時の処理分岐が多すぎ、テストと保守が困難
@@ -82,10 +85,12 @@
 #### 3. EXIF処理の重複
 
 **問題箇所**:
+
 - `src/lib/upload.ts:uploadImageCore` (L90-107)
 - `src/lib/critique-core.ts:generateCritiqueCore` (L49-70)
 
 **詳細**:
+
 - ❌ 両方の関数で同じFormDataから同じEXIF情報を抽出・パース
 - ❌ 無駄な処理、性能の低下
 
@@ -113,6 +118,7 @@ if (exifDataResult.success && exifDataResult.data) {
 **問題箇所**: `src/lib/critique-core.ts:generateCritiqueCore`
 
 **詳細**:
+
 - ❌ 画像を2回Buffer変換（AI処理用 + KV保存用）
 - ❌ アップロード時の処理済み画像データを再利用できていない
 
@@ -123,6 +129,7 @@ if (exifDataResult.success && exifDataResult.data) {
 #### 5. 処理の流れが追いづらい（多層構造）
 
 **問題のあるフロー**:
+
 ```
 page.tsx
   → useUploadFlow
@@ -133,6 +140,7 @@ page.tsx
 ```
 
 **詳細**:
+
 - ❌ 責任の境界が不明確
 - ❌ どのレイヤーが何を担当するかが分かりにくい設計
 
@@ -143,11 +151,13 @@ page.tsx
 #### 6. エラーハンドリングの分散
 
 **問題のある分散箇所**:
+
 - フロントエンド（hooks）
 - Server Actions
 - Core Functions
 
 **詳細**:
+
 - ❌ 各レイヤーでそれぞれエラーハンドリング
 - ❌ 統一されたエラー処理戦略がない
 
@@ -160,6 +170,7 @@ page.tsx
 **問題箇所**: `src/app/actions.ts:uploadImageWithCritique` (L60-80)
 
 **詳細**:
+
 - ❌ uploadImageWithCritique内でFormDataを再構築
 - ❌ フロントエンドからServer Actionsまで同じFormDataを維持する必要性
 - ❌ データの受け渡しが複雑で、バグの温床となりやすい
@@ -202,6 +213,7 @@ page.tsx
 4. テスト・リント・ビルド確認
 
 **将来のタスク**:
+
 - Phase 2以降は優先度と工数を検討して順次実施
 - 各Phase完了後に影響範囲のテストを実施
 - 段階的なリファクタリングによりリスクを最小化

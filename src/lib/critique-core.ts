@@ -1,11 +1,8 @@
 import { generatePhotoCritiqueWithRetry } from "@/lib/critique";
 import { kvClient } from "@/lib/kv";
 import type { CritiqueResult, ExifData } from "@/types/upload";
-import {
-  extractStringFromFormData,
-} from "./form-utils";
+import { extractStringFromFormData } from "./form-utils";
 import { extractAndValidateFile } from "./validation";
-
 
 /**
  * AI講評生成処理のコア関数（画像ファイル付き）

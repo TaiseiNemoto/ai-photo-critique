@@ -2,9 +2,7 @@
 import { processImage } from "@/lib/image";
 // import { kvClient } from "@/lib/kv"; // 重複保存解消のため削除
 import type { ExifData, ProcessedImageData } from "@/types/upload";
-import {
-  extractStringFromFormData,
-} from "./form-utils";
+import { extractStringFromFormData } from "./form-utils";
 import { extractAndValidateFile } from "./validation";
 
 /**
@@ -19,7 +17,6 @@ export interface UploadResult {
   };
   error?: string;
 }
-
 
 /**
  * 処理済みファイルをBase64データURLに変換
