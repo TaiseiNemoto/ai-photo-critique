@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { extractAndValidateImageFile, extractAndValidateFile } from "./validation";
+import {
+  extractAndValidateImageFile,
+  extractAndValidateFile,
+} from "./validation";
 
 // テスト用のモックファイル作成関数
 function createMockFile(options: {

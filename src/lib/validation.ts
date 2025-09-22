@@ -10,13 +10,15 @@ export interface FileValidationResult {
  * FormDataから画像ファイルを抽出・検証
  * ファイルサイズ・形式・存在性をチェック
  */
-export function extractAndValidateImageFile(formData: FormData): FileValidationResult {
+export function extractAndValidateImageFile(
+  formData: FormData,
+): FileValidationResult {
   const fileResult = extractFileFromFormData(formData, "image");
 
   if (!fileResult.success) {
     return {
       success: false,
-      error: "画像ファイルが見つかりません"
+      error: "画像ファイルが見つかりません",
     };
   }
 
@@ -27,7 +29,7 @@ export function extractAndValidateImageFile(formData: FormData): FileValidationR
   if (file.size > MAX_FILE_SIZE) {
     return {
       success: false,
-      error: "ファイルサイズが大きすぎます（最大10MB）"
+      error: "ファイルサイズが大きすぎます（最大10MB）",
     };
   }
 
@@ -36,13 +38,13 @@ export function extractAndValidateImageFile(formData: FormData): FileValidationR
   if (!allowedTypes.includes(file.type)) {
     return {
       success: false,
-      error: "サポートされていないファイル形式です"
+      error: "サポートされていないファイル形式です",
     };
   }
 
   return {
     success: true,
-    file: file
+    file: file,
   };
 }
 
@@ -53,7 +55,10 @@ export function extractAndValidateImageFile(formData: FormData): FileValidationR
 export function extractAndValidateFile(formData: FormData): File | null {
   const result = extractAndValidateImageFile(formData);
   if (!result.success) {
-    if (result.error?.includes("大きすぎます") || result.error?.includes("サポートされていない")) {
+    if (
+      result.error?.includes("大きすぎます") ||
+      result.error?.includes("サポートされていない")
+    ) {
       throw new Error(result.error);
     }
     return null;
