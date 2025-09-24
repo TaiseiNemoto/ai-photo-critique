@@ -3,7 +3,7 @@
 import { uploadImageCore, type UploadResult } from "@/lib/upload";
 import { generateCritiqueCore } from "@/lib/critique-core";
 import type { CritiqueResult } from "@/types/upload";
-import { ErrorHandler } from "@/lib/error-handling";
+import type { IntegratedResult } from "@/lib/processing-helpers";
 
 /**
  * 画像アップロード処理のServer Action
@@ -30,63 +30,27 @@ export async function generateCritique(
 }
 
 /**
- * 画像アップロードとAI講評生成を統合したServer Action（最適化版）
+ * 画像アップロードとAI講評生成を統合したServer Action（リファクタリング版）
+ *
+ * 責任: 統合処理の管理のみ（具体的な処理は委譲）
  *
  * @param formData - アップロードされた画像を含むFormData
  * @returns アップロード結果とAI講評結果の両方
  */
-export async function uploadImageWithCritique(formData: FormData): Promise<{
-  upload: UploadResult;
-  critique: CritiqueResult;
-}> {
-  const startTime = Date.now();
+export async function uploadImageWithCritique(
+  formData: FormData,
+): Promise<IntegratedResult> {
+  const {
+    executeUploadAndCritique,
+    measureProcessingTime,
+    handleIntegratedError,
+  } = await import("@/lib/processing-helpers");
 
-  try {
-    // アップロード処理を直接実行（ライブラリ関数呼び出し）
-    const uploadResult = await uploadImageCore(formData);
-
-    if (!uploadResult.success) {
-      const errorResult = {
-        success: false as const,
-        error: uploadResult.error || "アップロードに失敗しました",
-      };
-      return {
-        upload: uploadResult,
-        critique: errorResult,
-      };
+  return measureProcessingTime(async () => {
+    try {
+      return await executeUploadAndCritique(formData);
+    } catch (error) {
+      return handleIntegratedError(error);
     }
-
-    // 講評生成処理（EXIF処理最適化：既処理データを直接渡す）
-    const critiqueResult = await generateCritiqueCore(
-      formData,
-      uploadResult.data?.exifData, // 1回目の処理結果を再利用（型安全）
-    );
-
-    console.log(
-      `Integrated processing completed in ${Date.now() - startTime}ms`,
-    );
-
-    return {
-      upload: uploadResult,
-      critique: critiqueResult,
-    };
-  } catch (error) {
-    const errorResult = ErrorHandler.handleServerActionError(error);
-    const processingTime = Date.now() - startTime;
-    const errorMessage = !errorResult.success
-      ? errorResult.error.message
-      : "予期しないエラーが発生しました";
-
-    return {
-      upload: {
-        success: false,
-        error: errorMessage,
-      },
-      critique: {
-        success: false,
-        error: errorMessage,
-        processingTime,
-      },
-    };
-  }
+  });
 }
