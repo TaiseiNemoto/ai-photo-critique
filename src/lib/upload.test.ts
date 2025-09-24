@@ -32,66 +32,8 @@ describe("uploadImageCore", () => {
     });
   });
 
-  describe("EXIF重複処理の排除", () => {
-    it("クライアントサイドEXIFデータがある場合、サーバーサイド抽出をスキップする", async () => {
-      // Arrange
-      const mockFile = createMockFile("test.jpg", "image/jpeg");
-      const mockExifData = { camera: "Test Camera", iso: 100 };
-
-      const formData = new FormData();
-      formData.append("image", mockFile);
-      formData.append("exifData", JSON.stringify(mockExifData));
-
-      // Act
-      const result = await uploadImageCore(formData);
-
-      // Debug: 結果を確認
-      console.log("Test result:", result);
-      if (!result.success) {
-        console.log("Error:", result.error);
-      }
-
-      // Assert
-      expect(result.success).toBe(true);
-      expect(result.data?.exifData).toEqual(mockExifData);
-
-      // 重要: サーバーサイドEXIF抽出は完全削除済み
-    });
-
-    it("EXIFデータが欠損している場合、空オブジェクトを使用する", async () => {
-      // Arrange
-      const mockFile = createMockFile("test.jpg", "image/jpeg");
-      const formData = new FormData();
-      formData.append("image", mockFile);
-      // exifDataなし
-
-      // Act
-      const result = await uploadImageCore(formData);
-
-      // Assert
-      expect(result.success).toBe(true);
-      expect(result.data?.exifData).toEqual({}); // 空オブジェクト許容
-
-      // サーバーサイドEXIF抽出は完全削除済み
-    });
-
-    it("無効なEXIF JSONの場合、空オブジェクトを使用する", async () => {
-      // Arrange
-      const mockFile = createMockFile("test.jpg", "image/jpeg");
-      const formData = new FormData();
-      formData.append("image", mockFile);
-      formData.append("exifData", "invalid-json");
-
-      // Act
-      const result = await uploadImageCore(formData);
-
-      // Assert
-      expect(result.success).toBe(true);
-      expect(result.data?.exifData).toEqual({}); // フォールバック: 空オブジェクト
-
-      // サーバーサイドEXIF抽出は完全削除済み
-    });
-  });
+  // EXIF処理の詳細テストは src/lib/exif.test.ts に移動済み
+  // Server Action統合テストは src/app/actions.test.ts で実行
 
   describe("既存機能の確認", () => {
     it("ファイルが選択されていない場合、エラーを返す", async () => {

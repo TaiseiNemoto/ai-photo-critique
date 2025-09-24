@@ -1,17 +1,19 @@
 import { generatePhotoCritiqueWithRetry } from "@/lib/critique";
 import { kvClient } from "@/lib/kv";
 import type { CritiqueResult, ExifData } from "@/types/upload";
-import { extractStringFromFormData } from "./form-utils";
 import { extractAndValidateFile } from "./validation";
+import { extractExifFromFormData } from "./exif";
 
 /**
  * AI講評生成処理のコア関数（画像ファイル付き）
  *
  * @param formData - 講評対象の画像を含むFormData
+ * @param preProcessedExifData - 既に処理済みのEXIFデータ（重複処理最適化用）
  * @returns AI講評結果（成功時は3軸評価データ、失敗時はエラーメッセージ）
  */
 export async function generateCritiqueCore(
   formData: FormData,
+  preProcessedExifData?: ExifData,
 ): Promise<CritiqueResult> {
   try {
     // ファイルの抽出と基本検証
@@ -31,28 +33,8 @@ export async function generateCritiqueCore(
       };
     }
 
-    // クライアントから送信されたEXIF情報を取得
-    const exifDataResult = extractStringFromFormData(formData, "exifData", {
-      optional: true,
-    });
-    let exifData: ExifData = {}; // デフォルト空オブジェクト
-
-    if (exifDataResult.success && exifDataResult.data) {
-      try {
-        exifData = JSON.parse(exifDataResult.data);
-        console.log("Using client-side EXIF data for critique");
-      } catch (error) {
-        console.warn(
-          "Invalid EXIF data from client, using empty object:",
-          error,
-        );
-        exifData = {}; // EXIF欠損を許容
-      }
-    } else {
-      console.log(
-        "No client EXIF data provided for critique, using empty object",
-      );
-    }
+    // EXIF情報を取得（最適化：既処理データがあればそれを使用）
+    const exifData = preProcessedExifData || extractExifFromFormData(formData);
 
     // 画像をBufferに変換
     const arrayBuffer = await file.arrayBuffer();

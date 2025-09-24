@@ -12,11 +12,12 @@
   - [x] 全テスト通過・リントエラー解消
   - **効果**: DRY原則遵守、バリデーション基準統一
 
-- [ ] **2. EXIF処理の統合** 🔄 **次のタスク**
-  - [ ] EXIF重複処理の調査
-  - [ ] 共通EXIF処理関数の作成
-  - [ ] 両ファイルでの重複処理削除
-  - [ ] パフォーマンス改善確認
+- [x] **2. EXIF処理の統合** ✅ **完了** (2025-09-24)
+  - [x] EXIF重複処理の調査
+  - [x] 共通EXIF処理関数の作成
+  - [x] 両ファイルでの重複処理削除
+  - [x] パフォーマンス改善確認
+  - **効果**: DRY原則遵守、EXIF処理の統一化
 
 ### Phase 2: 中期的改善（アーキテクチャ改善）
 
@@ -82,34 +83,21 @@
 
 ---
 
-#### 3. EXIF処理の重複
+#### ~~3. EXIF処理の重複~~ ✅ **解決済み**
 
-**問題箇所**:
+**解決内容**:
 
-- `src/lib/upload.ts:uploadImageCore` (L90-107)
-- `src/lib/critique-core.ts:generateCritiqueCore` (L49-70)
+- `src/lib/exif.ts`に統合EXIF処理関数を作成
+- `extractExifFromFormData`関数により重複処理を削除
+- 完全なEXIF抽出・JSON.parse・エラーハンドリング機能を統一
+- 8つのテストケースで品質保証
 
-**詳細**:
+**修正ファイル**:
 
-- ❌ 両方の関数で同じFormDataから同じEXIF情報を抽出・パース
-- ❌ 無駄な処理、性能の低下
-
-```typescript
-// 重複している処理パターン
-const exifDataResult = extractStringFromFormData(formData, "exifData", {
-  optional: true,
-});
-let exifData: ExifData = {};
-if (exifDataResult.success && exifDataResult.data) {
-  try {
-    exifData = JSON.parse(exifDataResult.data);
-  } catch (error) {
-    // エラーハンドリング...
-  }
-}
-```
-
-**優先度**: 🟡 Medium
+- ➕ `src/lib/exif.ts` - 統合EXIF処理関数
+- ➕ `src/lib/exif.test.ts` - 包括的テスト
+- ✏️ `src/lib/upload.ts` - 重複関数削除
+- ✏️ `src/lib/critique-core.ts` - 重複関数削除
 
 ---
 

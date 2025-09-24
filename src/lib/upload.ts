@@ -2,8 +2,8 @@
 import { processImage } from "@/lib/image";
 // import { kvClient } from "@/lib/kv"; // 重複保存解消のため削除
 import type { ExifData, ProcessedImageData } from "@/types/upload";
-import { extractStringFromFormData } from "./form-utils";
 import { extractAndValidateFile } from "./validation";
+import { extractExifFromFormData } from "./exif";
 
 /**
  * 画像アップロードの結果を表す型
@@ -57,25 +57,7 @@ export async function uploadImageCore(
     }
 
     // クライアントから送信されたEXIF情報を取得
-    const exifDataResult = extractStringFromFormData(formData, "exifData", {
-      optional: true,
-    });
-    let exifData: ExifData = {}; // デフォルト空オブジェクト
-
-    if (exifDataResult.success && exifDataResult.data) {
-      try {
-        exifData = JSON.parse(exifDataResult.data);
-        console.log("Using client-side EXIF data");
-      } catch (error) {
-        console.warn(
-          "Invalid EXIF data from client, using empty object:",
-          error,
-        );
-        exifData = {}; // EXIF欠損を許容
-      }
-    } else {
-      console.log("No client EXIF data provided, using empty object");
-    }
+    const exifData = extractExifFromFormData(formData);
 
     // 画像処理のみ実行（EXIF抽出は削除）
     const processedImageResult = await processImage(file);
