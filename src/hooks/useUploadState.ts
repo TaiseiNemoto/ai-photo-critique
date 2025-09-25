@@ -8,6 +8,7 @@ export type UploadState = {
     status: "idle" | "loading" | "success" | "error";
     data?: CritiqueData;
     error?: string;
+    isRetryable?: boolean;
   };
 };
 
