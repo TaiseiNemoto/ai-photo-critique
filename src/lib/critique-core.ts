@@ -36,7 +36,7 @@ export async function generateCritiqueCore(
     // EXIF情報を取得（最適化：既処理データがあればそれを使用）
     const exifData = preProcessedExifData || extractExifFromFormData(formData);
 
-    // 画像をBufferに変換
+    // ★ 最適化: 画像を1回だけBuffer変換
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
@@ -48,9 +48,8 @@ export async function generateCritiqueCore(
       // 共有用IDを生成
       const shareId = kvClient.generateId();
 
-      // 画像をBase64データURLに変換
-      const arrayBuffer = await file.arrayBuffer();
-      const base64 = Buffer.from(arrayBuffer).toString("base64");
+      // ★ 最適化: 既存のbufferを再利用してBase64変換
+      const base64 = buffer.toString("base64");
       const imageData = `data:${file.type};base64,${base64}`;
 
       // 講評データを保存（画像データも含めて統合）
