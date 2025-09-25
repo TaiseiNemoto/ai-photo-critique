@@ -1,6 +1,9 @@
 import { generatePhotoCritiqueWithRetry } from "@/lib/critique";
 import { kvClient } from "@/lib/kv";
+import { ErrorHandler } from "@/lib/error-handling";
+import { ErrorCode } from "@/lib/error-codes";
 import type { CritiqueResult, ExifData } from "@/types/upload";
+import type { AppError } from "@/types/error";
 import { extractAndValidateFile } from "./validation";
 import { extractExifFromFormData } from "./exif";
 
@@ -21,7 +24,7 @@ export async function generateCritiqueCore(
     if (!file) {
       return {
         success: false,
-        error: "ファイルが選択されていません",
+        error: ErrorHandler.createError(ErrorCode.FILE_NOT_SELECTED),
       };
     }
 
@@ -29,7 +32,7 @@ export async function generateCritiqueCore(
     if (!file.type || !file.type.startsWith("image/")) {
       return {
         success: false,
-        error: "画像ファイルを選択してください",
+        error: ErrorHandler.createError(ErrorCode.INVALID_FILE_TYPE, "画像ファイルを選択してください"),
       };
     }
 
@@ -91,14 +94,33 @@ export async function generateCritiqueCore(
   } catch (error) {
     console.error("Critique core error:", error);
 
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : "AI講評の生成中にエラーが発生しました";
+    let appError: AppError;
+
+    if (error instanceof Error) {
+      // Geminiエラーの詳細分析
+      const geminiErrorCode = ErrorHandler.analyzeGeminiError(error);
+      if (geminiErrorCode !== ErrorCode.GEMINI_API_ERROR) {
+        appError = ErrorHandler.createError(geminiErrorCode, error.message);
+      } else {
+        // 一般的なファイル検証エラーの分析
+        const fileErrorCode = ErrorHandler.analyzeFileValidationError(error);
+        if (fileErrorCode !== ErrorCode.INVALID_FILE_TYPE) {
+          appError = ErrorHandler.createError(fileErrorCode, error.message);
+        } else {
+          // その他の処理エラー
+          appError = ErrorHandler.createError(ErrorCode.PROCESSING_ERROR, error.message);
+        }
+      }
+    } else {
+      appError = ErrorHandler.createError(
+        ErrorCode.UNKNOWN_ERROR,
+        typeof error === "string" ? error : "AI講評の生成中にエラーが発生しました"
+      );
+    }
 
     return {
       success: false,
-      error: errorMessage,
+      error: appError,
     };
   }
 }

@@ -8,6 +8,8 @@ export interface ExifData {
   focalLength?: string; // 焦点距離
 }
 
+import type { AppError } from "./error";
+
 export interface CritiqueData {
   technique: string; // 技術面の講評（50-100文字）
   composition: string; // 構図面の講評（50-100文字）
@@ -20,7 +22,7 @@ export interface CritiqueResult {
   data?: CritiqueData & {
     shareId?: string; // 共有用のID
   };
-  error?: string;
+  error?: string | AppError; // AppError型もサポート
   processingTime?: number; // デバッグ用
 }
 

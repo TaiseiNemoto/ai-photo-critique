@@ -35,10 +35,11 @@
 
 ### Phase 3: 長期的改善（設計改善）
 
-- [ ] **5. エラーハンドリング戦略の統一**
-  - [ ] 統一されたエラー型定義
-  - [ ] レイヤー間エラー伝播ルール策定
-  - [ ] 分散エラーハンドリングの集約
+- [x] **5. エラーハンドリング戦略の統一** ✅ **完了** (2025-09-25)
+  - [x] 統一されたエラー型定義
+  - [x] レイヤー間エラー伝播ルール策定
+  - [x] 分散エラーハンドリングの集約
+  - **効果**: ErrorPropagationクラスによる統一化、AppError型ベースの型安全なエラー処理、一貫したUI/UXエラー表示
 
 - [ ] **6. アーキテクチャの明確化**
   - [ ] UI層・ビジネスロジック層・データ層の責任分離
@@ -126,6 +127,27 @@
 - ✏️ `src/lib/critique-core.ts` - Buffer変換重複解消
 - ➕ `src/lib/critique-core.test.ts` - 最適化テスト追加
 - ➕ `docs/fixes/Phase2-4_data_flow_optimization.md` - 修正計画書
+
+---
+
+#### ~~5. エラーハンドリング戦略の統一~~ ✅ **解決済み** (Phase 3-5)
+
+**解決内容**:
+
+- `ErrorPropagation`クラスによるレイヤー間エラー伝播ルールの確立
+- `AppError`型ベースの統一エラー処理（フロントエンド・Core Functions）
+- リトライ戦略とUI表示メッセージの統一化
+- 型安全なエラーハンドリングの実現
+
+**修正ファイル**:
+
+- ➕ `src/lib/error-propagation.ts` - エラー伝播ルール
+- ➕ `src/lib/error-propagation.test.ts` - 包括的テスト
+- ✏️ `src/hooks/useCritiqueGeneration.ts` - ErrorHandler統合
+- ➕ `src/hooks/useCritiqueGeneration.test.ts` - 統合テスト
+- ✏️ `src/lib/critique-core.ts` - AppError型対応
+- ✏️ `src/types/upload.ts` - CritiqueResult型拡張
+- ✏️ `src/hooks/useUploadState.ts` - isRetryableフィールド追加
 
 ---
 
