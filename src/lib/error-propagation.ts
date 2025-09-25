@@ -14,7 +14,12 @@ export interface RetryStrategy {
   delayMs: number;
 }
 
-export type ErrorType = "validation" | "network" | "service" | "storage" | "unknown";
+export type ErrorType =
+  | "validation"
+  | "network"
+  | "service"
+  | "storage"
+  | "unknown";
 
 export class ErrorPropagation {
   /**
@@ -62,12 +67,15 @@ export class ErrorPropagation {
       }
 
       // 一般的な処理エラー
-      return ErrorHandler.createError(ErrorCode.PROCESSING_ERROR, error.message);
+      return ErrorHandler.createError(
+        ErrorCode.PROCESSING_ERROR,
+        error.message,
+      );
     }
 
     return ErrorHandler.createError(
       ErrorCode.UNKNOWN_ERROR,
-      typeof error === "string" ? error : "Unknown error occurred"
+      typeof error === "string" ? error : "Unknown error occurred",
     );
   }
 
@@ -180,7 +188,7 @@ export class ErrorPropagation {
    */
   private static getUserActionForErrorType(
     errorType: ErrorType,
-    isRetryable: boolean
+    isRetryable: boolean,
   ): string {
     if (isRetryable) {
       switch (errorType) {

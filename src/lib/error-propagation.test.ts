@@ -39,7 +39,7 @@ describe("ErrorPropagation", () => {
     it("should convert UI error to server action error format", () => {
       const serverActionError = ErrorPropagation.fromUIToServerAction(
         "FILE_NOT_SELECTED",
-        "File not selected by user"
+        "File not selected by user",
       );
 
       expect(serverActionError.success).toBe(false);

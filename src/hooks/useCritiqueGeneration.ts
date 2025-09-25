@@ -52,7 +52,10 @@ export function useCritiqueGeneration() {
           router.push("/report/current");
         }, TIMING.NAVIGATION_DELAY);
       } else {
-        handleCritiqueErrorWithPropagation(result.critique.error, onCritiqueStateChange);
+        handleCritiqueErrorWithPropagation(
+          result.critique.error,
+          onCritiqueStateChange,
+        );
       }
     } catch (error) {
       console.error("Critique generation error:", error);
@@ -88,7 +91,9 @@ function handleCritiqueErrorWithPropagation(
     // 文字列エラーの場合、AppErrorに変換
     appError = {
       code: ErrorCode.AI_SERVICE_ERROR,
-      message: (typeof error === "string" ? error : undefined) || MESSAGES.CRITIQUE_ERROR,
+      message:
+        (typeof error === "string" ? error : undefined) ||
+        MESSAGES.CRITIQUE_ERROR,
       timestamp: new Date().toISOString(),
     };
   }
