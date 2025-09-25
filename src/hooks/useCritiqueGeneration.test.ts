@@ -93,7 +93,7 @@ describe("useCritiqueGeneration - ErrorHandler Integration", () => {
           mockUploadedImage,
           mockFormDataRef,
           mockOnProcessingChange,
-          mockOnCritiqueStateChange
+          mockOnCritiqueStateChange,
         );
       });
 
@@ -101,7 +101,7 @@ describe("useCritiqueGeneration - ErrorHandler Integration", () => {
       expect(ErrorPropagation.fromCoreToUI).toHaveBeenCalledWith(
         expect.objectContaining({
           code: ErrorCode.AI_SERVICE_ERROR,
-        })
+        }),
       );
 
       expect(mockOnCritiqueStateChange).toHaveBeenCalledWith({
@@ -114,7 +114,7 @@ describe("useCritiqueGeneration - ErrorHandler Integration", () => {
         expect.any(String),
         expect.objectContaining({
           description: uiError.userAction,
-        })
+        }),
       );
     });
 
@@ -134,7 +134,9 @@ describe("useCritiqueGeneration - ErrorHandler Integration", () => {
       };
 
       vi.mocked(uploadImageWithCritique).mockRejectedValue(networkError);
-      vi.mocked(ErrorPropagation.fromServerActionToCore).mockReturnValue(coreError);
+      vi.mocked(ErrorPropagation.fromServerActionToCore).mockReturnValue(
+        coreError,
+      );
       vi.mocked(ErrorPropagation.fromCoreToUI).mockReturnValue(uiError);
 
       const { result } = renderHook(() => useCritiqueGeneration());
@@ -145,12 +147,14 @@ describe("useCritiqueGeneration - ErrorHandler Integration", () => {
           mockUploadedImage,
           mockFormDataRef,
           mockOnProcessingChange,
-          mockOnCritiqueStateChange
+          mockOnCritiqueStateChange,
         );
       });
 
       // Assert
-      expect(ErrorPropagation.fromServerActionToCore).toHaveBeenCalledWith(networkError);
+      expect(ErrorPropagation.fromServerActionToCore).toHaveBeenCalledWith(
+        networkError,
+      );
       expect(ErrorPropagation.fromCoreToUI).toHaveBeenCalledWith(coreError);
 
       expect(mockOnCritiqueStateChange).toHaveBeenCalledWith({
@@ -163,14 +167,13 @@ describe("useCritiqueGeneration - ErrorHandler Integration", () => {
         expect.any(String),
         expect.objectContaining({
           description: uiError.userAction,
-        })
+        }),
       );
     });
 
     it("should handle retryable errors with appropriate retry strategy", async () => {
       // Arrange
       const retryableError = "AI分析サービスがタイムアウトしました";
-
 
       const uiError = {
         message: "AI分析サービスがタイムアウトしました",
@@ -196,7 +199,7 @@ describe("useCritiqueGeneration - ErrorHandler Integration", () => {
           mockUploadedImage,
           mockFormDataRef,
           mockOnProcessingChange,
-          mockOnCritiqueStateChange
+          mockOnCritiqueStateChange,
         );
       });
 
@@ -204,7 +207,7 @@ describe("useCritiqueGeneration - ErrorHandler Integration", () => {
       expect(ErrorPropagation.fromCoreToUI).toHaveBeenCalledWith(
         expect.objectContaining({
           code: ErrorCode.AI_SERVICE_ERROR,
-        })
+        }),
       );
 
       expect(mockOnCritiqueStateChange).toHaveBeenCalledWith({
@@ -235,7 +238,9 @@ describe("useCritiqueGeneration - ErrorHandler Integration", () => {
         },
       });
 
-      vi.mocked(ErrorPropagation.analyzeErrorType).mockReturnValue("validation");
+      vi.mocked(ErrorPropagation.analyzeErrorType).mockReturnValue(
+        "validation",
+      );
       vi.mocked(ErrorPropagation.fromCoreToUI).mockReturnValue(uiError);
 
       const { result } = renderHook(() => useCritiqueGeneration());
@@ -246,7 +251,7 @@ describe("useCritiqueGeneration - ErrorHandler Integration", () => {
           mockUploadedImage,
           mockFormDataRef,
           mockOnProcessingChange,
-          mockOnCritiqueStateChange
+          mockOnCritiqueStateChange,
         );
       });
 

@@ -117,11 +117,13 @@ describe("generateCritiqueCore - AppError型対応テスト", () => {
 
     // Assert - RED: 現在はstring errorを返すが、AppError型を返すべき
     expect(result.success).toBe(false);
-    expect(result.error).toEqual(expect.objectContaining({
-      code: "FILE_NOT_SELECTED",
-      message: "ファイルが選択されていません",
-      timestamp: expect.any(String),
-    }));
+    expect(result.error).toEqual(
+      expect.objectContaining({
+        code: "FILE_NOT_SELECTED",
+        message: "ファイルが選択されていません",
+        timestamp: expect.any(String),
+      }),
+    );
   });
 
   it("should return AppError when Gemini API fails", async () => {
@@ -151,12 +153,14 @@ describe("generateCritiqueCore - AppError型対応テスト", () => {
 
     // Assert - RED: 現在はstring errorを返すが、AppError型を返すべき
     expect(result.success).toBe(false);
-    expect(result.error).toEqual(expect.objectContaining({
-      code: "PROCESSING_ERROR", // 実際の実装では PROCESSING_ERROR が返される
-      message: "処理中にエラーが発生しました",
-      timestamp: expect.any(String),
-      details: "API quota exceeded",
-    }));
+    expect(result.error).toEqual(
+      expect.objectContaining({
+        code: "PROCESSING_ERROR", // 実際の実装では PROCESSING_ERROR が返される
+        message: "処理中にエラーが発生しました",
+        timestamp: expect.any(String),
+        details: "API quota exceeded",
+      }),
+    );
   });
 
   it("should return AppError when KV storage fails", async () => {
@@ -196,11 +200,13 @@ describe("generateCritiqueCore - AppError型対応テスト", () => {
 
     // Assert - RED: 現在はstring errorを返すが、AppError型を返すべき
     expect(result.success).toBe(false);
-    expect(result.error).toEqual(expect.objectContaining({
-      code: "PROCESSING_ERROR", // 実際の実装では PROCESSING_ERROR が返される
-      message: "処理中にエラーが発生しました",
-      timestamp: expect.any(String),
-      details: "Redis connection failed",
-    }));
+    expect(result.error).toEqual(
+      expect.objectContaining({
+        code: "PROCESSING_ERROR", // 実際の実装では PROCESSING_ERROR が返される
+        message: "処理中にエラーが発生しました",
+        timestamp: expect.any(String),
+        details: "Redis connection failed",
+      }),
+    );
   });
 });

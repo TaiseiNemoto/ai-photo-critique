@@ -32,7 +32,10 @@ export async function generateCritiqueCore(
     if (!file.type || !file.type.startsWith("image/")) {
       return {
         success: false,
-        error: ErrorHandler.createError(ErrorCode.INVALID_FILE_TYPE, "画像ファイルを選択してください"),
+        error: ErrorHandler.createError(
+          ErrorCode.INVALID_FILE_TYPE,
+          "画像ファイルを選択してください",
+        ),
       };
     }
 
@@ -108,13 +111,18 @@ export async function generateCritiqueCore(
           appError = ErrorHandler.createError(fileErrorCode, error.message);
         } else {
           // その他の処理エラー
-          appError = ErrorHandler.createError(ErrorCode.PROCESSING_ERROR, error.message);
+          appError = ErrorHandler.createError(
+            ErrorCode.PROCESSING_ERROR,
+            error.message,
+          );
         }
       }
     } else {
       appError = ErrorHandler.createError(
         ErrorCode.UNKNOWN_ERROR,
-        typeof error === "string" ? error : "AI講評の生成中にエラーが発生しました"
+        typeof error === "string"
+          ? error
+          : "AI講評の生成中にエラーが発生しました",
       );
     }
 
