@@ -290,7 +290,12 @@ describe("generateCritique Server Action", () => {
 
       // Assert
       expect(result.success).toBe(false);
-      expect(result.error).toBe("ファイルが選択されていません");
+      expect(result.error).toEqual(
+        expect.objectContaining({
+          code: "FILE_NOT_SELECTED",
+          message: "ファイルが選択されていません",
+        }),
+      );
     });
   });
 });
