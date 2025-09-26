@@ -1,14 +1,13 @@
 "use client";
 
-import { useUploadFlow } from "@/hooks/useUploadFlow";
+import { useUploadService } from "@/services/upload-service";
 import AppHeader from "@/components/common/AppHeader";
 import UploadZone from "@/components/upload/UploadZone";
 import ImagePreview from "@/components/upload/ImagePreview";
 import GenerateButton from "@/components/upload/GenerateButton";
 
 export default function UploadPage() {
-  const { state, handleImageUploaded, handleGenerateCritique, resetUpload } =
-    useUploadFlow();
+  const uploadService = useUploadService();
 
   return (
     <div className="mobile-viewport bg-gray-50 scroll-smooth">
@@ -19,20 +18,20 @@ export default function UploadPage() {
         >
           <AppHeader />
 
-          {!state.uploadedImage ? (
-            <UploadZone onImageUploaded={handleImageUploaded} />
+          {!uploadService.state.uploadedImage ? (
+            <UploadZone onImageUploaded={uploadService.uploadImage} />
           ) : (
             <div className="space-y-6">
               <ImagePreview
-                uploadedImage={state.uploadedImage}
-                onReset={resetUpload}
+                uploadedImage={uploadService.state.uploadedImage}
+                onReset={uploadService.resetUpload}
               />
               <GenerateButton
-                isProcessing={state.isProcessing}
-                onGenerate={handleGenerateCritique}
-                disabled={!state.uploadedImage}
-                critiqueStatus={state.critique.status}
-                critiqueError={state.critique.error}
+                isProcessing={uploadService.state.isProcessing}
+                onGenerate={uploadService.generateCritique}
+                disabled={!uploadService.state.uploadedImage}
+                critiqueStatus={uploadService.state.critique.status}
+                critiqueError={uploadService.state.critique.error}
               />
             </div>
           )}

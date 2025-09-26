@@ -3,7 +3,11 @@
 import { uploadImageCore, type UploadResult } from "@/lib/upload";
 import { generateCritiqueCore } from "@/lib/critique-core";
 import type { CritiqueResult } from "@/types/upload";
-import type { IntegratedResult } from "@/lib/processing-helpers";
+// 統合結果の型定義
+export interface IntegratedResult {
+  upload: UploadResult;
+  critique: CritiqueResult;
+}
 
 /**
  * 画像アップロード処理のServer Action
@@ -40,17 +44,37 @@ export async function generateCritique(
 export async function uploadImageWithCritique(
   formData: FormData,
 ): Promise<IntegratedResult> {
-  const {
-    executeUploadAndCritique,
-    measureProcessingTime,
-    handleIntegratedError,
-  } = await import("@/lib/processing-helpers");
+  try {
+    // アップロード処理
+    const uploadResult = await uploadImageCore(formData);
 
-  return measureProcessingTime(async () => {
-    try {
-      return await executeUploadAndCritique(formData);
-    } catch (error) {
-      return handleIntegratedError(error);
+    if (!uploadResult.success) {
+      return {
+        upload: uploadResult,
+        critique: {
+          success: false,
+          error: uploadResult.error || "アップロードに失敗しました",
+        },
+      };
     }
-  });
+
+    // 講評生成処理（最適化：既処理EXIF データを再利用）
+    const critiqueResult = await generateCritiqueCore(
+      formData,
+      uploadResult.data?.exifData,
+    );
+
+    return {
+      upload: uploadResult,
+      critique: critiqueResult,
+    };
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "処理中にエラーが発生しました";
+
+    return {
+      upload: { success: false, error: errorMessage },
+      critique: { success: false, error: errorMessage },
+    };
+  }
 }
