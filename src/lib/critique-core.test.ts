@@ -11,6 +11,7 @@ vi.mock("./exif", () => ({
 }));
 
 vi.mock("./gemini", () => ({
+  generatePhotoCritique: vi.fn(),
   generatePhotoCritiqueWithRetry: vi.fn(),
   geminiClient: {
     analyzeCritique: vi.fn(),
@@ -35,9 +36,11 @@ const getMocks = async () => {
   return {
     extractAndValidateFile: vi.mocked(validation.extractAndValidateFile),
     extractExifFromFormData: vi.mocked(exif.extractExifFromFormData),
+    generatePhotoCritique: vi.mocked(gemini.generatePhotoCritique),
     generatePhotoCritiqueWithRetry: vi.mocked(
       gemini.generatePhotoCritiqueWithRetry,
     ),
+    geminiClient: vi.mocked(gemini.geminiClient),
     kvClient: vi.mocked(kv.kvClient),
   };
 };
@@ -50,6 +53,15 @@ describe("generateCritiqueCore - Buffer変換最適化テスト", () => {
     const mocks = await getMocks();
 
     mocks.extractExifFromFormData.mockReturnValue({});
+    mocks.geminiClient.analyzeCritique.mockResolvedValue({
+      success: true,
+      data: {
+        technique: "技術面の講評",
+        composition: "構図面の講評",
+        color: "色彩面の講評",
+      },
+      processingTime: 1000,
+    });
     mocks.generatePhotoCritiqueWithRetry.mockResolvedValue({
       success: true,
       data: {
@@ -57,6 +69,7 @@ describe("generateCritiqueCore - Buffer変換最適化テスト", () => {
         composition: "構図面の講評",
         color: "色彩面の講評",
       },
+      processingTime: 1000,
     });
     mocks.kvClient.generateId.mockReturnValue("test-id");
     mocks.kvClient.saveCritique.mockResolvedValue(undefined);
@@ -155,6 +168,7 @@ describe("generateCritiqueCore - AppError型対応テスト", () => {
     mocks.extractExifFromFormData.mockReturnValue({});
 
     const geminiError = new Error("API quota exceeded");
+    mocks.geminiClient.analyzeCritique.mockRejectedValue(geminiError);
     mocks.generatePhotoCritiqueWithRetry.mockRejectedValue(geminiError);
 
     const formData = new FormData();
@@ -163,9 +177,10 @@ describe("generateCritiqueCore - AppError型対応テスト", () => {
     // Act
     const result = await generateCritiqueCore(formData);
 
-    // Assert - 現在の実装ではエラー文字列を返す
+    // Assert - generatePhotoCritiqueWithRetry が文字列エラーを返すことを確認
     expect(result.success).toBe(false);
-    expect(result.error).toMatch(/Cannot read properties of undefined/); // モックが適切に設定されていないためのエラー
+    expect(typeof result.error).toBe("string");
+    expect(result.error).toContain("API quota exceeded");
   });
 
   it("should return AppError when KV storage fails", async () => {
@@ -180,6 +195,15 @@ describe("generateCritiqueCore - AppError型対応テスト", () => {
     const mocks = await getMocks();
     mocks.extractAndValidateFile.mockReturnValue(mockFile);
     mocks.extractExifFromFormData.mockReturnValue({});
+    mocks.geminiClient.analyzeCritique.mockResolvedValue({
+      success: true,
+      data: {
+        technique: "技術面の講評",
+        composition: "構図面の講評",
+        color: "色彩面の講評",
+      },
+      processingTime: 1000,
+    });
     mocks.generatePhotoCritiqueWithRetry.mockResolvedValue({
       success: true,
       data: {
@@ -187,6 +211,7 @@ describe("generateCritiqueCore - AppError型対応テスト", () => {
         composition: "構図面の講評",
         color: "色彩面の講評",
       },
+      processingTime: 1000,
     });
     mocks.kvClient.generateId.mockReturnValue("test-id");
 
@@ -199,8 +224,14 @@ describe("generateCritiqueCore - AppError型対応テスト", () => {
     // Act
     const result = await generateCritiqueCore(formData);
 
-    // Assert - 現在の実装ではエラー文字列を返す
+    // Assert - AppError型のエラーが返されることを確認
     expect(result.success).toBe(false);
-    expect(result.error).toMatch(/Cannot read properties of undefined/); // モックが適切に設定されていないためのエラー
+    expect(result.error).toEqual(
+      expect.objectContaining({
+        code: "PROCESSING_ERROR",
+        message: expect.any(String),
+        timestamp: expect.any(String),
+      }),
+    );
   });
 });
