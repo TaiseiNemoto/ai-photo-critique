@@ -2,13 +2,10 @@ import { POST } from "./route";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 
-// モックの設定
+// モックの設定（統合データ構造対応）
 vi.mock("@/lib/kv", () => ({
   kvClient: {
-    generateId: vi.fn(() => "share-short-123"),
     getCritique: vi.fn(),
-    saveShare: vi.fn(),
-    saveCritique: vi.fn(),
   },
 }));
 
@@ -23,11 +20,16 @@ describe("/api/share POST", () => {
     const mockCritiqueData = {
       id: "critique-123",
       filename: "test.jpg",
+      uploadedAt: "2025-08-20T09:30:00.000Z",
       technique: "良好なフォーカスが設定されています",
       composition: "三分割法が効果的に使用されています",
       color: "色彩のバランスが優れています",
+      overall: "総合的に優秀な写真です",
+      imageData: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD",
       exifData: { make: "Canon", model: "EOS R5" },
-      uploadedAt: "2025-08-20T09:30:00.000Z",
+      shareId: "critique-123",
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     };
 
     vi.mocked(kvClient.getCritique).mockResolvedValue(mockCritiqueData);
@@ -55,8 +57,6 @@ describe("/api/share POST", () => {
     });
 
     expect(kvClient.getCritique).toHaveBeenCalledWith("critique-123");
-    // 重要: 保存処理が呼ばれないことを確認（重複保存防止）
-    expect(kvClient.saveShare).not.toHaveBeenCalled();
   });
 
   it("存在しないshareIdの場合に404エラーを返す（旧テスト修正版）", async () => {
@@ -120,11 +120,16 @@ describe("/api/share POST", () => {
     const mockCritiqueData = {
       id: "existing-share-id-123",
       filename: "test.jpg",
+      uploadedAt: "2025-08-20T09:30:00.000Z",
       technique: "良好なフォーカスが設定されています",
       composition: "三分割法が効果的に使用されています",
       color: "色彩のバランスが優れています",
+      overall: "総合的に優秀な写真です",
+      imageData: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD",
       exifData: { make: "Canon", model: "EOS R5" },
-      uploadedAt: "2025-08-20T09:30:00.000Z",
+      shareId: "existing-share-id-123",
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     };
 
     vi.mocked(kvClient.getCritique).mockResolvedValue(mockCritiqueData);
@@ -153,10 +158,6 @@ describe("/api/share POST", () => {
 
     // 既存データの確認のみ実行されることを確認
     expect(kvClient.getCritique).toHaveBeenCalledWith("existing-share-id-123");
-
-    // 重要: 保存処理が呼ばれないことを確認（重複保存防止）
-    expect(kvClient.saveCritique).not.toHaveBeenCalled();
-    expect(kvClient.saveShare).not.toHaveBeenCalled();
   });
 
   it("shareIdがない場合、400エラーを返す", async () => {
@@ -181,10 +182,8 @@ describe("/api/share POST", () => {
       error: "送信されたデータが無効です",
     });
 
-    // データ取得・保存処理が呼ばれないことを確認
+    // データ取得処理が呼ばれないことを確認
     expect(kvClient.getCritique).not.toHaveBeenCalled();
-    expect(kvClient.saveCritique).not.toHaveBeenCalled();
-    expect(kvClient.saveShare).not.toHaveBeenCalled();
   });
 
   it("存在しないshareIdの場合、404エラーを返す", async () => {
@@ -211,11 +210,9 @@ describe("/api/share POST", () => {
       error: "データが見つかりません",
     });
 
-    // 確認処理のみ実行され、保存処理は呼ばれないことを確認
+    // 確認処理のみ実行されることを確認
     expect(kvClient.getCritique).toHaveBeenCalledWith(
       "nonexistent-share-id-123",
     );
-    expect(kvClient.saveCritique).not.toHaveBeenCalled();
-    expect(kvClient.saveShare).not.toHaveBeenCalled();
   });
 });

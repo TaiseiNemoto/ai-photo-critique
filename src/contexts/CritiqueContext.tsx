@@ -4,7 +4,7 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 import type { UploadedImage, CritiqueData } from "@/types/upload";
 
 interface CritiqueContextType {
-  // 現在の講評データ
+  // 現在の講評データ（統合データ構造を使用）
   currentCritique: {
     image: UploadedImage;
     critique: CritiqueData;

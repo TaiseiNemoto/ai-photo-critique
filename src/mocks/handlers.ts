@@ -3,12 +3,21 @@ import type { CritiqueData, CritiqueResult } from "@/types/upload";
 
 // モックレスポンスデータ
 const mockCritiqueData: CritiqueData = {
+  id: "mock-critique-id",
+  filename: "test-image.jpg",
+  uploadedAt: new Date().toISOString(),
   technique:
     "F値2.8で背景をよくぼかせています。シャッタースピードも適切で手ブレがありません。ISO感度も低く抑えられており、ノイズの少ないクリアな画質を実現できています。",
   composition:
     "三分割法を使って被写体を配置しており、バランスの取れた構図になっています。前景・中景・後景の使い分けも効果的で、奥行きのある写真に仕上がっています。",
   color:
     "暖色系の色温度設定で温かみのある雰囲気を演出できています。色彩の統一感があり、見る人に心地よい印象を与えます。明暗のコントラストも適度で立体感があります。",
+  overall: "総合的に良い写真です。",
+  imageData: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD",
+  exifData: { camera: "Mock Camera", iso: 200 },
+  shareId: "mock-share-id",
+  createdAt: new Date().toISOString(),
+  expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
 };
 
 const mockCritiqueError: CritiqueResult = {

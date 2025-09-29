@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { kvClient, type CritiqueData, type ShareData } from "./kv";
+import { kvClient, type CritiqueData } from "./kv";
 
 describe("KV Client", () => {
   beforeEach(async () => {
@@ -61,28 +61,47 @@ describe("KV Client", () => {
     });
   });
 
-  describe("共有データの操作", () => {
-    it("共有データの保存と取得ができること", async () => {
-      const testData: ShareData = {
-        id: "test-share-1",
-        critiqueId: "test-critique-1",
+  describe("統合されたCritiqueData（共有機能統合）", () => {
+    it("統合CritiqueData（共有データ統合）の保存と取得ができること", async () => {
+      const testData: CritiqueData = {
+        // 基本情報
+        id: "test-critique-unified",
+        filename: "unified-test.jpg",
+        uploadedAt: new Date().toISOString(),
+
+        // 講評内容
+        technique: "統合テスト技術評価",
+        composition: "統合テスト構図評価",
+        color: "統合テスト色彩評価",
+        overall: "統合テスト総合評価",
+
+        // 画像関連
+        imageData: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD",
+        exifData: { camera: "Unified Test Camera", iso: 400 },
+
+        // 共有機能（旧ShareData統合）
+        shareId: "share-unified-test",
         createdAt: new Date().toISOString(),
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       };
 
-      // 保存
-      await kvClient.saveShare(testData);
+      // 保存（これは現在失敗するはず - 統合型定義前のため）
+      await kvClient.saveCritique(testData);
 
-      // 取得
-      const retrieved = await kvClient.getShare(testData.id);
+      // 取得（これも失敗するはず）
+      const retrieved = await kvClient.getCritique(testData.id);
       expect(retrieved).toEqual(testData);
+      expect(retrieved?.shareId).toBe(testData.shareId);
+      expect(retrieved?.expiresAt).toBe(testData.expiresAt);
     });
 
-    it("存在しない共有データを取得すると null が返ること", async () => {
-      const result = await kvClient.getShare("non-existent-share-id");
-      expect(result).toBeNull();
+    it("ShareDataメソッドが削除されていること", async () => {
+      // これらのメソッドは統合後削除されるため、存在しないはず
+      expect(typeof kvClient.saveShare).toBe('undefined');
+      expect(typeof kvClient.getShare).toBe('undefined');
     });
   });
+
 
   // 注意: 画像データの操作テストは重複保存解消のため削除
   // 画像データはCritiqueDataに統合されるため、単独の保存・取得は不要
