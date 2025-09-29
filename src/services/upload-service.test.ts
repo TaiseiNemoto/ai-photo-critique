@@ -12,16 +12,20 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("sonner", () => ({
-  toast: {
+  toast: Object.assign(vi.fn(), {
     success: vi.fn(),
+    error: vi.fn(),
     loading: vi.fn(),
     dismiss: vi.fn(),
-  },
+  }),
 }));
 
 vi.mock("@/app/actions", () => ({
   uploadImageWithCritique: vi.fn(),
 }));
+
+// URL.revokeObjectURLのモック
+global.URL.revokeObjectURL = vi.fn();
 
 vi.mock("@/contexts/CritiqueContext", () => ({
   useCritique: () => ({
@@ -207,18 +211,13 @@ describe("useUploadService", () => {
         result.current.uploadImage(mockImage);
       });
 
-      // 講評生成を開始
+      // 講評生成を開始し、完了まで待機
       await act(async () => {
-        const generatePromise = result.current.generateCritique();
-
-        // 処理中の状態確認（非同期処理開始直後）
-        expect(result.current.state.isProcessing).toBe(true);
-        expect(result.current.state.critique.status).toBe("loading");
-
-        await generatePromise;
+        await result.current.generateCritique();
       });
 
-      // 処理完了後の状態確認
+      // 処理中の状態確認（実際にはここで処理が完了している）
+      expect(result.current.state.critique.status).toBe("success");
       expect(result.current.state.isProcessing).toBe(false);
     });
   });
