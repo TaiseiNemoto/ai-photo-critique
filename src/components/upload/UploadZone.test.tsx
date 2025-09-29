@@ -3,7 +3,6 @@ import { render, screen } from "@testing-library/react";
 import { Toaster } from "sonner";
 import UploadZone from "@/components/upload/UploadZone";
 
-
 // クライアントサイドEXIF処理をモック化
 vi.mock("@/lib/exif-client", () => ({
   extractExifDataClient: vi.fn(),
