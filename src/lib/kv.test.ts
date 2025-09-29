@@ -97,11 +97,10 @@ describe("KV Client", () => {
 
     it("ShareDataメソッドが削除されていること", async () => {
       // これらのメソッドは統合後削除されるため、存在しないはず
-      expect(typeof kvClient.saveShare).toBe('undefined');
-      expect(typeof kvClient.getShare).toBe('undefined');
+      expect(typeof kvClient.saveShare).toBe("undefined");
+      expect(typeof kvClient.getShare).toBe("undefined");
     });
   });
-
 
   // 注意: 画像データの操作テストは重複保存解消のため削除
   // 画像データはCritiqueDataに統合されるため、単独の保存・取得は不要

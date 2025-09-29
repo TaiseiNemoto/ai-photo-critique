@@ -4,10 +4,7 @@ import { toast } from "sonner";
 import { useUploadState } from "@/hooks/useUploadState";
 import { useCritique } from "@/contexts/CritiqueContext";
 import { uploadImageWithCritique } from "@/app/actions";
-import type {
-  UploadedImage,
-  UploadedImageWithFormData,
-} from "@/types/upload";
+import type { UploadedImage, UploadedImageWithFormData } from "@/types/upload";
 import type { AppError } from "@/types/error";
 import type { UploadState } from "@/hooks/useUploadState";
 
