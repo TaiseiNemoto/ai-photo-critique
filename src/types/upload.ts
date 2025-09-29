@@ -4,7 +4,10 @@ import type { CritiqueData } from "@/lib/kv";
 export type { CritiqueData };
 
 // 講評のみを扱う場合の型（CritiqueDataから必要なプロパティを抽出）
-export type CritiqueContent = Pick<CritiqueData, 'technique' | 'composition' | 'color' | 'overall'>;
+export type CritiqueContent = Pick<
+  CritiqueData,
+  "technique" | "composition" | "color" | "overall"
+>;
 
 export interface ExifData {
   make?: string; // カメラメーカー

@@ -100,7 +100,6 @@ class KvClient {
     return null;
   }
 
-
   // 注意: 以下の関数は画像データ重複保存解消のため削除
   // - saveImage() : 単独の画像保存は不要（CritiqueDataに統合）
   // - saveUpload() : アップロードデータ保存は不要（講評時に統合）
