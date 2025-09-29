@@ -7,8 +7,9 @@ import { uploadImageWithCritique } from "@/app/actions";
 import type {
   UploadedImage,
   UploadedImageWithFormData,
-  UploadState,
 } from "@/types/upload";
+import type { AppError } from "@/types/error";
+import type { UploadState } from "@/hooks/useUploadState";
 
 // 定数
 const MESSAGES = {
@@ -45,12 +46,21 @@ function createFallbackFormData(uploadedImage: UploadedImage): FormData {
  * 講評エラーのハンドリング
  */
 function handleCritiqueErrorWithPropagation(
-  error: string | undefined,
+  error: string | AppError | undefined,
   onCritiqueStateChange: (state: UploadState["critique"]) => void,
 ): void {
+  let errorMessage: string;
+  if (typeof error === "string") {
+    errorMessage = error;
+  } else if (error && typeof error === "object" && "message" in error) {
+    errorMessage = error.message;
+  } else {
+    errorMessage = "講評生成中にエラーが発生しました";
+  }
+
   onCritiqueStateChange({
     status: "error",
-    error: error || "講評生成中にエラーが発生しました",
+    error: errorMessage,
     isRetryable: true,
   });
 }
