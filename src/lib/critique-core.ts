@@ -58,24 +58,20 @@ export async function generateCritiqueCore(
       const base64 = buffer.toString("base64");
       const imageData = `data:${file.type};base64,${base64}`;
 
-      // 講評データを保存（画像データも含めて統合）
+      const now = new Date();
+      const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
       await kvClient.saveCritique({
         id: shareId,
         filename: file.name,
+        uploadedAt: new Date().toISOString(),
         technique: result.data.technique,
         composition: result.data.composition,
         color: result.data.color,
-        exifData: exifData as Record<string, unknown>,
+        overall: result.data.overall,
         imageData: imageData,
-        uploadedAt: new Date().toISOString(),
-      });
-
-      // 共有データを保存
-      const now = new Date();
-      const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24時間後
-      await kvClient.saveShare({
-        id: shareId,
-        critiqueId: shareId,
+        exifData: exifData as Record<string, unknown>,
+        shareId: shareId,
         createdAt: now.toISOString(),
         expiresAt: expiresAt.toISOString(),
       });

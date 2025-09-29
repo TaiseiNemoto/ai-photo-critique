@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import type { CritiqueData, CritiqueResult } from "@/types/upload";
+import type { CritiqueContent, CritiqueResult } from "@/types/upload";
 
 const genAI = new GoogleGenAI({
   apiKey: process.env.GOOGLE_AI_API_KEY || "",
@@ -155,7 +155,7 @@ export class GeminiClient {
 - JSONフォーマット厳守`;
   }
 
-  private parseCritiqueResponse(response: string): CritiqueData {
+  private parseCritiqueResponse(response: string): CritiqueContent {
     try {
       // JSON部分を抽出
       const jsonMatch = response.match(/\{[\s\S]*\}/);

@@ -2,11 +2,10 @@ import { GET } from "./route";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 
-// モックの設定
+// モックの設定（統合データ構造対応）
 vi.mock("@/lib/kv", () => ({
   kvClient: {
     getCritique: vi.fn(),
-    getShare: vi.fn(),
   },
 }));
 
@@ -21,22 +20,19 @@ describe("/api/data/[id] GET", () => {
     const mockCritiqueData = {
       id: "test-id-12345",
       filename: "test.jpg",
+      uploadedAt: "2025-08-20T09:30:00.000Z",
       technique: "良好なフォーカスが設定されています",
       composition: "三分割法が効果的に使用されています",
       color: "色彩のバランスが優れています",
+      overall: "総合的に優秀な写真です",
+      imageData: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD",
       exifData: { make: "Canon", model: "EOS R5" },
-      uploadedAt: "2025-08-20T09:30:00.000Z",
-    };
-
-    const mockShareData = {
-      id: "test-id-12345",
-      critiqueId: "test-id-12345",
+      shareId: "test-id-12345",
       createdAt: new Date().toISOString(),
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24時間後
     };
 
     vi.mocked(kvClient.getCritique).mockResolvedValue(mockCritiqueData);
-    vi.mocked(kvClient.getShare).mockResolvedValue(mockShareData);
 
     const mockRequest = {} as NextRequest;
     const params = { id: "test-id-12345" };
@@ -48,15 +44,12 @@ describe("/api/data/[id] GET", () => {
     expect(responseBody).toEqual({
       success: true,
       data: mockCritiqueData,
-      shareData: mockShareData,
     });
     expect(kvClient.getCritique).toHaveBeenCalledWith("test-id-12345");
-    expect(kvClient.getShare).toHaveBeenCalledWith("test-id-12345");
   });
 
   it("存在しないIDの場合に404エラーを返す", async () => {
     vi.mocked(kvClient.getCritique).mockResolvedValue(null);
-    vi.mocked(kvClient.getShare).mockResolvedValue(null);
 
     const mockRequest = {} as NextRequest;
     const params = { id: "nonexistent-id" };
@@ -71,26 +64,23 @@ describe("/api/data/[id] GET", () => {
     });
   });
 
-  it("期限切れの共有データの場合に410エラーを返す", async () => {
-    const mockCritiqueData = {
+  it("期限切れのデータの場合に410エラーを返す", async () => {
+    const expiredCritiqueData = {
       id: "expired-id",
       filename: "test.jpg",
+      uploadedAt: "2025-08-19T09:30:00.000Z",
       technique: "テスト講評",
       composition: "テスト構図",
       color: "テスト色彩",
+      overall: "テスト総合評価",
+      imageData: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD",
       exifData: {},
-      uploadedAt: "2025-08-19T09:30:00.000Z",
-    };
-
-    const expiredShareData = {
-      id: "expired-id",
-      critiqueId: "expired-id",
+      shareId: "expired-id",
       createdAt: "2025-08-19T09:30:00.000Z",
       expiresAt: "2025-08-19T10:30:00.000Z", // 既に期限切れ
     };
 
-    vi.mocked(kvClient.getCritique).mockResolvedValue(mockCritiqueData);
-    vi.mocked(kvClient.getShare).mockResolvedValue(expiredShareData);
+    vi.mocked(kvClient.getCritique).mockResolvedValue(expiredCritiqueData);
 
     const mockRequest = {} as NextRequest;
     const params = { id: "expired-id" };

@@ -1,17 +1,14 @@
 export interface CritiqueData {
   id: string;
   filename: string;
+  uploadedAt: string;
   technique: string;
   composition: string;
   color: string;
+  overall?: string;
+  imageData: string;
   exifData: Record<string, unknown>;
-  imageData: string; // Base64 data URL
-  uploadedAt: string;
-}
-
-export interface ShareData {
-  id: string;
-  critiqueId: string;
+  shareId: string;
   createdAt: string;
   expiresAt: string;
 }
@@ -103,30 +100,6 @@ class KvClient {
     return null;
   }
 
-  // 共有URLデータの保存（24時間TTL）
-  async saveShare(data: ShareData): Promise<void> {
-    const client = await this.getClient();
-    const key = `share:${data.id}`;
-    await client.setex(key, 24 * 60 * 60, JSON.stringify(data));
-  }
-
-  // 共有URLデータの取得
-  async getShare(id: string): Promise<ShareData | null> {
-    const client = await this.getClient();
-    const key = `share:${id}`;
-    const data = await client.get(key);
-
-    if (!data) return null;
-
-    // Upstash Redis の場合、データが既にパースされて返される場合がある
-    if (typeof data === "string") {
-      return JSON.parse(data);
-    } else if (typeof data === "object") {
-      return data as ShareData;
-    }
-
-    return null;
-  }
 
   // 注意: 以下の関数は画像データ重複保存解消のため削除
   // - saveImage() : 単独の画像保存は不要（CritiqueDataに統合）
