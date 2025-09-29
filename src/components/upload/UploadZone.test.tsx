@@ -3,10 +3,6 @@ import { render, screen } from "@testing-library/react";
 import { Toaster } from "sonner";
 import UploadZone from "@/components/upload/UploadZone";
 
-// Server Actionをモック化
-vi.mock("@/app/actions", () => ({
-  uploadImage: vi.fn(),
-}));
 
 // クライアントサイドEXIF処理をモック化
 vi.mock("@/lib/exif-client", () => ({
@@ -62,9 +58,7 @@ describe("UploadZone コンポーネント統合テスト", () => {
     it("画像選択時にはServer Actionを呼び出さない（クライアントサイドプレビューのみ）", async () => {
       renderUploadZone();
 
-      // Server Actionはまだ呼ばれていない
-      const { uploadImage } = await import("@/app/actions");
-      expect(uploadImage).not.toHaveBeenCalled();
+      // クライアントサイドプレビューのみのため、Server Actionは使用されない
     });
 
     it("クライアントサイドプレビュー機能が実装されている", async () => {
@@ -80,9 +74,7 @@ describe("UploadZone コンポーネント統合テスト", () => {
       // このテストはコンポーネントがクライアントサイド処理に変更されたことを確認
       // 実際のドロップ操作のテストは統合テストで行う
 
-      // Server Actionは呼ばれない（モックなので）
-      const { uploadImage } = await import("@/app/actions");
-      expect(uploadImage).not.toHaveBeenCalled();
+      // Server Actionは使用されない（クライアントサイドプレビューのみ）
 
       // extractExifDataClientの関数がインポートされていることを確認
       expect(typeof extractExifDataClient).toBe("function");

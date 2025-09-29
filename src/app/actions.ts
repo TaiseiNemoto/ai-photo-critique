@@ -10,30 +10,6 @@ export interface IntegratedResult {
 }
 
 /**
- * 画像アップロード処理のServer Action
- *
- * @param formData - アップロードされた画像を含むFormData
- * @returns 処理結果（成功時はEXIFデータと処理済み画像、失敗時はエラーメッセージ）
- */
-export async function uploadImage(formData: FormData): Promise<UploadResult> {
-  // ライブラリ関数を直接呼び出し（API Route経由を排除）
-  return await uploadImageCore(formData);
-}
-
-/**
- * 画像に対するAI講評を生成するServer Action
- *
- * @param formData - 講評対象の画像を含むFormData
- * @returns AI講評結果（成功時は3軸評価データ、失敗時はエラーメッセージ）
- */
-export async function generateCritique(
-  formData: FormData,
-): Promise<CritiqueResult> {
-  // ライブラリ関数を直接呼び出し（API Route経由を排除）
-  return await generateCritiqueCore(formData);
-}
-
-/**
  * 画像アップロードとAI講評生成を統合したServer Action（リファクタリング版）
  *
  * 責任: 統合処理の管理のみ（具体的な処理は委譲）
