@@ -56,18 +56,24 @@ describe("generateCritiqueCore - Buffer変換最適化テスト", () => {
     mocks.geminiClient.analyzeCritique.mockResolvedValue({
       success: true,
       data: {
-        technique: "技術面の講評",
-        composition: "構図面の講評",
-        color: "色彩面の講評",
+        technique:
+          "シャープネスと露出バランスが適切に調整されており、被写体の質感が効果的に表現されています。",
+        composition:
+          "三分割法を活用した構図で、視線の流れが自然に被写体に向かうよう工夫されています。",
+        color:
+          "暖色系の色調が統一感を生み出し、全体的に温かみのある印象を与える色彩設計となっています。",
       },
       processingTime: 1000,
     });
     mocks.generatePhotoCritiqueWithRetry.mockResolvedValue({
       success: true,
       data: {
-        technique: "技術面の講評",
-        composition: "構図面の講評",
-        color: "色彩面の講評",
+        technique:
+          "シャープネスと露出バランスが適切に調整されており、被写体の質感が効果的に表現されています。",
+        composition:
+          "三分割法を活用した構図で、視線の流れが自然に被写体に向かうよう工夫されています。",
+        color:
+          "暖色系の色調が統一感を生み出し、全体的に温かみのある印象を与える色彩設計となっています。",
       },
       processingTime: 1000,
     });
@@ -77,7 +83,7 @@ describe("generateCritiqueCore - Buffer変換最適化テスト", () => {
   });
 
   it("should call file.arrayBuffer() only once for buffer optimization", async () => {
-    // ★ RED: 失敗するテスト - 現在は2回呼ばれているため
+    // ⭐ RED: 失敗するテスト - 現在は2回呼ばれているため
 
     const mockArrayBuffer = vi.fn().mockResolvedValue(new ArrayBuffer(1024));
     const mockFile = {
@@ -96,7 +102,7 @@ describe("generateCritiqueCore - Buffer変換最適化テスト", () => {
 
     await generateCritiqueCore(formData);
 
-    // ★ RED: このテストは現在失敗する（2回呼ばれているため）
+    // ⭐ RED: このテストは現在失敗する（2回呼ばれているため）
     expect(mockArrayBuffer).toHaveBeenCalledTimes(1);
   });
 
@@ -120,7 +126,7 @@ describe("generateCritiqueCore - Buffer変換最適化テスト", () => {
 
     await generateCritiqueCore(formData);
 
-    // ★ RED: 現在の実装ではarrayBuffer()が2回呼ばれる
+    // ⭐ RED: 現在の実装ではarrayBuffer()が2回呼ばれる
     expect(mockArrayBuffer).toHaveBeenCalledTimes(1);
   });
 });
@@ -198,18 +204,24 @@ describe("generateCritiqueCore - AppError型対応テスト", () => {
     mocks.geminiClient.analyzeCritique.mockResolvedValue({
       success: true,
       data: {
-        technique: "技術面の講評",
-        composition: "構図面の講評",
-        color: "色彩面の講評",
+        technique:
+          "シャープネスと露出バランスが適切に調整されており、被写体の質感が効果的に表現されています。",
+        composition:
+          "三分割法を活用した構図で、視線の流れが自然に被写体に向かうよう工夫されています。",
+        color:
+          "暖色系の色調が統一感を生み出し、全体的に温かみのある印象を与える色彩設計となっています。",
       },
       processingTime: 1000,
     });
     mocks.generatePhotoCritiqueWithRetry.mockResolvedValue({
       success: true,
       data: {
-        technique: "技術面の講評",
-        composition: "構図面の講評",
-        color: "色彩面の講評",
+        technique:
+          "シャープネスと露出バランスが適切に調整されており、被写体の質感が効果的に表現されています。",
+        composition:
+          "三分割法を活用した構図で、視線の流れが自然に被写体に向かうよう工夫されています。",
+        color:
+          "暖色系の色調が統一感を生み出し、全体的に温かみのある印象を与える色彩設計となっています。",
       },
       processingTime: 1000,
     });
