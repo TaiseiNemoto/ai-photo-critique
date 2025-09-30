@@ -54,91 +54,49 @@ export default function ReportPage({ params }: ReportPageProps) {
     );
   }
 
-  // idが"current"の場合はContext APIからデータを使用
-  if (id === "current" && currentCritique) {
-    const { image, critique } = currentCritique;
-
-    return (
-      <div className="mobile-viewport bg-gray-50 scroll-smooth">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 max-w-4xl">
-          <main
-            className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-gray-200 shadow-xl gpu-accelerated"
-            role="main"
-          >
-            <ReportHeader />
-
-            <ImagePreview src={image.preview} />
-
-            <div className="space-y-6 mb-8 swipe-indicator">
-              <CritiqueCard
-                title="技術面"
-                icon="技"
-                content={critique.technique}
-              />
-              <CritiqueCard
-                title="構図"
-                icon="構"
-                content={critique.composition}
-              />
-              <CritiqueCard title="色彩" icon="色" content={critique.color} />
-            </div>
-
-            {image.exif && <ExifDetails exif={image.exif} />}
-
-            <ReportActions reportId="current" />
-          </main>
-        </div>
-      </div>
-    );
+  // idが"current"以外の場合はメインページにリダイレクト
+  // 共有ページは /s/[id] を使用
+  if (id !== "current") {
+    router.push("/");
+    return null;
   }
 
-  // その他のidの場合は従来のモックデータを使用（将来的にはVercel KVから取得）
-  const reportData = {
-    image: "/placeholder.svg?height=400&width=600",
-    technical:
-      "• ピントは被写体の目にしっかりと合っており、シャープネスも適切です\n• 露出は全体的にバランスが取れており、ハイライトの飛びやシャドウの潰れもありません\n• ISO感度の設定も適切で、ノイズは最小限に抑えられています",
-    composition:
-      "• 三分割法の交点に被写体を配置し、安定感のある構図になっています\n• 前景・中景・背景の奥行き感が効果的に表現されています\n• 視線の流れが自然で、被写体への注目を促す構成です",
-    color:
-      "• 補色関係が効果的に活用され、被写体が際立っています\n• 全体的な色調は統一感があり、温かみのある印象を与えます\n• 彩度とコントラストのバランスが良く、自然な仕上がりです",
-    exif: {
-      fNumber: "f/2.8",
-      exposureTime: "1/250s",
-      iso: "200",
-      focalLength: "35mm",
-      lens: "Sony FE 24-70mm F2.8 GM",
-      camera: "Sony α7R V",
-    },
-  };
+  // currentCritiqueがない場合はメインページにリダイレクト
+  if (!currentCritique) {
+    router.push("/");
+    return null;
+  }
+
+  const { image, critique } = currentCritique;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="mobile-viewport bg-gray-50 scroll-smooth">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 max-w-4xl">
         <main
-          className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-gray-200 shadow-xl"
+          className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-gray-200 shadow-xl gpu-accelerated"
           role="main"
         >
           <ReportHeader />
 
-          <ImagePreview src={reportData.image} />
+          <ImagePreview src={image.preview} />
 
-          <div className="space-y-6 mb-8">
+          <div className="space-y-6 mb-8 swipe-indicator">
             <CritiqueCard
               title="技術面"
               icon="技"
-              content={reportData.technical}
+              content={critique.technique}
             />
             <CritiqueCard
               title="構図"
               icon="構"
-              content={reportData.composition}
+              content={critique.composition}
             />
-            <CritiqueCard title="色彩" icon="色" content={reportData.color} />
+            <CritiqueCard title="色彩" icon="色" content={critique.color} />
           </div>
 
-          <ExifDetails exif={reportData.exif} />
+          {image.exif && <ExifDetails exif={image.exif} />}
 
-          <ReportActions reportId={id} />
+          <ReportActions reportId="current" />
         </main>
       </div>
     </div>
