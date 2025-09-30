@@ -7,6 +7,7 @@ import { uploadImageWithCritique } from "@/app/actions";
 import type { UploadedImage, UploadedImageWithFormData } from "@/types/upload";
 import type { AppError } from "@/types/error";
 import type { UploadState } from "@/hooks/useUploadState";
+import type { CritiqueData } from "@/lib/kv";
 
 // 定数
 const MESSAGES = {
@@ -146,9 +147,31 @@ export function useUploadService(): UploadService {
       toast.dismiss(loadingToastId);
 
       if (result.critique.success && result.critique.data) {
+        // 完全なCritiqueDataオブジェクトを構築
+        const now = new Date();
+        const fullCritiqueData: CritiqueData = {
+          id: result.critique.data.shareId!,
+          filename: state.uploadedImage!.file.name,
+          uploadedAt: now.toISOString(),
+          technique: result.critique.data.technique,
+          composition: result.critique.data.composition,
+          color: result.critique.data.color,
+          overall: result.critique.data.overall,
+          imageData: state.uploadedImage!.preview,
+          exifData: (state.uploadedImage!.exif || {}) as Record<
+            string,
+            unknown
+          >,
+          shareId: result.critique.data.shareId!,
+          createdAt: now.toISOString(),
+          expiresAt: new Date(
+            now.getTime() + 24 * 60 * 60 * 1000,
+          ).toISOString(),
+        };
+
         setCritiqueState({
           status: "success",
-          data: result.critique.data,
+          data: fullCritiqueData,
         });
 
         toast.success(MESSAGES.CRITIQUE_SUCCESS, {
@@ -159,7 +182,7 @@ export function useUploadService(): UploadService {
         setTimeout(() => {
           setCritiqueData({
             image: state.uploadedImage!,
-            critique: result.critique.data!,
+            critique: fullCritiqueData, // 構築済みデータを再利用
           });
           router.push("/report/current");
         }, TIMING.NAVIGATION_DELAY);
