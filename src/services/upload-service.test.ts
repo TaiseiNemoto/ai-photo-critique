@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useUploadService } from "./upload-service";
 import { uploadImageWithCritique } from "@/app/actions";
-import type { UploadedImageWithFormData, CritiqueData } from "@/types/upload";
+import type { UploadedImageWithFormData } from "@/types/upload";
 
 // モックの設定
 vi.mock("next/navigation", () => ({
@@ -102,18 +102,18 @@ describe("useUploadService", () => {
         formData: new FormData(),
       };
 
-      const mockCritiqueData: CritiqueData = {
-        technique: { title: "技術", content: "良好", score: 8 },
-        composition: { title: "構図", content: "バランス良い", score: 9 },
-        color: { title: "色彩", content: "鮮やか", score: 7 },
-        overall: { content: "総評", improvement: "改善点" },
-        processingTime: 2500,
-        id: "test-id",
+      // CritiqueContent形式（APIレスポンス形式）
+      const mockCritiqueContent = {
+        technique: "技術面の講評内容",
+        composition: "構図面の講評内容",
+        color: "色彩面の講評内容",
+        overall: "総合評価の内容",
+        shareId: "test-share-id",
       };
 
       const mockResult = {
         upload: { success: true, data: { id: "test-id" } },
-        critique: { success: true, data: mockCritiqueData },
+        critique: { success: true, data: mockCritiqueContent }, // CritiqueContent形式
       };
 
       (
@@ -134,7 +134,21 @@ describe("useUploadService", () => {
 
       expect(result.current.state.isProcessing).toBe(false);
       expect(result.current.state.critique.status).toBe("success");
-      expect(result.current.state.critique.data).toEqual(mockCritiqueData);
+      expect(result.current.state.critique.data).toMatchObject({
+        id: "test-share-id",
+        filename: "test.jpg",
+        technique: "技術面の講評内容",
+        composition: "構図面の講評内容",
+        color: "色彩面の講評内容",
+        overall: "総合評価の内容",
+        imageData: "data:image/jpeg;base64,test",
+        exifData: { camera: "Test Camera" },
+        shareId: "test-share-id",
+      });
+      // タイムスタンプの存在確認
+      expect(result.current.state.critique.data?.uploadedAt).toBeDefined();
+      expect(result.current.state.critique.data?.createdAt).toBeDefined();
+      expect(result.current.state.critique.data?.expiresAt).toBeDefined();
       expect(toast.success).toHaveBeenCalledWith(
         expect.stringContaining("講評"),
         expect.any(Object),
